@@ -5,11 +5,10 @@ date: "6 February 2017"
 output:
   rmarkdown::html_vignette:
     toc: yes
-    keep_md: yes
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Introduction to SDMs}
-  %\usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
 ---
 
 # Introduction
