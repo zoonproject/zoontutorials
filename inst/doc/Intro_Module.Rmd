@@ -3,13 +3,12 @@ title: "Introduction to SDMs"
 author: "zoontutorials team"
 date: "6 February 2017"
 output:
-  html_document:
+  rmarkdown::html_vignette:
     toc: yes
-    keep_md: yes
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Basic zoon usage}
-  %\usepackage[utf8]{inputenc}
+  %\VignetteIndexEntry{Introduction to SDMs}
+  %\VignetteEncoding{UTF-8}
 ---
 
 # Introduction
@@ -18,6 +17,7 @@ vignette: >
 * Types of SDMs
     + correlative vs. mechanistic models
     + multispecies models
+
 * brief discussion of the limitations of the method used here
 * conceptual map of workflow steps
 
@@ -28,12 +28,12 @@ vignette: >
 library(zoon)
 ```
 
-
 # Detailed SDM Workflow
 ## Step 1. Occurrence
 * types of occurrence data
     + presence only
     + presence-absence
+
 * limitations of po
 * sourced from internet vs. your own data
 
