@@ -3,13 +3,12 @@ title: "Introduction to SDMs"
 author: "zoontutorials team"
 date: "6 February 2017"
 output:
-  html_document:
+  rmarkdown::html_vignette:
     toc: yes
-    keep_md: yes
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Basic zoon usage}
-  %\usepackage[utf8]{inputenc}
+  %\VignetteIndexEntry{Introduction to SDMs}
+  %\VignetteEncoding{UTF-8}
 ---
 
 # Introduction
