@@ -1,16 +1,6 @@
----
-title: "Introduction to SDMs"
-author: "zoontutorials team"
-date: "6 February 2017"
-output:
-  html_document:
-    toc: yes
-    keep_md: yes
-vignette: >
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Basic zoon usage}
-  %\usepackage[utf8]{inputenc}
----
+# Introduction to SDMs
+zoontutorials team  
+6 February 2017  
 
 # Introduction
 * Why do SDMs?
@@ -24,8 +14,25 @@ vignette: >
 # Basic SDM Workflow
 * This section will include the steps, and the r script, with visuals for the steps (head of data, model formula, output visual)
 
-```{r this is a chunk of code}
+
+```r
 library(zoon)
+```
+
+```
+## Warning: package 'zoon' was built under R version 3.3.2
+```
+
+```
+## Loading required package: raster
+```
+
+```
+## Loading required package: sp
+```
+
+```
+## Warning: package 'sp' was built under R version 3.3.2
 ```
 
 

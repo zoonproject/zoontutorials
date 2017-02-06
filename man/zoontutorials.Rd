@@ -2,4 +2,8 @@
 % Please edit documentation in R/zoontutorials.R
 \name{zoontutorials}
 \alias{zoontutorials}
+\title{Tutorials and Best Practice Guides for Species Distribution Modelling using zoon}
+\description{
+See vignette for an introductory tutorial to SDM using zoon
+}
 
