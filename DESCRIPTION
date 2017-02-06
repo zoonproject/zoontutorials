@@ -1,12 +1,15 @@
 Package: zoontutorials
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: Tutorials and Best Practice Guides for Species Distribution Modelling using zoon
+Version: 0.1
+Authors@R: c(person("Nick", "Golding", role = c("aut", "cre"),
+                    email = "nick.golding.research@gmail.com"))
+Maintainer: Nick Golding nick.golding.research@gmail.com
+Description: The zoon package enables reproducible, shareable and extensible species distribution modelling (SDM) from R, and provides vignettes on how to use the package's functionality.
+    This package provides tutorials to help beginners get started with SDM, as well as best practice guides to advise on some of the more tricky and contentious aspects of SDM.
+    The package will be continuously updated based on input from users and SDM experts.
+    Please get in touch if you think we should change something!
+License: BSD_3_CLAUSE + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 5.0.1
