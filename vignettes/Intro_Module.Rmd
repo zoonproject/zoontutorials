@@ -20,13 +20,23 @@ vignette: >
 * brief discussion of the limitations of the method used here
 * conceptual map of workflow steps
 
-# Basic SDM Workflow
+# Basic zoon SDM Workflow
 * This section will include the steps, and the r script, with visuals for the steps (head of data, model formula, output visual)
 
-```{r this is a chunk of code}
+The zoon workflow is designed to make fitting an SDM straight-forward and reproducible. To fit an SDM you use the `workflow` function, and need only to select a module in each of these five categories: occurrence, covariate, process, model, and output. The following sections of this tutorial will guide you through the process of selecting a module for each argument of the `workflow` function. But first, don't forget to load the package!
+```{r message=FALSE, warning=FALSE}
 library(zoon)
 ```
+An example workflow, for the mosquito *Anopheles Plumbeus* in the UK, would look like this:  
+```{r message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=3}
+example_workflow <- workflow(occurrence = UKAnophelesPlumbeus,
+                             covariate = UKAir,
+                             process = OneHundredBackground,
+                             model = RandomForest,
+                             output = PrintMap)
+```
 
+`zoon` comes with several pre-existing modules for each argument, so you might like to explore some different combinations to get a feel for how to put a `workflow` together (**Hint:** Try running the `GetModuleList` command).
 
 # Detailed SDM Workflow
 ## Step 1. Occurrence
@@ -35,6 +45,50 @@ library(zoon)
   + presence-absence
 * limitations of po
 * sourced from internet vs. your own data
+
+SDMs are most frequently fit with species occurrence data (rather than, for example, species abundance data), and this can come in three formats: presence-only, presence-background, and presence-absence: 
+
+* Presence-only data is usually sourced from museum or herbarium records, and is just a list of all recorded sightings/captures of a species and its location. 
+
+* Presence-background data is the more commonly used format of presence-only data (rather than an entirely separate format), and combines presence records with a set amount of randomly generated background points or 'pseudo-absences'. 
+
+* Presence-absence data generally comes from structured field surveys where the presence *or* absence of the target species is recorded for a given site.
+
+The first module required in a `workflow` is `occurrence` and it is where you load your species occurrence data. There are three methods for loading data into your workflow: using pre-existing `occurrence` modules in `zoon`, downloading data from an online repository, or loading in your own from a local computer. 
+
+`zoon` comes with several pre-existing data set modules that you can use, and you can see them using `GetModuleList()`. Under the `$occurrence` sub-heading you can see all available `occurrence` modules including these datasets. For this tutorial, we will be using the `CarolinaWrenPO` module. This is a presence-only dataset of the Carolina Wren in the USA. This is a common resident species in the eastern half of the USA whose range reaches into southern Ontario, Canada and north-east of Mexico, but the dataset has been cropped to the extent of the contiguous USA region. To use this dataset, you would call your `occurrence` with this line of code inside your workflow:
+
+```{r eval=FALSE}
+occurrence = CarolinaWrenPO
+```
+
+**Add head(data) here?**
+
+To download a species dataset from an online repository such as GBIF you use the `SpOcc` module. When using this module, you need to define several arguments: species, extent, databases, type, and limit. First you need to select your species of interest (by scientific name), then define the extent of the area you are interested in, select a repository, the type of data you are interested in (i.e. presence only), and finally an upper limit to the number of records to be sourced. Several online repositories are available to use [hint: use `ModuleHelp(“SpOcc”)` to see a list of options], but here we use GBIF. We are interested in obtaining presence-only data for the Giant Panda from GBIF, so we set our `occurrence` module like this:
+
+```{r eval=FALSE}
+occurrence = SpOcc(species = “Ailuropoda melanoleuca”, extent = “ ”, database = “GBIF”) 
+```
+
+** Needs finishing when GBIF is working again to test **
+
+**Add head(data) here?**
+
+If you have your own dataset that you want to analyse then you can load it using the `LocalOccurrenceData` module. This requires a .csv file with three columns for the values of longitutude, latitude, and value (i.e. species presence = 1) in that order. For non-latitude/longitude based coordinate systems refer to the information about a CRS column using `ModuleHelp("LocalOccurrenceData")`. To load your own presence-only dataset, set your `occurrence` module within `workflow` as this:
+
+```{r eval=FALSE}
+occurrence = LocalOccurrenceData(filename = "myData.csv",
+                                 occurrenceType = 'presence')
+```
+
+To load your own presence-absence dataset, set your `occurrence` module within `workflow` as this:
+
+```{r eval=FALSE}
+occurrence = LocalOccurrenceData(filename = "myData.csv",
+                                 occurrenceType = 'presence/absence')
+```
+
+**Add example here***
 
 ## Step 2. Covariates
 * gridded covariates
@@ -47,6 +101,58 @@ library(zoon)
 
 ## Step 3. Process
 * how to deal with pseudoabsence data
+
+Now that you have loaded in your data using the `occurrence` and `covariate` modules, the `process` modules will perform any processes required before fitting the model itself. These modules can be broadly classified into those that effect your data, those that generate additional data, or those that set up model validation.
+
+The `process` modules that effect your data allow you to clean your raw data, and to process it in such a manner as to improve the interpretability of your results.
+
+*	Incomplete or incorrect data can lead to drawing false conclusions, so the `Clean` module performs data cleansing to remove impossible, incomplete, or unlikely occurrence points in a data set based on the longitude/latitude values. 
+
+*	The `StandardiseCov` module standardises selected variables (by default, all) by subtracting the mean and dividing by the standard deviation, which allows for the direct comparison of the effect size of variables. This vastly improves the interpretability of the model, as variables measured at different scales will often lead to difficult comparisons of regression coefficients (aka effect size). For example, the regression coefficient for the distance of a site to roads might be +3.0 when measured in kilometres, but if measured in meters it would be +0.003, and then for effect of average temperature in Celsius could be -10. How do you compare the effect of these variables? Standardisation of data is especially useful for the comparison of coefficients within a model. 
+*	Sentence on transformation. Wait until back in front of stats textbooks.
+
+The `process` modules that generate new data include the generation of background data points required for models being fit to presence-only data, or the creation of interactions between variables in the model.
+
+All models that utilise presence-only data sets **(or almost all? at least within zoon)** require the generation of background data points (aka pseudo-absences). The data points represent the range of environmental conditions present in the region being modelled. There are several modules in zoon that undertake this process: 
+
+* `Background` generates n background samples (default 100)
+
+* `OneHundredBackground` and `OneThousandBackground` generate preset quantities (100/1000 respectively)
+
+* `TargetGroupBackground` generates background points with similar bias to the target species occurrence records. **Need Elith(?) reference here**
+
+Interactions between variables can have important implications for the interpretation of statistical models. Expand when back in front of textbooks. The `addInteraction` module lets you define interactions between variables in your model. Not generating new data per se, but adds additional variables to the model based on existing variables. There are three ways to implement the `addInteractions` module:
+
+* You can add all pair-wise interactions
+```{r eval=FALSE}
+process = addInteractions(which.covs = 'pairs')
+```
+
+* You can add all interactions between a select group of variables
+```{r eval=FALSE}
+process = addInteractions(which.covs = c(A,B))   # adds an interacton between A & B
+
+process = addInteractions(which.covs = list(c(A,B), c(A,C)))   # adds interactions between A & B and A & C, but not B & C
+
+process = addInteractions(which.covs = c(A,B,C))   # adds all two-way (e.g. A & B) interactions and a three-way interaction between A, B & C
+```
+
+* You can specify polynomial terms
+```{r eval=FALSE}
+process = addInteractions(which.covs = c(A,A))   # leads to a quadratic polynomial
+
+process = addInteractions(which.covs = c(A,A,A))   # leads to a cubic, polynomial
+```
+
+**[Expand on what model validation is/why it is important]** The Process modules that set up model validation include:
+
+*	`Crossvalidate`: Run k fold crossvalidation (default = 5). If you are using presence-absence, this will split presences and absences separately so folds have equally balanced data. Otherwise it just samples.
+
+*	`Bootstrap`: This module generates random bootstraps of the data. It defaults to the number of points in the dataset
+
+*	`BackgroundAndCrossvalidate`: This module generates up to 100 background records at random in the raster cells and splits all data in k folds for cross validation (default = 5).
+
+In some instances you may not require a `process` module in your `workflow`,  however, it is a mandatory argument and so the `NoProcess` module can be used as a 'blank' module.
 
 ## Step 4. Model
 

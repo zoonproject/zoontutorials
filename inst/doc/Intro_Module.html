@@ -75,7 +75,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="TOC">
 <ul>
 <li><a href="#introduction">Introduction</a></li>
-<li><a href="#basic-sdm-workflow">Basic SDM Workflow</a></li>
+<li><a href="#basic-zoon-sdm-workflow">Basic zoon SDM Workflow</a></li>
 <li><a href="#detailed-sdm-workflow">Detailed SDM Workflow</a><ul>
 <li><a href="#step-1.-occurrence">Step 1. Occurrence</a></li>
 <li><a href="#step-2.-covariates">Step 2. Covariates</a></li>
@@ -99,16 +99,21 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>conceptual map of workflow steps</li>
 </ul>
 </div>
-<div id="basic-sdm-workflow" class="section level1">
-<h1>Basic SDM Workflow</h1>
+<div id="basic-zoon-sdm-workflow" class="section level1">
+<h1>Basic zoon SDM Workflow</h1>
 <ul>
 <li>This section will include the steps, and the r script, with visuals for the steps (head of data, model formula, output visual)</li>
 </ul>
+<p>The zoon workflow is designed to make fitting an SDM straight-forward and reproducible. To fit an SDM you use the <code>workflow</code> function, and need only to select a module in each of these five categories: occurrence, covariate, process, model, and output. The following sections of this tutorial will guide you through the process of selecting a module for each argument of the <code>workflow</code> function. But first, don’t forget to load the package!</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(zoon)</code></pre></div>
-<pre><code>## Warning: package 'zoon' was built under R version 3.3.2</code></pre>
-<pre><code>## Loading required package: raster</code></pre>
-<pre><code>## Loading required package: sp</code></pre>
-<pre><code>## Warning: package 'sp' was built under R version 3.3.2</code></pre>
+<p>An example workflow, for the mosquito <em>Anopheles Plumbeus</em> in the UK, would look like this:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example_workflow &lt;-<span class="st"> </span><span class="kw">workflow</span>(<span class="dt">occurrence =</span> UKAnophelesPlumbeus,
+                             <span class="dt">covariate =</span> UKAir,
+                             <span class="dt">process =</span> OneHundredBackground,
+                             <span class="dt">model =</span> RandomForest,
+                             <span class="dt">output =</span> PrintMap)</code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+<p><code>zoon</code> comes with several pre-existing modules for each argument, so you might like to explore some different combinations to get a feel for how to put a <code>workflow</code> together (<strong>Hint:</strong> Try running the <code>GetModuleList</code> command).</p>
 </div>
 <div id="detailed-sdm-workflow" class="section level1">
 <h1>Detailed SDM Workflow</h1>
@@ -121,6 +126,27 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>limitations of po</li>
 <li>sourced from internet vs. your own data</li>
 </ul>
+<p>SDMs are most frequently fit with species occurrence data (rather than, for example, species abundance data), and this can come in three formats: presence-only, presence-background, and presence-absence:</p>
+<ul>
+<li><p>Presence-only data is usually sourced from museum or herbarium records, and is just a list of all recorded sightings/captures of a species and its location.</p></li>
+<li><p>Presence-background data is the more commonly used format of presence-only data (rather than an entirely separate format), and combines presence records with a set amount of randomly generated background points or ‘pseudo-absences’.</p></li>
+<li><p>Presence-absence data generally comes from structured field surveys where the presence <em>or</em> absence of the target species is recorded for a given site.</p></li>
+</ul>
+<p>The first module required in a <code>workflow</code> is <code>occurrence</code> and it is where you load your species occurrence data. There are three methods for loading data into your workflow: using pre-existing <code>occurrence</code> modules in <code>zoon</code>, downloading data from an online repository, or loading in your own from a local computer.</p>
+<p><code>zoon</code> comes with several pre-existing data set modules that you can use, and you can see them using <code>GetModuleList()</code>. Under the <code>$occurrence</code> sub-heading you can see all available <code>occurrence</code> modules including these datasets. For this tutorial, we will be using the <code>CarolinaWrenPO</code> module. This is a presence-only dataset of the Carolina Wren in the USA. This is a common resident species in the eastern half of the USA whose range reaches into southern Ontario, Canada and north-east of Mexico, but the dataset has been cropped to the extent of the contiguous USA region. To use this dataset, you would call your <code>occurrence</code> with this line of code inside your workflow:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">occurrence =<span class="st"> </span>CarolinaWrenPO</code></pre></div>
+<p><strong>Add head(data) here?</strong></p>
+<p>To download a species dataset from an online repository such as GBIF you use the <code>SpOcc</code> module. When using this module, you need to define several arguments: species, extent, databases, type, and limit. First you need to select your species of interest (by scientific name), then define the extent of the area you are interested in, select a repository, the type of data you are interested in (i.e. presence only), and finally an upper limit to the number of records to be sourced. Several online repositories are available to use [hint: use <code>ModuleHelp(“SpOcc”)</code> to see a list of options], but here we use GBIF. We are interested in obtaining presence-only data for the Giant Panda from GBIF, so we set our <code>occurrence</code> module like this:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">occurrence =<span class="st"> </span><span class="kw">SpOcc</span>(<span class="dt">species =</span> “Ailuropoda melanoleuca”, <span class="dt">extent =</span> “ ”, <span class="dt">database =</span> “GBIF”) </code></pre></div>
+<p>** Needs finishing when GBIF is working again to test **</p>
+<p><strong>Add head(data) here?</strong></p>
+<p>If you have your own dataset that you want to analyse then you can load it using the <code>LocalOccurrenceData</code> module. This requires a .csv file with three columns for the values of longitutude, latitude, and value (i.e. species presence = 1) in that order. For non-latitude/longitude based coordinate systems refer to the information about a CRS column using <code>ModuleHelp(&quot;LocalOccurrenceData&quot;)</code>. To load your own presence-only dataset, set your <code>occurrence</code> module within <code>workflow</code> as this:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">occurrence =<span class="st"> </span><span class="kw">LocalOccurrenceData</span>(<span class="dt">filename =</span> <span class="st">&quot;myData.csv&quot;</span>,
+                                 <span class="dt">occurrenceType =</span> <span class="st">'presence'</span>)</code></pre></div>
+<p>To load your own presence-absence dataset, set your <code>occurrence</code> module within <code>workflow</code> as this:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">occurrence =<span class="st"> </span><span class="kw">LocalOccurrenceData</span>(<span class="dt">filename =</span> <span class="st">&quot;myData.csv&quot;</span>,
+                                 <span class="dt">occurrenceType =</span> <span class="st">'presence/absence'</span>)</code></pre></div>
+<p><strong>Add example here</strong>*</p>
 </div>
 <div id="step-2.-covariates" class="section level2">
 <h2>Step 2. Covariates</h2>
@@ -139,6 +165,46 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <ul>
 <li>how to deal with pseudoabsence data</li>
 </ul>
+<p>Now that you have loaded in your data using the <code>occurrence</code> and <code>covariate</code> modules, the <code>process</code> modules will perform any processes required before fitting the model itself. These modules can be broadly classified into those that effect your data, those that generate additional data, or those that set up model validation.</p>
+<p>The <code>process</code> modules that effect your data allow you to clean your raw data, and to process it in such a manner as to improve the interpretability of your results.</p>
+<ul>
+<li><p>Incomplete or incorrect data can lead to drawing false conclusions, so the <code>Clean</code> module performs data cleansing to remove impossible, incomplete, or unlikely occurrence points in a data set based on the longitude/latitude values.</p></li>
+<li>The <code>StandardiseCov</code> module standardises selected variables (by default, all) by subtracting the mean and dividing by the standard deviation, which allows for the direct comparison of the effect size of variables. This vastly improves the interpretability of the model, as variables measured at different scales will often lead to difficult comparisons of regression coefficients (aka effect size). For example, the regression coefficient for the distance of a site to roads might be +3.0 when measured in kilometres, but if measured in meters it would be +0.003, and then for effect of average temperature in Celsius could be -10. How do you compare the effect of these variables? Standardisation of data is especially useful for the comparison of coefficients within a model.</li>
+<li><p>Sentence on transformation. Wait until back in front of stats textbooks.</p></li>
+</ul>
+<p>The <code>process</code> modules that generate new data include the generation of background data points required for models being fit to presence-only data, or the creation of interactions between variables in the model.</p>
+<p>All models that utilise presence-only data sets <strong>(or almost all? at least within zoon)</strong> require the generation of background data points (aka pseudo-absences). The data points represent the range of environmental conditions present in the region being modelled. There are several modules in zoon that undertake this process:</p>
+<ul>
+<li><p><code>Background</code> generates n background samples (default 100)</p></li>
+<li><p><code>OneHundredBackground</code> and <code>OneThousandBackground</code> generate preset quantities (100/1000 respectively)</p></li>
+<li><p><code>TargetGroupBackground</code> generates background points with similar bias to the target species occurrence records. <strong>Need Elith(?) reference here</strong></p></li>
+</ul>
+<p>Interactions between variables can have important implications for the interpretation of statistical models. Expand when back in front of textbooks. The <code>addInteraction</code> module lets you define interactions between variables in your model. Not generating new data per se, but adds additional variables to the model based on existing variables. There are three ways to implement the <code>addInteractions</code> module:</p>
+<ul>
+<li>You can add all pair-wise interactions</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">addInteractions</span>(<span class="dt">which.covs =</span> <span class="st">'pairs'</span>)</code></pre></div>
+<ul>
+<li>You can add all interactions between a select group of variables</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">addInteractions</span>(<span class="dt">which.covs =</span> <span class="kw">c</span>(A,B))   <span class="co"># adds an interacton between A &amp; B</span>
+
+process =<span class="st"> </span><span class="kw">addInteractions</span>(<span class="dt">which.covs =</span> <span class="kw">list</span>(<span class="kw">c</span>(A,B), <span class="kw">c</span>(A,C)))   <span class="co"># adds interactions between A &amp; B and A &amp; C, but not B &amp; C</span>
+
+process =<span class="st"> </span><span class="kw">addInteractions</span>(<span class="dt">which.covs =</span> <span class="kw">c</span>(A,B,C))   <span class="co"># adds all two-way (e.g. A &amp; B) interactions and a three-way interaction between A, B &amp; C</span></code></pre></div>
+<ul>
+<li>You can specify polynomial terms</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">addInteractions</span>(<span class="dt">which.covs =</span> <span class="kw">c</span>(A,A))   <span class="co"># leads to a quadratic polynomial</span>
+
+process =<span class="st"> </span><span class="kw">addInteractions</span>(<span class="dt">which.covs =</span> <span class="kw">c</span>(A,A,A))   <span class="co"># leads to a cubic, polynomial</span></code></pre></div>
+<p><strong>[Expand on what model validation is/why it is important]</strong> The Process modules that set up model validation include:</p>
+<ul>
+<li><p><code>Crossvalidate</code>: Run k fold crossvalidation (default = 5). If you are using presence-absence, this will split presences and absences separately so folds have equally balanced data. Otherwise it just samples.</p></li>
+<li><p><code>Bootstrap</code>: This module generates random bootstraps of the data. It defaults to the number of points in the dataset</p></li>
+<li><p><code>BackgroundAndCrossvalidate</code>: This module generates up to 100 background records at random in the raster cells and splits all data in k folds for cross validation (default = 5).</p></li>
+</ul>
+<p>In some instances you may not require a <code>process</code> module in your <code>workflow</code>, however, it is a mandatory argument and so the <code>NoProcess</code> module can be used as a ‘blank’ module.</p>
 </div>
 <div id="step-4.-model" class="section level2">
 <h2>Step 4. Model</h2>
