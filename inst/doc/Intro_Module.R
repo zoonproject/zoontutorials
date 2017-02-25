@@ -23,6 +23,29 @@ example_workflow <- workflow(occurrence = UKAnophelesPlumbeus,
 #                                   occurrenceType = 'presence/absence')
 
 ## ----eval=FALSE----------------------------------------------------------
+#  covariates = CarolinaWrenRasters
+
+## ----eval=FALSE----------------------------------------------------------
+#  covariates = NCEP(extent = c(-5,5,50,60), # default values for the NCEP module
+#                    variables = "hgt")
+
+## ----eval=FALSE----------------------------------------------------------
+#  covariates = Bioclim(extent = c(-180,180,-90,90), # default values for the Bioclim module
+#                       resolution = 10,
+#                       layers = 1:5)
+
+## ----eval=FALSE----------------------------------------------------------
+#  covariates = Bioclim_future(extent = c(-10, 10, 45, 65),   # default values for the Bioclim_future module
+#                              resolution = 10,
+#                              layers = 1:19,
+#                              rcp = 45,
+#                              model = "AC",
+#                              year = 70)
+
+## ----eval=FALSE----------------------------------------------------------
+#  covariates = LocalRaster(rasters = "MyRaster")
+
+## ----eval=FALSE----------------------------------------------------------
 #  process = addInteractions(which.covs = 'pairs')
 
 ## ----eval=FALSE----------------------------------------------------------
