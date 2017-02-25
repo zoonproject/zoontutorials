@@ -199,11 +199,11 @@ process = Background(n = 100,   # generate 100 unbiased background points
 * `OneHundredBackground` and `OneThousandBackground` generate preset quantities (100/1000 respectively)
 
 ```{r eval=FALSE}
-process = OneHundredBackground()
+process = OneHundredBackground
 ```
 
 ```{r eval=FALSE}
-process = OneThousandBackground()
+process = OneThousandBackground
 ```
 
 Interactions between variables can have important implications for the interpretation of statistical models. Expand when back in front of textbooks. The `addInteraction` module lets you define interactions between variables in your model. Not generating new data per se, but adds additional variables to the model based on existing variables. There are three ways to implement the `addInteractions` module:
@@ -240,7 +240,7 @@ process = Crossvalidate(k = 5)   # 5-fold cross-validation
 *	`Bootstrap`: This module generates random bootstraps of the data. It defaults to the number of points in the dataset
 
 ```{r eval=FALSE}
-process = Bootstrap()   # Bootstrap a number of points equal to the number of points in the dataset
+process = Bootstrap   # Bootstrap a number of points equal to the number of points in the dataset
 ```
 
 *	`BackgroundAndCrossvalid`: This module generates up to 100 background records at random in the raster cells and splits all data in k folds for cross validation (default = 5).
@@ -252,14 +252,84 @@ process = BackgroundAndCrossvalid(k = 5)   # generate up to 100 background point
 In some instances you may not require a `process` module in your `workflow`,  however, it is a mandatory argument and so the `NoProcess` module can be used as a 'blank' module.
 
 ```{r eval=FALSE}
-process = NoProcess()
+process = NoProcess
 ```
 
 ## Step 4. Model
 
+Arguably the most important part of your `workflow`, is the `model` module. This is where you choose which type of SDM you want to fit to your data. There is a multitude of different SDM methods to choose from **(add Elith paper reference)** and each with its own merits, but here we provide a quick overview of some of the more common methods. 
+
+### Logistic Regression
+
+Logistic regression, fit with the `LogisticRegression` module, is a type of Generalised Linear Model for analysing datasets where the outcome is a dichotomous variable (i.e. only two possible outcomes, like the presence or absence of a species, represented binarily as 1/0), and the outcome is dependent on one or more independent variables (i.e. your environmental data). Coefficient estimation is achieved by choosing parameter values that maximise the likelihood of observing the sample values. This model can be fit to presence-background and presence-absence datasets. You select this model by defining the model in your `workflow` as the following (no arguments required):
+
+```{r eval=FALSE}
+model = LogisticRegression
+```
+
+### mgcv
+
+The `mgcv` module fits a Generalises Additive Model (GAM) using generalised cross-validation via the `mgcv` package. In contrast to GLMs (like the `LogisticRegression` module) where the coefficient for each variable is estimated, in a GAM the linear predictor is the sum of smoothing functions fit to each measured variable. **(Add definition of smoothing functions?)**. This model can be fit to presence-background and presence-absence datasets. To fit this module you need to define a basis dimension used to represent the smooth term, and a two-letter character string indicating the smoothing basis to use. You select this model in your `workflow` using the following call:
+
+```{r eval=FALSE}
+model = mgcv(k = -1,   # default settings
+             bs = "tp")
+```
+
+### MaxEnt
+
+The `MaxEnt` module fits a MaxEnt model using the `maxent()` function in the `dismo` package. MaxEnt is the most widely used SDM algorithm **(Elith reference)** today. This is a machine learning method that computes a probability distribution over the environment data grid cells, and the chosen distribution is the one that maximises the entropy (hence, MaxEnt) subject to some constraints. This method works with presence-background data. This module does require you to have the MaxEnt executable file saved in the corret location. The `zoon` helper function `GetMaxEnt()` is available to help with this installation. You select this model in your `workflow` using the following call:
+
+```{r eval=FALSE}
+model = MaxEnt
+```
+
+### Boosted Regression Trees
+
+The `GBM` module fits a generalised boosted regression model (aka boosted regression trees) using the `gbm` package. Boosted regression trees (BRTs) are known by a wide variety of names (such as Gradient Boosting Machine, hence 'GBM'), but this is the name most commonly used when referring to species distribution models. This is a machine learning technique that produces a prediction model in the form of an ensemble of weak prediction models (i.e. decision trees). This differs from the standard regression approach of fitting a single best model by using the 'boosting' technique to combine combine relatively large numbers of simple trees adaptively, to optimise predictive performance. For this model you need to define the maximum number of trees, the maximum depth of variable interactions, and a shrinkage parameter (aka the learning rate). This model can be fit to presence-background and presence-absence data using the following call in your `workflow`:
+
+```{r eval=FALSE}
+model = GBM(max.trees = 1000,   # default values
+            interaction.depth = 5,
+            shrinkage = 0.001)
+```
+
+### RandomForest
+
+The `RandomForest` module fits a random forest classification model. **(need to expand)**. This model can be fit to presence-background or presence-absence data using the following call in your `workflow`:
+
+```{r eval=FALSE}
+model = RandomForest
+```
+
 ## Step 5. Output
 * types of output
 * interpreting outputs
+
+## Putting it all together
+
+Now that we have seen how to use each argument in the `workflow` function it is time to put all of the pieces together and fit our own SDM within `zoon`. Since it is the most popular SDM methodology, lets fit a MaxEnt model to our Carolina Wren presence-background data set, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, but when we run them together we get a complete `workflow`.
+
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+myMaxEntWorkflow <- workflow(occurrence = CarolinaWrenPO,
+                       covariate = CarolinaWrenRasters,
+                       process = OneThousandBackground,
+                       model = MaxEnt,
+                       output = PrintMap(points = FALSE))
+```
+
+Now run the exact same `workflow` but switch to a `LogisticRegression` model. How do they compare?
+
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+myLogisticflow <- workflow(occurrence = CarolinaWrenPO,
+                       covariate = CarolinaWrenRasters,
+                       process = OneThousandBackground,
+                       model = LogisticRegression,
+                       output = PrintMap(points = FALSE))
+```
+
+There are some pretty obvious differences in the predicted distribution maps of these two approaches. The only thing to change betweeen the two workflows is our model of choice, so what causes the difference? Check out our more detailed guide on SDM model algorithm selection here **(insert plug for future guides)**
+
 
 # Conclusion
 
