@@ -151,20 +151,60 @@ Now that you have loaded in your data using the `occurrence` and `covariate` mod
 
 The `process` modules that effect your data allow you to clean your raw data, and to process it in such a manner as to improve the interpretability of your results.
 
-*	Incomplete or incorrect data can lead to drawing false conclusions, so the `Clean` module performs data cleansing to remove impossible, incomplete, or unlikely occurrence points in a data set based on the longitude/latitude values. 
+*	Incomplete or incorrect data can lead to drawing false conclusions, so the `Clean` module performs data cleansing to remove impossible, incomplete, or unlikely occurrence points in a data set based on the longitude/latitude values. Use `ModuleHelp("Clean")` to see how to select a cleaning method.
 
-*	The `StandardiseCov` module standardises selected variables (by default, all) by subtracting the mean and dividing by the standard deviation, which allows for the direct comparison of the effect size of variables. This vastly improves the interpretability of the model, as variables measured at different scales will often lead to difficult comparisons of regression coefficients (aka effect size). For example, the regression coefficient for the distance of a site to roads might be +3.0 when measured in kilometres, but if measured in meters it would be +0.003, and then for effect of average temperature in Celsius could be -10. How do you compare the effect of these variables? Standardisation of data is especially useful for the comparison of coefficients within a model. 
-*	Sentence on transformation. Wait until back in front of stats textbooks.
+```{r eval=FALSE}
+process = Clean(which = c(1,2,3,4))   # default fit of the Clean module
+```
+
+*	The `StandardiseCov` module standardises selected variables (by default, all) by subtracting the mean and dividing by the standard deviation, which allows for the direct comparison of the effect size of variables. This vastly improves the interpretability of the model, as variables measured at different scales will often lead to difficult comparisons of regression coefficients (aka effect size). For example, the regression coefficient for the distance of a site to roads might be +3.0 when measured in kilometres, but if measured in meters it would be +0.003, and then for effect of average temperature in Celsius could be -10. How do you compare the effect of these variables? Standardisation of data is especially useful for the comparison of coefficients within a model.
+
+To use this module you need to choose which, if any, variables you want to exclude from standardisation, and if you want to use the Gelman variant of standardissing by two standard deviations instead of one **(link to this here)**.
+
+```{r eval=FALSE}
+process = StandardiseCov(Gelman = FALSE, exclude = NULL)   # default form of the StandardiseCov module.
+```
+
+*	The `Transform` module lets you apply a transformation function (e.g. square, log, etc) to your environmental variables. This requires you to define the transformation, a character vector listing the covariates to be transformed, and whether you want to replace the original variable with the transformed version or add it as an extra layer.
+
+```{r eval=FALSE}
+process = Transform(trans = function(x) {x},   # default form of the Transform module. Perform no transformations on any variable
+                    which_cov = NULL,
+                    replace = TRUE)
+```
+
+```{r eval=FALSE}
+process = Transform(trans = function(x) {x^2},   # Add a new variable that is the squared transformation of the "cov1" variable
+                    which_cov = "cov1",
+                    replace = FALSE)
+```
+
+```{r eval=FALSE}
+process = Transform(trans = function(x) {log(x)}, # Replace the "cov1" variable with the log-transformed version of "cov1"
+                    which_cov = "cov1",
+                    replace = TRUE)
+```
 
 The `process` modules that generate new data include the generation of background data points required for models being fit to presence-only data, or the creation of interactions between variables in the model.
 
 All models that utilise presence-only data sets **(or almost all? at least within zoon)** require the generation of background data points (aka pseudo-absences). The data points represent the range of environmental conditions present in the region being modelled. There are several modules in zoon that undertake this process: 
 
-* `Background` generates n background samples (default 100)
+* `Background` generates n background samples (default 100). You need to define the number of background samples you wish to generate, and have the option of defining a bias value (see `ModuleHelp("Background")`).
+
+```{r eval=FALSE}
+process = Background(n = 100,   # generate 100 unbiased background points
+                     bias = NULL)
+```
 
 * `OneHundredBackground` and `OneThousandBackground` generate preset quantities (100/1000 respectively)
 
-* `TargetGroupBackground` generates background points with similar bias to the target species occurrence records. **Need Elith(?) reference here**
+```{r eval=FALSE}
+process = OneHundredBackground()
+```
+
+```{r eval=FALSE}
+process = OneThousandBackground()
+```
 
 Interactions between variables can have important implications for the interpretation of statistical models. Expand when back in front of textbooks. The `addInteraction` module lets you define interactions between variables in your model. Not generating new data per se, but adds additional variables to the model based on existing variables. There are three ways to implement the `addInteractions` module:
 
@@ -193,11 +233,27 @@ process = addInteractions(which.covs = c(A,A,A))   # leads to a cubic, polynomia
 
 *	`Crossvalidate`: Run k fold crossvalidation (default = 5). If you are using presence-absence, this will split presences and absences separately so folds have equally balanced data. Otherwise it just samples.
 
+```{r eval=FALSE}
+process = Crossvalidate(k = 5)   # 5-fold cross-validation
+```
+
 *	`Bootstrap`: This module generates random bootstraps of the data. It defaults to the number of points in the dataset
 
-*	`BackgroundAndCrossvalidate`: This module generates up to 100 background records at random in the raster cells and splits all data in k folds for cross validation (default = 5).
+```{r eval=FALSE}
+process = Bootstrap()   # Bootstrap a number of points equal to the number of points in the dataset
+```
+
+*	`BackgroundAndCrossvalid`: This module generates up to 100 background records at random in the raster cells and splits all data in k folds for cross validation (default = 5).
+
+```{r eval=FALSE}
+process = BackgroundAndCrossvalid(k = 5)   # generate up to 100 background points, and the split all data into 5 folds for cross validation
+```
 
 In some instances you may not require a `process` module in your `workflow`,  however, it is a mandatory argument and so the `NoProcess` module can be used as a 'blank' module.
+
+```{r eval=FALSE}
+process = NoProcess()
+```
 
 ## Step 4. Model
 
