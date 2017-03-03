@@ -296,7 +296,7 @@ model = GBM(max.trees = 1000,   # default values
 
 ### RandomForest
 
-The `RandomForest` module fits a random forest classification model. **(need to expand)**. This model can be fit to presence-background or presence-absence data using the following call in your `workflow`:
+The `RandomForest` module fits a random forest classification model. Similarly to the boosted regression trees in the `GBM` module, random forests are a machine learning technique that make use of an ensemble of weak prediction models (i.e. decision trees). Random forests differ from BRTs by fitting each decision tree independently from previously fit trees using bootstrapped samples of your data. **(need a better definition of the difference between BRT and RF?)**. This model can be fit to presence-background or presence-absence data using the following call in your `workflow`:
 
 ```{r eval=FALSE}
 model = RandomForest
