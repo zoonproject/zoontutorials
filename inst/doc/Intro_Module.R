@@ -22,6 +22,28 @@ example_workflow <- workflow(occurrence = UKAnophelesPlumbeus,
 #  occurrence = LocalOccurrenceData(filename = "myData.csv",
 #                                   occurrenceType = 'presence/absence')
 
+## ----eval=FALSE, message=FALSE, warning=FALSE----------------------------
+#  Occurrence(Your_Workflow_Name_Here)
+
+## ----eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE-----------------
+hidden_PO_workflow <- workflow(occurrence = CarolinaWrenPO,    ### just some basic workflows so there
+                             covariate = CarolinaWrenRasters,  ### is something to run accessor functions
+                             process = OneHundredBackground,   ### on as examples
+                             model = MaxEnt,
+                             output = NoOutput)
+
+hidden_PA_workflow <- workflow(occurrence = CarolinaWrenPA,
+                             covariate = CarolinaWrenRasters,
+                             process = NoProcess,
+                             model = LogisticRegression,
+                             output = NoOutput)
+
+## ----eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE-----------------
+head(Occurrence(hidden_PO_workflow))
+
+## ----eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE-----------------
+tail(Occurrence(hidden_PA_workflow))
+
 ## ----eval=FALSE----------------------------------------------------------
 #  covariate = CarolinaWrenRasters
 
@@ -44,6 +66,12 @@ example_workflow <- workflow(occurrence = UKAnophelesPlumbeus,
 
 ## ----eval=FALSE----------------------------------------------------------
 #  covariate = LocalRaster(rasters = "MyRaster")
+
+## ----eval=FALSE----------------------------------------------------------
+#  Covariate(Your_Workflow_Name_Here)
+
+## ----eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE-----------------
+Covariate(hidden_PO_workflow)
 
 ## ----eval=FALSE----------------------------------------------------------
 #  process = Clean(which = c(1,2,3,4))   # default fit of the Clean module
