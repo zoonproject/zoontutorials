@@ -58,6 +58,8 @@ In practice, presence-only data is more commonly used than presence-absence data
 
 The first module required in a `workflow` is `occurrence` and it is where you load your species occurrence data. There are three methods for loading data into your workflow: using pre-existing `occurrence` modules in `zoon`, downloading data from an online repository, or loading in your own from a local computer. 
 
+### Existing *zoon* data
+
 `zoon` comes with several pre-existing data set modules that you can use, and you can see them using `GetModuleList()`. Under the `$occurrence` sub-heading you can see all available `occurrence` modules including these datasets. For this tutorial, we will be using the `CarolinaWrenPO` module, which is a presence-only dataset of the Carolina Wren in the USA. This is a common resident species in the eastern half of the USA whose range reaches into southern Ontario, Canada and north-east of Mexico, but the dataset has been cropped to the extent of the contiguous USA region. To use this dataset, you would call your `occurrence` with this line of code inside your workflow:
 
 ```{r eval=FALSE}
@@ -65,6 +67,8 @@ occurrence = CarolinaWrenPO
 ```
 
 **Add head(data) here?**
+
+### Data from online repositories
 
 To download a species dataset from an online repository such as GBIF you use the `SpOcc` module. When using this module, you need to define several arguments: species, extent, databases, type, and limit. First you need to select your species of interest (by scientific name), then define the extent of the area you are interested in, select a repository, the type of data you are interested in (i.e. presence only), and finally an upper limit to the number of records to be sourced. Several online repositories are available to use [hint: use `ModuleHelp(“SpOcc”)` to see a list of options], but here we use GBIF. We are interested in obtaining presence-only data for the Giant Panda from GBIF, so we set our `occurrence` module like this:
 
@@ -75,6 +79,8 @@ occurrence = SpOcc(species = “Ailuropoda melanoleuca”, extent = “ ”, dat
 ** Needs finishing when GBIF is working again to test **
 
 **Add head(data) here?**
+
+### Loading your own data
 
 If you have your own dataset that you want to analyse then you can load it using the `LocalOccurrenceData` module. This requires a .csv file with three columns for the values of longitutude, latitude, and value (i.e. species presence = 1) in that order. For non-latitude/longitude based coordinate systems refer to the information about a CRS column using `ModuleHelp("LocalOccurrenceData")`. To load your own presence-only dataset, set your `occurrence` module within `workflow` as this:
 
@@ -133,11 +139,15 @@ tail(Occurrence(hidden_PA_workflow))
 
 The second module required in a `workflow` is `covariate` and it is where you load in your environmental data. as with the `occurrence` module, there are three ways to load environmental data into your model: use pre-existing `zoon` modules, data from online sources, and loading in your own data from a local computer.
 
+### Existing *zoon* data
+
 The pre-existing `zoon` modules are less exhaustive for `covariates` than `occurrence`, but you still find them using `GetModuleList()`. Under the `$covariate` sub-heading you can see all available `covariate` modules including these datasets. For this tutorial, we will be using the `CarolinaWrenRasters` module. This is the complementary environmental data to our chosen `occurrence` module. To use this dataset, you would call your `covariate` with this line of code inside your workflow:
 
 ```{r eval=FALSE}
 covariate = CarolinaWrenRasters
 ```
+
+### Data from online repositories
 
 The three main `covariate` modules for sourcing environmental data from an online repository are `NCEP`, `Bioclim`, and `Bioclim-future`.
 
@@ -167,6 +177,8 @@ covariate = Bioclim_future(extent = c(-10, 10, 45, 65),   # default values for t
                             year = 70)
 ```
 
+### Loading your own data
+
 You can load your own environmental data into your `workflow` uing the `LocalRaster` module. This will load in either a single raster or a list of rasters and create a raster stack dependant on what you define. This can take the form of a string of the filename of the raster layer, a list/vector of strings of filenames of rasters to be stacked, a RasterLayer or a RasterStack object. The structure of this module call is as follows:
 
 ```{r eval=FALSE}
@@ -189,6 +201,8 @@ Covariate(hidden_PO_workflow)
 
 Now that you have loaded in your data using the `occurrence` and `covariate` modules, the `process` modules will perform any processes required before fitting the model itself. These modules can be broadly classified into those that effect your data, those that generate additional data, or those that set up model validation.
 
+### Process your data
+
 The `process` modules that effect your data allow you to clean your raw data, and to process it in such a manner as to improve the interpretability of your results.
 
 *	Incomplete or incorrect data can lead to drawing false conclusions, so the `Clean` module performs data cleansing to remove impossible, incomplete, or unlikely occurrence points in a data set based on the longitude/latitude values. Use `ModuleHelp("Clean")` to see how to select a cleaning method.
@@ -197,7 +211,7 @@ The `process` modules that effect your data allow you to clean your raw data, an
 process = Clean(which = c(1,2,3,4))   # default fit of the Clean module
 ```
 
-*	The `StandardiseCov` module standardises selected variables (by default, all) by subtracting the mean and dividing by the standard deviation, which allows for the direct comparison of the effect size of variables. This vastly improves the interpretability of the model, as variables measured at different scales will often lead to difficult comparisons of regression coefficients (aka effect size). For example, the regression coefficient for the distance of a site to roads might be +3.0 when measured in kilometres, but if measured in meters it would be +0.003, and then for effect of average temperature in Celsius could be -10. How do you compare the effect of these variables? Standardisation of data is especially useful for the comparison of coefficients within a model.
+*	The `StandardiseCov` module standardises selected variables (by default, all of them) by subtracting the mean and dividing by the standard deviation, which allows for the direct comparison of the effect size of variables. This vastly improves the interpretability of the model, as variables measured at different scales will often lead to difficult comparisons of regression coefficients (aka effect size). For example, the regression coefficient for the distance of a site to roads might be +3.0 when measured in kilometres, but if measured in meters it would be +0.003, and then for effect of average temperature in Celsius could be -10. How do you compare the effect of these variables? Standardisation of data is especially useful for the comparison of coefficients within a model.
 
 To use this module you need to choose which, if any, variables you want to exclude from standardisation, and if you want to use the Gelman variant of standardissing by two standard deviations instead of one **(link to this here)**.
 
@@ -225,6 +239,8 @@ process = Transform(trans = function(x) {log(x)}, # Replace the "cov1" variable 
                     replace = TRUE)
 ```
 
+### Generate new data
+
 The `process` modules that generate new data include the generation of background data points required for models being fit to presence-only data, or the creation of interactions between variables in the model.
 
 All models that utilise presence-only data sets **(or almost all? at least within zoon)** require the generation of background data points (aka pseudo-absences). The data points represent the range of environmental conditions present in the region being modelled. There are several modules in zoon that undertake this process: 
@@ -236,7 +252,7 @@ process = Background(n = 100,   # generate 100 unbiased background points
                      bias = NULL)
 ```
 
-* `OneHundredBackground` and `OneThousandBackground` generate preset quantities (100/1000 respectively)
+* `OneHundredBackground` and `OneThousandBackground` generate preset quantities (100 and 1000 points respectively)
 
 ```{r eval=FALSE}
 process = OneHundredBackground
@@ -246,14 +262,14 @@ process = OneHundredBackground
 process = OneThousandBackground
 ```
 
-Interactions between variables can have important implications for the interpretation of statistical models. Expand when back in front of textbooks. The `addInteraction` module lets you define interactions between variables in your model. Not generating new data per se, but adds additional variables to the model based on existing variables. There are three ways to implement the `addInteractions` module:
+Interactions between variables can have important implications for the interpretation of statistical models. Expand when back in front of textbooks (Something about interpretation of response curves? Doesn't effect maps). The `addInteraction` module lets you define interactions between variables in your model. This is not generating new data per se, but adds additional variables to the model based on existing variables. There are three ways to implement the `addInteractions` module:
 
-* You can add all pair-wise interactions
+* You can add all pair-wise interactions:
 ```{r eval=FALSE}
 process = addInteractions(which.covs = 'pairs')
 ```
 
-* You can add all interactions between a select group of variables
+* You can add all interactions between a select group of variables:
 ```{r eval=FALSE}
 process = addInteractions(which.covs = c(A,B))   # adds an interacton between A & B
 
@@ -262,22 +278,24 @@ process = addInteractions(which.covs = list(c(A,B), c(A,C)))   # adds interactio
 process = addInteractions(which.covs = c(A,B,C))   # adds all two-way (e.g. A & B) interactions and a three-way interaction between A, B & C
 ```
 
-* You can specify polynomial terms
+* You can specify polynomial terms:
 ```{r eval=FALSE}
 process = addInteractions(which.covs = c(A,A))   # leads to a quadratic polynomial
 
 process = addInteractions(which.covs = c(A,A,A))   # leads to a cubic, polynomial
 ```
 
-**[Expand on what model validation is/why it is important]** The Process modules that set up model validation include:
+### Set up model validation
 
-*	`Crossvalidate`: Run k fold crossvalidation (default = 5). If you are using presence-absence, this will split presences and absences separately so folds have equally balanced data. Otherwise it just samples.
+Model validation is a very important step in the model fitting process as it lets you determine if your model is an acceptable description of your data. Model validation can be as simple as including goodnss-of-fit tests or analysing the residuals **can this be done for SDMs?** but the `zoon` package uses more complex methods that subset and/or resample the dataset. **[Expand on what model validation is/why it is important]** The Process modules that set up model validation include:
+
+*	`Crossvalidate`: Run k fold crossvalidation (default = 5). If you are using presence-absence, this will split presences and absences separately so folds have equally balanced data, otherwise it just samples. This samples the dataset without replacement into k 'folds' or sub-datasets to be used for training and testing the model. A model is fit to the k-1 folds of training data and evaluated against the fold of testing data (and repeated so each fold is used as the testing data once, and then the results are averaged). This is mainly used where the goal is to use the model for prediction as it tests if the model is overfit to the training data and thus unlikely to be suitable for prediction across another dataset (i.e. the test fold). 
 
 ```{r eval=FALSE}
 process = Crossvalidate(k = 5)   # 5-fold cross-validation
 ```
 
-*	`Bootstrap`: This module generates random bootstraps of the data. It defaults to the number of points in the dataset
+*	`Bootstrap`: This module generates random bootstraps of the data. **expand** It defaults to the number of points in the dataset
 
 ```{r eval=FALSE}
 process = Bootstrap   # Bootstrap a number of points equal to the number of points in the dataset
