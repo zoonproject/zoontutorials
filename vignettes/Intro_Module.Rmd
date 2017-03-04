@@ -50,13 +50,15 @@ SDMs are most frequently fit with species occurrence data (rather than, for exam
 
 * Presence-only data is usually sourced from museum or herbarium records, and is just a list of all recorded sightings/captures of a species and its location. 
 
-* Presence-background data is the more commonly used format of presence-only data (rather than an entirely separate format), and combines presence records with a set amount of randomly generated background points or 'pseudo-absences'. 
+* Presence-background data is the more commonly used format of presence-only data (rather than an entirely separate format), and combines presence records with a set amount of randomly generated background points or 'pseudo-absences'.
 
 * Presence-absence data generally comes from structured field surveys where the presence *or* absence of the target species is recorded for a given site.
 
+In practice, presence-only data is more commonly used than presence-absence data, so this tutorial is written for presence-only data as default, and any necessary alterations for presence-absence will be noted.
+
 The first module required in a `workflow` is `occurrence` and it is where you load your species occurrence data. There are three methods for loading data into your workflow: using pre-existing `occurrence` modules in `zoon`, downloading data from an online repository, or loading in your own from a local computer. 
 
-`zoon` comes with several pre-existing data set modules that you can use, and you can see them using `GetModuleList()`. Under the `$occurrence` sub-heading you can see all available `occurrence` modules including these datasets. For this tutorial, we will be using the `CarolinaWrenPO` module. This is a presence-only dataset of the Carolina Wren in the USA. This is a common resident species in the eastern half of the USA whose range reaches into southern Ontario, Canada and north-east of Mexico, but the dataset has been cropped to the extent of the contiguous USA region. To use this dataset, you would call your `occurrence` with this line of code inside your workflow:
+`zoon` comes with several pre-existing data set modules that you can use, and you can see them using `GetModuleList()`. Under the `$occurrence` sub-heading you can see all available `occurrence` modules including these datasets. For this tutorial, we will be using the `CarolinaWrenPO` module, which is a presence-only dataset of the Carolina Wren in the USA. This is a common resident species in the eastern half of the USA whose range reaches into southern Ontario, Canada and north-east of Mexico, but the dataset has been cropped to the extent of the contiguous USA region. To use this dataset, you would call your `occurrence` with this line of code inside your workflow:
 
 ```{r eval=FALSE}
 occurrence = CarolinaWrenPO
@@ -89,6 +91,36 @@ occurrence = LocalOccurrenceData(filename = "myData.csv",
 ```
 
 **Add example here***
+
+`zoon` has several accessor functions available to view the output of each module in your workflow. Using the `Occurrence()` function you can view your raw species occurrence data. You call this like so:
+
+```{r eval=FALSE, message=FALSE, warning=FALSE}
+Occurrence(Your_Workflow_Name_Here)
+```
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+hidden_PO_workflow <- workflow(occurrence = CarolinaWrenPO,    ### just some basic workflows so there
+                             covariate = CarolinaWrenRasters,  ### is something to run accessor functions
+                             process = OneHundredBackground,   ### on as examples
+                             model = MaxEnt,
+                             output = NoOutput)
+
+hidden_PA_workflow <- workflow(occurrence = CarolinaWrenPA,
+                             covariate = CarolinaWrenRasters,
+                             process = NoProcess,
+                             model = LogisticRegression,
+                             output = NoOutput)
+```
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+head(Occurrence(hidden_PO_workflow))
+```
+
+This is the first six lines of the `CarolinaWrenPO` dataset module. The first two coumns provide the geographic location of the observation (as longitude and latitude), the third column is the observation value (1 = presence, 0 = absence), the fourth column is the type of observation (presence/absence, see below for an example of absence points from the `CarolinaWrenPA` dataset module), and the last column identifies the fold the data point is located in if utilising cross-validation (covered later in the section of `Process` modules, but a default model can be considered to always have one 'fold').
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+tail(Occurrence(hidden_PA_workflow))
+```
 
 ## Step 2. Covariates
 * gridded covariates
