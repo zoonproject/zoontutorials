@@ -14,7 +14,21 @@ vignette: >
 # Introduction
 * Why do SDMs?
     + maps (prediction) vs. ecology (inference)
-* Types of SDMs
+
+In ecology, we often want to understand where a species is located in the environment and the restraints on that distribution so we can predict where the species may occur in the future, or what stresses it may be more subject to. We typcially consider that species' ranges are constrained by three dominant factors: abiotic environment, biotic environment, and movement. Examples of these include the climate required for it to survive, the local vegetation types it needs to survive, and it's abillity to traverse different landscapes, respectively. The intersection of these three factors is the "ecological niche." This niche space is where we expect a species to occur, given what we know of it's biology and ecology. Experience tells us, however, that species are not always located where we expect them to be. Their "realised niche," then, is where they actually exist within the bounds of the environmental space where they could potentially exist. 
+
+The task of species distribution modelling is to determine....
+
+
+##Types of SDMs
+There are two main types of SDMs: mechanistic and correlative. Mechanistic models are considered a "bottum-up" approach to modelling species distributions because they begin with mathematical formulations of the specific environmental and biologic processes that impact a species' distribution and scale up to predict occurrence in geographic space. Parameters included in this type of model have physical meaning, and we use that understanding to expand to predictions at a larger scale. These can include thermodynamic models, for example. 
+
+Correlative models, which are the chief concern of the zoon workflow, are a "top-down" approach. These models lack a detailed mathematical formula to explain the physical processes underlying species' occurrence, and rather use statistical models to describe occurrence in relation to selected environmental and biological parameters. 
+
+Correlative models use species occurrence data in combination with environemtnal preictors to use underpinning statistical models that help us derive new maps of the likelihood of species occurrence. One potential output of these models 
+
+We estimate
+
     + correlative vs. mechanistic models
     + multispecies models
 * brief discussion of the limitations of the method used here
@@ -91,6 +105,8 @@ occurrence = LocalOccurrenceData(filename = "myData.csv",
 **Add example here***
 
 ## Step 2. Covariates
+
+
 * gridded covariates
 * discuss concept of niche space vs. geographic space
     + include a graphical representation of this?
