@@ -12,34 +12,33 @@ vignette: >
 ---
 
 # Introduction
-## Why do Species Distribution Models?
+## Why do we fit species distribution models?
 In ecology, we often want to understand where a species is located in the environment and the restraints on that distribution so we can predict where the species may occur in the future. We typcially consider that species exist within their "ecological niche." In contrast to geographic space, the ecological niche does not describe a physical place, but rather the environmental conditions required for a species. 
 
 Ecologists typically consider species' ecological niche space to be constrained by three dominant factors: the abiotic environment, the biotic environment, and movement. Characteristics of the ecological niche include the abiotic and biotic habitat, the resources it obtains from the habitat, and the species' activity pattern that allow it to utilise its space. Examples of these include the climate required for a species to survive, the local vegetation types it depends on, and it's abillity to traverse different landscapes, respectively. The intersection of these three factors is the "fundamental niche." This niche space is where we expect a species to occur, given what we know of its biology and ecology. Experience tells us, however, that species are not always located where we expect them to be. Their "realised niche" is where they actually exist within the bounds of the environmental space where they could potentially exist. 
 
-## Types of SDMs
-There are two main types of SDMs: mechanistic and correlative. Mechanistic models are considered a "bottum-up" approach to modelling species distributions because they begin with mathematical formulations of the specific environmental and biologic processes that impact a species' distribution and scale up to predict occurrence in geographic space. Parameters included in this type of model have physical meaning, such as thermotolerance thresholds, and we use that understanding to expand to predictions at a larger scale. These models are often better at characterising XXXXX
+## What is a species distribution model?
+Species distribution models estimate the probabilty of occurrence of species along environmental gradients. They do this by estimating the correlation between enviornmental variables and species occurrence data. For example, using SDMs, we can estiamte the probability a species of bird will use forest habitat with high tree cover compared to open habitat with low tree cover. Or we might estimate the probability of occurrense for a frog across the a whole continent using climatic variables, such as rainfall and temperature. We can take these statisical relationships and project them onto geographic space, which allows us to visualise on a map how the probabilty of species occurrence varies in geographic space.
 
-Correlative models, which are the chief concern of the zoon workflow, are a "top-down" approach. These models lack a detailed mathematical formula to explain the physical processes underlying species' occurrence, and rather use statistical models to describe occurrence in relation to selected environmental and biological parameters. 
+There are many types of species distribution models and the field is rapidly expanding. `zoon` is concerned with correlative SDMs, as described above, which are the most widley used SDM. This tutoiral will focus on models which estimate probability of occurrence, however, we could also use species abundance data to estimate how abundance varies along environemntal gradients. As well as correlative SDMs, there are also mechanistic SDMs. Where correlative SDMs use statiscs to estimate relatinoships between occurreance data and environemntal covariates, mechanistic SDMs use mathematical relationships between species energy requirements and environmental covaraites. Where correlative SDMs estimate a species realised niche, mechanistic SDMs estimates the fundemental niche. The field of mechanistic models is ... and we encourage the read to pursue their interest further, as we leave the topic here. 
 
-Correlative models use species occurrence data in combination with environmental preictors to use underpinning statistical models that help us derive new maps of the likelihood of species occurrence. 
+# How do I fit a species distribution model?
+We implement a species distribution model with five steps:
+    1. Occurence: We first gather and format our species occurrence data.
+    2. Covariates: Next, we gather and format the environmental variables we believe are important to our species of interest.
+    3. Process: Often our data, both occurrence and environmental, will need some pre-processing before we fit our models.
+    4. Model: We then fit one or more statistical models to our data to estimate species probability of occurrence.
+    5. Output: Finally, after fitting our model, we produce model outputs, such as graphs and maps, to enable us to make ecological inference about the species.
+    
+The `zoon` `workflow` is structured around these five steps and designed to make building and fitting SDMs straight-foward and reproducile. The primary zoon function is `workflow`, which we use to fit the SDM. The workflow function has five arguments, one for each step in the SDM fitting process. For each argument, we need only to select a 'module'. The modules we choose in each step determine what type of model we run with what data and what outputs we produce. This tutorial will guide you through the process of selecting a module for each argument of the `workflow` function. Along the way, we'll introduce some key factors that you should consider when fitting and evaluating an SDM.
 
-When we build SDM's, we are trying to describe the ecological niche of a species using statistical correlations with environmental predictors. The statistical models we use, therefore, have implications on the how generalisable the resulting conclusions are. We have to make trade-offs between how well our model will fit our data, and how applicable the results will be to the species in general. 
-
-# Steps in a correlative SDM
-The basic steps of a correlative species distribution model are:
-    1. Occurence: Prepare and format species occurrence data 
-    2. Covariates: Preapre and format the environmental predictors you will use in your model
-    3. Process: Make any modifications and adjustments to your data sets
-    4. Model: Fit statistical models
-    5. Output: Produce either predictions or ecological inferences, for example in the form of maps
-
-The `zoon` `workflow` is designed to make building and fitting correlative SDMs based on the above steps as straight-forward and reproducible as possible. To fit an SDM you use the `workflow` function, and need only to select a module in each of the five main steps of a correlative SDM: occurrence, covariate, process, model, and output. The following sections of this tutorial will guide you through the process of selecting a module for each argument of the `workflow` function. But first, don't forget to load the package!
+But first, let's fit a quick and simple SDM with `zoon` as a means of introdction. Don't forget to load the package!
 
 ```{r message=FALSE, warning=FALSE}
 library(zoon)
 ```
-An basic workflow, in this example for the mosquito *Anopheles Plumbeus* in the UK, might look like this:  
+
+A basic workflow for the mosquito *Anopheles plumbeus* in the UK could look like this:  
 ```{r message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=3}
 UKMosquitoes <- workflow(occurrence = UKAnophelesPlumbeus,
                              covariate = UKAir,
@@ -48,20 +47,22 @@ UKMosquitoes <- workflow(occurrence = UKAnophelesPlumbeus,
                              output = PrintMap)
 ```
 
-`zoon` comes with several pre-existing modules for each argument, which we will go through in more detail in the rest of this guide. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList` command.
+In this workflow, we have loaded the *Anopheles plumbeus* occurrence data for the UK, loaded the environmental covariate UKAir, selected 100 background occurrence data (more on this later), fitted a random forest model, and printed a map. The map shows us how the probability of occurrence of *Anopheles plumbeus* varies across a region of the UK. The red dots show recorded presences. Most of the map has a low probility of occurance (light green) but there is a patch of high occurrence probabilty (blue) in the centre. The model has estimated the area of detected presences as havign a high liklihood of occurrence.
+
+`zoon` comes with several pre-existing modules for each argument. We will go through a key selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList` command.
 
 
 # Zoon SDM Workflow
 ## Step 1. Occurrence
-SDMs are most frequently fit with species occurrence data (rather than, for example, abundance data), and this can come in three formats: presence-only, presence-background, and presence-absence. 
+Species distribution models are fitted with species occurrence data, which is available in three formats: presence-only, presence-background, and presence-absence. Less commonly, species distribution models can be fitted with abundance data. 
 
 * Presence-only data is usually sourced from museum or herbarium records, and is a list of all recorded sightings/captures of a species with its location. 
 
-* Presence-background data is a type of presence-only data that combines presence records with a set amount of randomly generated background points, also called 'pseudo-absences.' This is the more common of the two types. 
+* Presence-background data is a type of presence-only data that combines presence records with randomly generated background points, also called 'pseudo-absences.' This is the more common of the two types. 
 
 * Presence-absence data generally comes from structured field surveys where the presence *or* absence of the target species is recorded for a given site.
 
-In practice, presence-only data is more common than presence-absence data, so this tutorial is written for presence-only data as default, and any necessary alterations for presence-absence will be noted.
+Presence-only data is widely and freely accesible only and as a result is more commonly used than presence-absence data. As such, we write this tutorial for presence-only data and note any necessary alterations for presence-absence data.
 
 The first module required in a `workflow` is `occurrence` and it is where you load your species occurrence data. There are three methods for loading data into your workflow depending where your data come from: you can use pre-existing `occurrence` modules in `zoon`, download data from an online repository, or load in your own data from a local computer. All three methods are demonstrated below. 
 
@@ -75,7 +76,7 @@ occurrence = CarolinaWrenPO
 ### Data from online repositories
 You may want to source your species occurrence data from online repositories. Several online repositories are available to use [hint: use `ModuleHelp(“SpOcc”)` to see a list of options], 
 
-The `SpOcc` module will allow you to access data from these databases. This module requires a number of specifications: species, extent, database, type, and limit. Species refers to the scienfic name of your species of interest, extent describes the area you are interested in, database requires the name of your repository, type denotes the type of occurrence data you are interested in (for example presence-only), and limit corresponds to the number of records to be sourced. 
+The `SpOcc` module allows you to access data from these databases. This module requires a number of specifications: species, extent, database, type, and limit. Species refers to the scienfic name of your species of interest, extent describes the area you are interested in, database requires the name of your repository, type denotes the type of occurrence data you are interested in (for example presence-only), and limit corresponds to the number of records to be sourced. 
 
 In this example we will use GBIF. We are interested in obtaining presence-only data for the Giant Panda, so we set our `occurrence` module like this:
 
@@ -86,7 +87,7 @@ occurrence = SpOcc(species = “Ailuropoda melanoleuca”, extent = “ ”, dat
 ** Needs finishing when GBIF is working again to test **
 
 ### Loading your own data
-If you have your own occurrence dataset from field surveys that you want to analyse, then you can load it using the `LocalOccurrenceData` module. This requires a .csv file with three columns for the values of longitude, latitude, and value of species presence, in that order. For alternate coordinate systems refer to the information about a CRS column using `ModuleHelp("LocalOccurrenceData")`. 
+If you have occurrence dataset from field surveys that you want to analyse, you can load it using the `LocalOccurrenceData` module. This requires a .csv file with three columns for the values of longitude, latitude, and value of species presence, in that order. For alternate coordinate systems refer to the information about a CRS column using `ModuleHelp("LocalOccurrenceData")`. 
 
 To load your own presence-only dataset, set your `occurrence` module within `workflow` as follows:
 
@@ -104,7 +105,7 @@ occurrence = LocalOccurrenceData(filename = "myData.csv",
 
 **Add example here**
 
-`zoon` has several accessor functions [NOTE: THIS IS UNCLEAR TO A BEGINNER] available to view the output of each module in your workflow. You can view your raw species occurrence data using the `Occurrence()` function:
+`zoon` has several fucntions available to view the contents of each module in your workflow. For exmaple, you can view your species occurrence data using the `Occurrence()` function:
 
 ```{r eval=FALSE, message=FALSE, warning=FALSE}
 Occurrence(Your_Workflow_Name_Here)
@@ -196,7 +197,7 @@ Covariate(hidden_PO_workflow)
 You can use the `?'RasterStack-class'` command to find a more detailed summary of your data. 
 
 ## Step 3. Process
-Now that you have loaded in your species and environmental data using the `occurrence` and `covariate` modules, the `process` modules will perform any modifications required before fitting the model itself. These modules can be broadly classified into those that alter your raw data, those that generate additional data, or those that set up model validation.
+Now that you have loaded in your species and environmental data using the `occurrence` and `covariate` modules, the `process` modules will perform any modifications required before fitting the model itself. These modules can be broadly classified into those that modify your data, generate additional data, or set up model validation.
 
 ### Modify your data
 `process` modules that modify your data improve interpretability of your results. They can involve, for example, tidying or transforming your raw data or standardising your covariates.
@@ -207,7 +208,7 @@ Now that you have loaded in your species and environmental data using the `occur
 process = Clean(which = c(1,2,3,4))   # default fit of the Clean module
 ```
 
-*	The `Transform` module lets you apply a transformation function (e.g. square or log) to your environmental variables. You might do this to [[INSERT EXPLANATION HERE!]. To use this module you will need to define the transformation, provide a character vector listing the covariates to be transformed, and state whether you want to replace the original variable with the transformed version or add it as an extra layer.
+*	The `Transform` module lets you apply a transformation (e.g. square or log) to your environmental variables. We often transform environemntal variables to normailise them. To use this module you need to define the transformation, provide a character vector listing the covariates to be transformed, and state whether you want to replace the original variable with the transformed version or add it as an extra layer.
 
 ```{r eval=FALSE}
 process = Transform(trans = function(x) {x},   # default form of the Transform module. Perform no transformations on any variable
@@ -227,7 +228,7 @@ process = Transform(trans = function(x) {log(x)}, # Replace the "cov1" variable 
                     replace = TRUE)
 ```
 
-*	The `StandardiseCov` module standardises covariates in your model, improving comparison of effect size of variables. By default, the module standardises all variables, and does so by subtracting the mean and dividing by the standard deviation. This standardisation places variables on the same scale. For example, the regression coefficient for the distance of a site to roads might be +3.0 when measured in kilometres, but +0.003 if measured in meters, and the effect of average temperature could be -10C. How would you compare the effect of these variables? Standardisation allows you to compare the relative effects of different covariates within a model. To use this module you need to choose which variables to exclude from standardisation (if any), and whether to use the Gelman variant (standardises by two standard deviations instead of one - **(link to this here)**.)
+*	Another transformation we often employ is to centre and standardise our environmental covariations. This common transformation allows us to diretly compare the influence of different variables on species distributions and also improve the efficiency of model fitting alogorithms. We use the `StandardiseCov` module standardises covariates in your model. By default, the module standardises all variables by subtracting the mean and dividing by the standard deviation. This standardisation places variables on the same scale. For example, the regression coefficient for the distance of a site to roads might be +3.0 when measured in kilometres, but +0.003 if measured in meters, and the effect of average temperature could be -10C. How would you compare the effect of these variables? Standardisation allows you to compare the relative effects of different covariates within a model. To use this module you need to choose which variables to exclude from standardisation (if any), and whether to use the Gelman variant (standardises by two standard deviations instead of one - **(link to this here)**.)
 
 ```{r eval=FALSE}
 process = StandardiseCov(Gelman = FALSE, exclude = NULL)   # default form of the StandardiseCov module.
@@ -283,7 +284,7 @@ process = addInteractions(which.covs = c(A,A,A))   # leads to a cubic, polynomia
 
 ### Set up model validation
 
-Model validation is a very important step in the model fitting process as it lets you determine if your model is an acceptable description of your data. Model validation can be as simple as including goodness-of-fit tests or analysing the residuals **can this be done for SDMs?** but the `zoon` package uses more complex methods that subset and/or resample the dataset. **[Expand on what model validation is/why it is important]** The `process` modules that set up model validation include:
+Model validation is an important step in the model fitting process as it lets you determine if your model is an acceptable description of your data. Model validation can be as simple as including goodness-of-fit tests or analysing the residuals **can this be done for SDMs?** but the `zoon` package uses more complex methods that subset and/or resample the dataset. **[Expand on what model validation is/why it is important]** The `process` modules that set up model validation include:
 
 *	`Crossvalidate`: Run k fold crossvalidation (default = 5). If you are using presence-absence, this will split presences and absences separately so folds have equally balanced data, otherwise it just samples. This samples the dataset without replacement into k 'folds' or sub-datasets to be used for training and testing the model. A model is fit to the k-1 folds of training data and evaluated against the fold of testing data (and repeated so each fold is used as the testing data once, and then the results are averaged). This is mainly used where the goal is to use the model for prediction as it tests if the model is overfit to the training data and thus unlikely to be suitable for prediction across another dataset (i.e. the test fold). 
 
@@ -311,11 +312,11 @@ process = NoProcess
 
 ## Step 4. Model
 
-Arguably the most important part of your `workflow` is the `model` module. This is where you choose which type of SDM you want to fit to your data. There are many different SDM methods to choose from **(add Elith paper reference)** and each have their mertis, but here we provide a quick overview of some of the more common methods. 
+Arguably the most important part of your `workflow` is the `model` module. **actually, probably not due to the variation in results with model choice** This is where you choose which type of SDM you want to fit to your data. There are many different SDM methods to choose from **(add Elith paper reference)** and each have their mertis. Here we provide a quick overview of some of the common methods. 
 
 ### Logistic Regression
 
-Logistic regression is a type of Generalised Linear Model (GLM) that can be fit to presence-background and presence-absence datasets. It is best suited for these datasets where the outcome is a binary variable (presence represented as "1" and absence as "0," for example) that is dependent on one or more independent explanatory variables. Coefficients are estimated by choosing parameter values that maximise the likelihood of observing the sample values. You select `LogisticRegression` model by defining your `workflow` as follows:
+Logistic regression is a type of Generalised Linear Model (GLM) that can be fit to presence-background and presence-absence datasets. Logistic regression fits binary data (presence represented as "1" and absence as "0," for example) that is dependent on one or more independent explanatory variables. Coefficients are estimated by choosing parameter values that maximise the likelihood of observing the sample values. You select `LogisticRegression` model by defining your `workflow` as follows:
 
 ```{r eval=FALSE}
 model = LogisticRegression
@@ -357,8 +358,14 @@ model = RandomForest
 ```
 
 ## Step 5. Output
-* types of output
-* interpreting outputs
+It is finally time to check out our results. 
+
+*Map
+
+*response curves for logistic regression and/or GAM
+
+*model evaluation stats
+
 
 ## Putting it all together
 
@@ -382,9 +389,9 @@ myLogisticflow <- workflow(occurrence = CarolinaWrenPO,
                        output = PrintMap(points = FALSE))
 ```
 
-There are some pretty obvious differences in the predicted distribution maps of these two approaches. The only thing to change betweeen the two workflows is our model of choice, so what causes the difference? Check out our more detailed guide on SDM model algorithm selection here **(insert plug for future guides)**
+There are some obvious differences in the predicted distribution maps of these two approaches. The only thing to change betweeen the two workflows is our model of choice, so what causes the difference? Check out our more detailed guide on SDM model algorithm selection here **(insert plug for future guides)**
 
 
 # Conclusion
-
+*Liz happy to write to pair with the intro*
 
