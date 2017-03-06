@@ -15,16 +15,14 @@ vignette: >
 ## Why do Species Distribution Models?
 In ecology, we often want to understand where a species is located in the environment and the restraints on that distribution so we can predict where the species may occur in the future. We typcially consider that species exist within their "ecological niche." In contrast to geographic space, the ecological niche does not describe a physical place, but rather the environmental conditions required for a species. 
 
-Ecologists typically consider species' ecological niche space to be constrained by three dominant factors: the abiotic environment, the biotic environment, and movement. Characteristics of the ecological niche include the abiotic and biotic habitat, the resources it obtains from the habitat, and the species' activity pattern that allow it to utilise its space. Examples of these include the climate required for a species to survive, the local vegetation types it depends on, and it's abillity to traverse different landscapes, respectively. The intersection of these three factors is the "fundamental niche." This niche space is where we expect a species to occur, given what we know of its biology and ecology. Experience tells us, however, that species are not always located where we expect them to be. Their "realised niche" is where they actually exist within the bounds of the environmental space where they could potentially exist. 
+Ecologists typically consider species' ecological niche space to be constrained by three dominant factors: the abiotic environment, the biotic environment, and movement. Characteristics of the ecological niche include the abiotic and biotic habitat, the resources it obtains from the habitat, and the species' activity pattern that allow it to utilise its space. Examples of these include the climate required for a species to survive, the local vegetation types it depends on, and it's abillity to traverse different landscapes, respectively. The intersection of the abiotic and biotic environmental conditions constitutes the "fundamental niche," or where the species could physiologically occur given what we know of its biology and ecology. Experience tells us, however, that species are not always located where we expect them to be. Their "realised niche" is where they actually exist within the bounds of the environmental space where they could potentially exist. This is conceptualised by the bounds of the species' activity or movement, which may restrict to it where it can access. Invasive species are often those that are introduced to a new place by anthropogenic activity, thereby allowing them to overcome a movement barrier, and subsequently thrive in a region that exists within their fundamental niche. 
 
 ## Types of SDMs
-There are two main types of SDMs: mechanistic and correlative. Mechanistic models are considered a "bottum-up" approach to modelling species distributions because they begin with mathematical formulations of the specific environmental and biologic processes that impact a species' distribution and scale up to predict occurrence in geographic space. Parameters included in this type of model have physical meaning, such as thermotolerance thresholds, and we use that understanding to expand to predictions at a larger scale. These models are often better at characterising XXXXX
+There are two main types of SDMs: mechanistic and correlative. Mechanistic models are considered a "bottum-up" approach to modelling species distributions because they begin with mathematical formulations of the specific environmental and biologic processes that impact a species' distribution and scale up to predict occurrence in geographic space. Parameters included in this type of model have physical meaning, such as thermotolerance thresholds, and we use that understanding to expand to predictions at a larger scale. 
 
-Correlative models, which are the chief concern of the zoon workflow, are a "top-down" approach. These models lack a detailed mathematical formula to explain the physical processes underlying species' occurrence, and rather use statistical models to describe occurrence in relation to selected environmental and biological parameters. 
+Correlative models, which are the chief concern of the `zoon` workflow, are a "top-down" approach. These models lack a detailed mathematical formula to explain the physical processes underlying species' occurrence, and rather use statistical models to describe occurrence in relation to selected environmental and biological parameters. Correlative models use species occurrence data in combination with environmental preictors to use underpinning statistical models that help us derive new maps of the likelihood of species occurrence. 
 
-Correlative models use species occurrence data in combination with environmental preictors to use underpinning statistical models that help us derive new maps of the likelihood of species occurrence. 
-
-When we build SDM's, we are trying to describe the ecological niche of a species using statistical correlations with environmental predictors. The statistical models we use, therefore, have implications on the how generalisable the resulting conclusions are. We have to make trade-offs between how well our model will fit our data, and how applicable the results will be to the species in general. 
+When we build SDM's, we are trying to describe the ecological niche of a species using statistical correlations with environmental predictors. The statistical models we use, therefore, have implications on the how generalisable the resulting conclusions are. We have to make trade-offs between how well our model will fit our data, and how applicable the results will be to the species in general. Correlative models are typically better at characterising the realised niche of a species, rather than the fundamental niche, because of the type of data they incorporate. 
 
 # Steps in a correlative SDM
 The basic steps of a correlative species distribution model are:
@@ -39,7 +37,7 @@ The `zoon` `workflow` is designed to make building and fitting correlative SDMs 
 ```{r message=FALSE, warning=FALSE}
 library(zoon)
 ```
-An basic workflow, in this example for the mosquito *Anopheles Plumbeus* in the UK, might look like this:  
+A basic workflow, in this example for the mosquito *Anopheles Plumbeus* in the UK, might look like this:  
 ```{r message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=3}
 UKMosquitoes <- workflow(occurrence = UKAnophelesPlumbeus,
                              covariate = UKAir,
@@ -48,7 +46,7 @@ UKMosquitoes <- workflow(occurrence = UKAnophelesPlumbeus,
                              output = PrintMap)
 ```
 
-`zoon` comes with several pre-existing modules for each argument, which we will go through in more detail in the rest of this guide. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList` command.
+`zoon` comes with several pre-existing modules for each argument, which we will go through in more detail in the rest of this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList` command.
 
 
 # Zoon SDM Workflow
@@ -57,13 +55,13 @@ SDMs are most frequently fit with species occurrence data (rather than, for exam
 
 * Presence-only data is usually sourced from museum or herbarium records, and is a list of all recorded sightings/captures of a species with its location. 
 
-* Presence-background data is a type of presence-only data that combines presence records with a set amount of randomly generated background points, also called 'pseudo-absences.' This is the more common of the two types. 
+* Presence-background data is a type of presence-only data that combines presence records with a set amount of randomly generated background points, also called "pseudo-absences." This is the more common of the two types. 
 
 * Presence-absence data generally comes from structured field surveys where the presence *or* absence of the target species is recorded for a given site.
 
 In practice, presence-only data is more common than presence-absence data, so this tutorial is written for presence-only data as default, and any necessary alterations for presence-absence will be noted.
 
-The first module required in a `workflow` is `occurrence` and it is where you load your species occurrence data. There are three methods for loading data into your workflow depending where your data come from: you can use pre-existing `occurrence` modules in `zoon`, download data from an online repository, or load in your own data from a local computer. All three methods are demonstrated below. 
+The first module required in a `workflow` is `occurrence` and it is where you load your species occurrence data. There are three methods for loading data into your workflow depending on where your data come from: you can use pre-existing `occurrence` modules in `zoon`, download data from an online repository, or load in your own data from a local computer. All three methods are demonstrated below. 
 
 ### Existing zoon data
 `zoon` comes with several pre-existing dataset modules that you can use. These are available with the `GetModuleList()` command. Under the `$occurrence` sub-heading you can see all available `occurrence` modules including these datasets. For this tutorial, we will be using the `CarolinaWrenPO` module, which is a presence-only dataset of the Carolina Wren in the USA. This is a common species in in North America whose range reaches from southern Canada to north-eastern Mexico, but the dataset has been cropped to the extent of the contiguous USA. To use this dataset, or any other module available within `zoon` for your `occurrence` data, we use the following line of code inside the `workflow`:
