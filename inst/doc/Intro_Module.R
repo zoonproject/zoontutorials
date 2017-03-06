@@ -2,7 +2,7 @@
 library(zoon)
 
 ## ----message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=3----
-example_workflow <- workflow(occurrence = UKAnophelesPlumbeus,
+UKMosquitoes <- workflow(occurrence = UKAnophelesPlumbeus,
                              covariate = UKAir,
                              process = OneHundredBackground,
                              model = RandomForest,
@@ -12,7 +12,7 @@ example_workflow <- workflow(occurrence = UKAnophelesPlumbeus,
 #  occurrence = CarolinaWrenPO
 
 ## ----eval=FALSE----------------------------------------------------------
-#  occurrence = SpOcc(species = “Ailuropoda melanoleuca”, extent = “ ”, database = “GBIF”)
+#  occurrence = SpOcc(species = â€œAiluropoda melanoleucaâ€, extent = â€œ â€, database = â€œGBIFâ€)
 
 ## ----eval=FALSE----------------------------------------------------------
 #  occurrence = LocalOccurrenceData(filename = "myData.csv",
@@ -77,9 +77,6 @@ Covariate(hidden_PO_workflow)
 #  process = Clean(which = c(1,2,3,4))   # default fit of the Clean module
 
 ## ----eval=FALSE----------------------------------------------------------
-#  process = StandardiseCov(Gelman = FALSE, exclude = NULL)   # default form of the StandardiseCov module.
-
-## ----eval=FALSE----------------------------------------------------------
 #  process = Transform(trans = function(x) {x},   # default form of the Transform module. Perform no transformations on any variable
 #                      which_cov = NULL,
 #                      replace = TRUE)
@@ -93,6 +90,9 @@ Covariate(hidden_PO_workflow)
 #  process = Transform(trans = function(x) {log(x)}, # Replace the "cov1" variable with the log-transformed version of "cov1"
 #                      which_cov = "cov1",
 #                      replace = TRUE)
+
+## ----eval=FALSE----------------------------------------------------------
+#  process = StandardiseCov(Gelman = FALSE, exclude = NULL)   # default form of the StandardiseCov module.
 
 ## ----eval=FALSE----------------------------------------------------------
 #  process = Background(n = 100,   # generate 100 unbiased background points
