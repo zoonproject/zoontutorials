@@ -52,9 +52,6 @@ Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
 
 In this workflow, we have loaded the Carolina Wren presence-only occurrence data for the USA, loaded the environmental covariates, selected 100 background occurrence data (more on this later), fitted a logistic regression model, and printed a map. The map shows us how the probability of occurrence of the Carolina Wren varies across the USA. The red dots show recorded presences. Most of the map has a low probility of occurance (light green) but there is a patch of high occurrence probabilty (blue) in the centre. The model has estimated the area of detected presences as havign a high liklihood of occurrence.
 
-`zoon` comes with several pre-existing modules for each argument. We will go through a key selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList` command.
->>>>>>> upstream/master
-
 `zoon` comes with several pre-existing modules for each argument. We will go through a key selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList()` command.
 
 # Zoon SDM Workflow
@@ -119,25 +116,44 @@ Occurrence(Your_Workflow_Name_Here)
 The outputs of this accessor function are shown below for both the `CarolinaWrenPO` (top) and `CarolinaWrenPA` data modules (bottom). The first two columns provide the geographic location of the observation (as longitude and latitude), the third column is the observation value (1 = presence, 0 = absence), the fourth column is the type of observation, and the last column identifies the "fold" the data point is located in if utilising cross-validation (covered later in the section of `Process` modules, but a default model can be considered to always have one fold).
 
 ```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-#hidden_PO_workflow <- workflow(occurrence = CarolinaWrenPO,    ### just some basic workflows so there
-#                             covariate = CarolinaWrenRasters,  ### is something to run accessor functions
-#                             process = Background,          ### on as examples
-#                             model = MaxEnt,
-#                             output = NoOutput)
+hidden_PO_workflow <- workflow(occurrence = CarolinaWrenPO,    ### just some basic workflows so there
+                             covariate = CarolinaWrenRasters,  ### is something to run accessor functions
+                             process = Background,          ### on as examples
+                             model = MaxEnt,
+                             output = NoOutput)
 
-#hidden_PA_workflow <- workflow(occurrence = CarolinaWrenPA,
-#                             covariate = CarolinaWrenRasters,
-#                             process = NoProcess,
-#                             model = LogisticRegression,
-#                             output = NoOutput)
+hidden_PA_workflow <- workflow(occurrence = CarolinaWrenPA,
+                             covariate = CarolinaWrenRasters,
+                             process = NoProcess,
+                             model = LogisticRegression,
+                             output = NoOutput)
 ```
 
 ```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-#head(Occurrence(hidden_PO_workflow))
+head(Occurrence(hidden_PO_workflow))
 ```
 
 ```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-#tail(Occurrence(hidden_PA_workflow))
+tail(Occurrence(hidden_PA_workflow))
+```
+
+If we wanted to get a data frame that showed our combined presence points with their corresponding values of a covariate layer, we would use the `Process()` accessor function. 
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+test_workflow <- workflow(occurrence = CarolinaWrenPO,
+                        covariate = CarolinaWrenRasters,  
+                        process = Background, 
+                        model = LogisticRegression, 
+                        output = NoOutput)
+
+```
+
+```{r eval=TRUE, echo=TRUE, message=FALSE, warning=FALSE}
+occ_and_cov_df <- Process(test_workflow)$df
+```
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+head(occ_and_cov_df)
 ```
 
 ## Step 2. Covariates
@@ -146,7 +162,9 @@ The second module required in a `workflow()` is for your environmental data. As 
 
 ### Existing *zoon* data
 
-You still find the pre-existing `zoon` `covariate` modules using `GetModuleList()` under the `$covariate` sub-heading. For this tutorial, we will be using the `CarolinaWrenRasters` module. This is the complementary environmental data to our chosen `occurrence` module. To use this dataset, call your `covariate` data in the `workflow()` as follows:
+You still find the pre-existing `zoon` `covariate` modules using `GetModuleList()` under the `$covariate` sub-heading. For this tutorial, we will be using the `CarolinaWrenRasters` module. This is the complementary environmental data to our chosen `occurrence` module. To look at the meta-data for all loaded modules, use `ModuleHelp()`, for example, to explore the covariates in `CarolinaWrenRasters`, we would use `ModuleHelp(CarolinaWrenRasters)`.
+
+To use this dataset, call your `covariate` data in the `workflow()` as follows:
 
 ```{r eval=FALSE}
 covariate = CarolinaWrenRasters
