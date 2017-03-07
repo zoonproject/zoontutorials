@@ -105,7 +105,7 @@ occurrence = LocalOccurrenceData(filename = "myData.csv",
 
 **Add example here**
 
-`zoon` has several fucntions available to view the contents of each module in your workflow. For exmaple, you can view your species occurrence data using the `Occurrence()` function:
+`zoon` has several fucntions available to view the contents of each module in your workflow. These are called accessor fcuntions. For exmaple, you can view your species occurrence data using the `Occurrence()` function:
 
 ```{r eval=FALSE, message=FALSE, warning=FALSE}
 Occurrence(Your_Workflow_Name_Here)
@@ -360,7 +360,8 @@ model = RandomForest
 ## Step 5. Output
 It is finally time to check out our results. 
 
-*Map
+*Map ()
+
 
 *response curves for logistic regression and/or GAM
 
