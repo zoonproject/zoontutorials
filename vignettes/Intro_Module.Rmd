@@ -11,16 +11,29 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r knitrOpts, echo = FALSE, cache = FALSE, eval = TRUE}
+# set up knitr options
+knitr::opts_chunk$set(message = FALSE,
+               warning = FALSE,
+               fig.align = 'center',
+               dev = c('png'),
+               cache = TRUE,
+               cache.path = file.path(getwd(), 'vignettes/Intro_Module_cache'))
+```
+
 # Introduction
 ## Why do we fit species distribution models?
 In ecology, we often want to understand where a species is located in the environment and the restraints on that distribution so we can predict where the species may occur in the future. We typcially consider that species exist within their "ecological niche." In contrast to geographic space, the ecological niche does not describe a physical place, but rather the environmental conditions required for a species. 
 
-Ecologists typically consider species' ecological niche space to be constrained by three dominant factors: the abiotic environment, the biotic environment, and movement. Characteristics of the ecological niche include the abiotic and biotic habitat, the resources it obtains from the habitat, and the species' activity pattern that allow it to utilise its space. Examples of these include the climate required for a species to survive, the local vegetation types it depends on, and it's abillity to traverse different landscapes, respectively. The intersection of these three factors is the "fundamental niche." This niche space is where we expect a species to occur, given what we know of its biology and ecology. Experience tells us, however, that species are not always located where we expect them to be. Their "realised niche" is where they actually exist within the bounds of the environmental space where they could potentially exist. 
+Ecologists typically consider species' ecological niche space to be constrained by three dominant factors: the abiotic environment, the biotic environment, and its movement. Characteristics of the ecological niche include the abiotic and biotic habitat, the resources it obtains from the habitat, and the species' activity pattern that allow it to utilise its space. Examples of these include the climate required for a species to survive, the local vegetation types it depends on, and its abillity to traverse different landscapes, respectively. The intersection of the abiotic and biotic environmental conditions constitutes the "fundamental niche," or where the species could physiologically occur given what we know of its biology and ecology. Experience tells us, however, that species are not always located where we expect them to be. Their "realised niche" is where they actually exist within the bounds of the environmental space where they could potentially exist. 
 
 ## What is a species distribution model?
-Species distribution models estimate the probabilty of occurrence of species along environmental gradients. They do this by estimating the correlation between enviornmental variables and species occurrence data. For example, using SDMs, we can estiamte the probability a species of bird will use forest habitat with high tree cover compared to open habitat with low tree cover. Or we might estimate the probability of occurrense for a frog across the a whole continent using climatic variables, such as rainfall and temperature. We can take these statisical relationships and project them onto geographic space, which allows us to visualise on a map how the probabilty of species occurrence varies in geographic space.
+Species distribution models estimate the probabilty of occurrence of species along environmental gradients. They do this by estimating the correlation between environmental variables and species occurrence data. For example, using SDMs, we can estiamte the probability a species of bird will use forest habitat with high tree cover compared to open habitat with low tree cover. Or we might estimate the probability of occurrence for a frog across the a whole continent using climatic variables, such as rainfall and temperature. We can take these statisical relationships and project them onto geographic space, which allows us to visualise on a map how the probabilty of species occurrence varies in geographic space.
 
-There are many types of species distribution models and the field is rapidly expanding. `zoon` is concerned with correlative SDMs, as described above, which are the most widley used SDM. This tutoiral will focus on models which estimate probability of occurrence, however, we could also use species abundance data to estimate how abundance varies along environemntal gradients. As well as correlative SDMs, there are also mechanistic SDMs. Where correlative SDMs use statiscs to estimate relatinoships between occurreance data and environemntal covariates, mechanistic SDMs use mathematical relationships between species energy requirements and environmental covaraites. Where correlative SDMs estimate a species realised niche, mechanistic SDMs estimates the fundemental niche. The field of mechanistic models is ... and we encourage the read to pursue their interest further, as we leave the topic here. 
+*figure here*
+*also pull out figures from papers*
+
+There are many types of species distribution models and the field is rapidly expanding. `zoon` is concerned with correlative SDMs, as described above, which are the most widely used SDM. This tutoiral will focus on models which estimate probability of occurrence, however, we could also use species abundance data to estimate how abundance varies along environemntal gradients. As well as correlative SDMs, there are also mechanistic SDMs. Where correlative SDMs use statistics to estimate relationships between occurrence data and environmental covariates, mechanistic SDMs use mathematical relationships between species energy requirements and environmental covaraites. Where correlative SDMs estimate a species realised niche, mechanistic SDMs estimates the fundemental niche. The field of mechanistic models is ... and we encourage the read to pursue their interest further, as we leave the topic here. 
 
 # How do I fit a species distribution model?
 We implement a species distribution model with five steps:
@@ -30,27 +43,29 @@ We implement a species distribution model with five steps:
     4. Model: We then fit one or more statistical models to our data to estimate species probability of occurrence.
     5. Output: Finally, after fitting our model, we produce model outputs, such as graphs and maps, to enable us to make ecological inference about the species.
     
-The `zoon` `workflow` is structured around these five steps and designed to make building and fitting SDMs straight-foward and reproducile. The primary zoon function is `workflow`, which we use to fit the SDM. The workflow function has five arguments, one for each step in the SDM fitting process. For each argument, we need only to select a 'module'. The modules we choose in each step determine what type of model we run with what data and what outputs we produce. This tutorial will guide you through the process of selecting a module for each argument of the `workflow` function. Along the way, we'll introduce some key factors that you should consider when fitting and evaluating an SDM.
+The `zoon` workflow is structured around these five steps and designed to make building and fitting SDMs straight-foward and reproducible. The primary zoon function is `workflow()`, which we use to fit the SDM. The workflow function has five arguments, one for each step in the SDM fitting process. For each argument, we need only to select a 'module.' The modules we choose in each step determine what type of model we run with what data and what outputs we produce. This tutorial will guide you through the process of selecting a module for each argument of the `workflow()` function. Along the way, we'll introduce some key factors that you should consider when fitting and evaluating an SDM.
 
-But first, let's fit a quick and simple SDM with `zoon` as a means of introdction. Don't forget to load the package!
+But first, let's fit a quick and simple SDM with `zoon` as a means of introduction. Don't forget to load the package!
 
 ```{r message=FALSE, warning=FALSE}
 library(zoon)
 ```
 
-A basic workflow for the mosquito *Anopheles plumbeus* in the UK could look like this:  
-```{r message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=3}
-UKMosquitoes <- workflow(occurrence = UKAnophelesPlumbeus,
-                             covariate = UKAir,
-                             process = OneHundredBackground,
-                             model = RandomForest,
+A basic workflow for the Carolina Wren in the USA could look like this:  
+```{r message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
+                             covariate = CarolinaWrenRasters,
+                             process = Background(100),
+                             model = LogisticRegression,
                              output = PrintMap)
 ```
 
-In this workflow, we have loaded the *Anopheles plumbeus* occurrence data for the UK, loaded the environmental covariate UKAir, selected 100 background occurrence data (more on this later), fitted a random forest model, and printed a map. The map shows us how the probability of occurrence of *Anopheles plumbeus* varies across a region of the UK. The red dots show recorded presences. Most of the map has a low probility of occurance (light green) but there is a patch of high occurrence probabilty (blue) in the centre. The model has estimated the area of detected presences as havign a high liklihood of occurrence.
+In this workflow, we have loaded the Carolina Wren presence-only occurrence data for the USA, loaded the environmental covariates, selected 100 background occurrence data (more on this later), fitted a logistic regression model, and printed a map. The map shows us how the probability of occurrence of the Carolina Wren varies across the USA. The red dots show recorded presences. Most of the map has a low probility of occurance (light green) but there is a patch of high occurrence probabilty (blue) in the centre. The model has estimated the area of detected presences as havign a high liklihood of occurrence.
 
 `zoon` comes with several pre-existing modules for each argument. We will go through a key selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList` command.
+>>>>>>> upstream/master
 
+`zoon` comes with several pre-existing modules for each argument. We will go through a key selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList()` command.
 
 # Zoon SDM Workflow
 ## Step 1. Occurrence
@@ -64,17 +79,17 @@ Species distribution models are fitted with species occurrence data, which is av
 
 Presence-only data is widely and freely accesible only and as a result is more commonly used than presence-absence data. As such, we write this tutorial for presence-only data and note any necessary alterations for presence-absence data.
 
-The first module required in a `workflow` is `occurrence` and it is where you load your species occurrence data. There are three methods for loading data into your workflow depending where your data come from: you can use pre-existing `occurrence` modules in `zoon`, download data from an online repository, or load in your own data from a local computer. All three methods are demonstrated below. 
+The first module required in a `workflow()` is `occurrence` and it is where we will load our species occurrence data. There are three methods for loading data into our `workflow()` depending on the source of our data: we can use pre-existing `occurrence` modules in `zoon`, download data from online repositories, or load in our own data from a local computer. All three methods are demonstrated below. 
 
 ### Existing zoon data
-`zoon` comes with several pre-existing dataset modules that you can use. These are available with the `GetModuleList()` command. Under the `$occurrence` sub-heading you can see all available `occurrence` modules including these datasets. For this tutorial, we will be using the `CarolinaWrenPO` module, which is a presence-only dataset of the Carolina Wren in the USA. This is a common species in in North America whose range reaches from southern Canada to north-eastern Mexico, but the dataset has been cropped to the extent of the contiguous USA. To use this dataset, or any other module available within `zoon` for your `occurrence` data, we use the following line of code inside the `workflow`:
+`zoon` comes with several pre-existing dataset modules that you can use. These are available with the `GetModuleList()` command. Under the `$occurrence` sub-heading you can see all available `occurrence` modules including these datasets. For this tutorial, we will be using the `CarolinaWrenPO` module, which is a presence-only dataset of the Carolina Wren in the USA. This is a common species in in North America whose range reaches from southern Canada to north-eastern Mexico, but the dataset has been cropped to the extent of the contiguous USA. To use this dataset, or any other module available within `zoon` for your `occurrence` data, we use the following line of code inside the `workflow()`:
 
 ```{r eval=FALSE}
 occurrence = CarolinaWrenPO
 ```
 
 ### Data from online repositories
-You may want to source your species occurrence data from online repositories. Several online repositories are available to use [hint: use `ModuleHelp(“SpOcc”)` to see a list of options], 
+You may want to source your species occurrence data from online repositories. Several online repositories are available to use [hint: use `ModuleHelp(“SpOcc”)` to see a list of options].
 
 The `SpOcc` module allows you to access data from these databases. This module requires a number of specifications: species, extent, database, type, and limit. Species refers to the scienfic name of your species of interest, extent describes the area you are interested in, database requires the name of your repository, type denotes the type of occurrence data you are interested in (for example presence-only), and limit corresponds to the number of records to be sourced. 
 
@@ -89,14 +104,14 @@ occurrence = SpOcc(species = “Ailuropoda melanoleuca”, extent = “ ”, dat
 ### Loading your own data
 If you have occurrence dataset from field surveys that you want to analyse, you can load it using the `LocalOccurrenceData` module. This requires a .csv file with three columns for the values of longitude, latitude, and value of species presence, in that order. For alternate coordinate systems refer to the information about a CRS column using `ModuleHelp("LocalOccurrenceData")`. 
 
-To load your own presence-only dataset, set your `occurrence` module within `workflow` as follows:
+To load your own presence-only dataset, set your `occurrence` module within `workflow()` as follows:
 
 ```{r eval=FALSE}
 occurrence = LocalOccurrenceData(filename = "myData.csv",
                                  occurrenceType = 'presence')
 ```
 
-To load your own presence-absence dataset, set your `occurrence` module within `workflow` as follows:
+To load your own presence-absence dataset, set your `occurrence` module within `workflow()` as follows:
 
 ```{r eval=FALSE}
 occurrence = LocalOccurrenceData(filename = "myData.csv",
@@ -114,34 +129,34 @@ Occurrence(Your_Workflow_Name_Here)
 The outputs of this accessor function are shown below for both the `CarolinaWrenPO` (top) and `CarolinaWrenPA` data modules (bottom). The first two columns provide the geographic location of the observation (as longitude and latitude), the third column is the observation value (1 = presence, 0 = absence), the fourth column is the type of observation, and the last column identifies the "fold" the data point is located in if utilising cross-validation (covered later in the section of `Process` modules, but a default model can be considered to always have one fold).
 
 ```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-hidden_PO_workflow <- workflow(occurrence = CarolinaWrenPO,    ### just some basic workflows so there
-                             covariate = CarolinaWrenRasters,  ### is something to run accessor functions
-                             process = OneHundredBackground,   ### on as examples
-                             model = MaxEnt,
-                             output = NoOutput)
+#hidden_PO_workflow <- workflow(occurrence = CarolinaWrenPO,    ### just some basic workflows so there
+#                             covariate = CarolinaWrenRasters,  ### is something to run accessor functions
+#                             process = Background,          ### on as examples
+#                             model = MaxEnt,
+#                             output = NoOutput)
 
-hidden_PA_workflow <- workflow(occurrence = CarolinaWrenPA,
-                             covariate = CarolinaWrenRasters,
-                             process = NoProcess,
-                             model = LogisticRegression,
-                             output = NoOutput)
+#hidden_PA_workflow <- workflow(occurrence = CarolinaWrenPA,
+#                             covariate = CarolinaWrenRasters,
+#                             process = NoProcess,
+#                             model = LogisticRegression,
+#                             output = NoOutput)
 ```
 
 ```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-head(Occurrence(hidden_PO_workflow))
+#head(Occurrence(hidden_PO_workflow))
 ```
 
 ```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-tail(Occurrence(hidden_PA_workflow))
+#tail(Occurrence(hidden_PA_workflow))
 ```
 
 ## Step 2. Covariates
 
-The second module required in a `workflow` is for your environmental data. As with the `occurrence` module, there are three ways to load `covariate` data into your model: pre-existing `zoon` modules, data from online sources, and your own data from a local computer.
+The second module required in a `workflow()` is for your environmental data. As with the `occurrence` module, there are three ways to load `covariate` data into your model: pre-existing `zoon` modules, data from online sources, and your own data from a local computer.
 
 ### Existing *zoon* data
 
-You still find the pre-existing `zoon` `covariate` modules using `GetModuleList()` under the `$covariate` sub-heading. For this tutorial, we will be using the `CarolinaWrenRasters` module. This is the complementary environmental data to our chosen `occurrence` module. To use this dataset, call your `covariate` data in the `workflow` as follows:
+You still find the pre-existing `zoon` `covariate` modules using `GetModuleList()` under the `$covariate` sub-heading. For this tutorial, we will be using the `CarolinaWrenRasters` module. This is the complementary environmental data to our chosen `occurrence` module. To use this dataset, call your `covariate` data in the `workflow()` as follows:
 
 ```{r eval=FALSE}
 covariate = CarolinaWrenRasters
@@ -179,7 +194,7 @@ covariate = Bioclim_future(extent = c(-10, 10, 45, 65),   # default values for t
 
 ### Loading your own data
 
-You can load your own environmental data into your `workflow` uing the `LocalRaster` module. This will load in either a single raster or a list of rasters. If you load a list of rasters, the module will create a raster stack in the form of a string of the raster layer filenames, a list/vector of strings of raster filenames to be stacked, a RasterLayer, or a RasterStack object. The structure of this module call is:
+You can load your own environmental data into your `workflow()` uing the `LocalRaster` module. This will load in either a single raster or a list of rasters. If you load a list of rasters, the module will create a raster stack in the form of a string of the raster layer filenames, a list/vector of strings of raster filenames to be stacked, a RasterLayer, or a RasterStack object. The structure of this module call is:
 
 ```{r eval=FALSE}
 covariate = LocalRaster(rasters = "MyRaster")
@@ -188,13 +203,19 @@ covariate = LocalRaster(rasters = "MyRaster")
 Using the `Covariate()` accessor function will show you important details of your raster stack, including the extent of the dataset, the coordinate projection scheme (here, WGS84), and minimum/maximum value for your variables. 
 
 ```{r eval=FALSE}
-Covariate(Your_Workflow_Name_Here)
+#Covariate(Your_Workflow_Name_Here)
 ```
 
 ```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-Covariate(hidden_PO_workflow)
+#Covariate(hidden_PO_workflow)
 ```
 You can use the `?'RasterStack-class'` command to find a more detailed summary of your data. 
+
+### Exploring your data
+Thinking about your covariates. 
+
+
+
 
 ## Step 3. Process
 Now that you have loaded in your species and environmental data using the `occurrence` and `covariate` modules, the `process` modules will perform any modifications required before fitting the model itself. These modules can be broadly classified into those that modify your data, generate additional data, or set up model validation.
@@ -304,7 +325,7 @@ process = Bootstrap   # Bootstrap a number of points equal to the number of poin
 process = BackgroundAndCrossvalid(k = 5)   # generate up to 100 background points, and the split all data into 5 folds for cross validation
 ```
 
-In some instances you may not require a `process` module in your `workflow`,  however, it is a mandatory argument and so the `NoProcess` module can be used as a 'blank' module.
+In some instances you may not require a `process` module in your `workflow()`,  however, it is a mandatory argument and so the `NoProcess` module can be used as a 'blank' module.
 
 ```{r eval=FALSE}
 process = NoProcess
@@ -312,11 +333,11 @@ process = NoProcess
 
 ## Step 4. Model
 
-Arguably the most important part of your `workflow` is the `model` module. **actually, probably not due to the variation in results with model choice** This is where you choose which type of SDM you want to fit to your data. There are many different SDM methods to choose from **(add Elith paper reference)** and each have their mertis. Here we provide a quick overview of some of the common methods. 
+Arguably the most important part of your `workflow()` is the `model` module. **actually, probably not due to the variation in results with model choice** This is where you choose which type of SDM you want to fit to your data. There are many different SDM methods to choose from **(add Elith paper reference)** and each have their mertis. Here we provide a quick overview of some of the common methods. 
 
 ### Logistic Regression
 
-Logistic regression is a type of Generalised Linear Model (GLM) that can be fit to presence-background and presence-absence datasets. Logistic regression fits binary data (presence represented as "1" and absence as "0," for example) that is dependent on one or more independent explanatory variables. Coefficients are estimated by choosing parameter values that maximise the likelihood of observing the sample values. You select `LogisticRegression` model by defining your `workflow` as follows:
+Logistic regression is a type of Generalised Linear Model (GLM) that can be fit to presence-background and presence-absence datasets. Logistic regression fits binary data (presence represented as "1" and absence as "0," for example) that is dependent on one or more independent explanatory variables. Coefficients are estimated by choosing parameter values that maximise the likelihood of observing the sample values. You select `LogisticRegression` model by defining your `workflow()` as follows:
 
 ```{r eval=FALSE}
 model = LogisticRegression
@@ -324,7 +345,7 @@ model = LogisticRegression
 
 ### Generalised Additive Model
 
-In contrast to GLMs, in which the coefficient for each covariate is estimated, in Generalised Additive Models (GAMs) the linear predictor is the sum of smoothing functions fit to each measured variable. **(Add definition of smoothing functions?)**. This model can be fit to presence-background and presence-absence datasets. The `mgcv` module fits a GAM using generalised cross-validation via the `mgcv` package. To fit this model you need to define a basis dimension used to represent the smooth term, and a two-letter character string indicating the smoothing basis to use. You select this model in your `workflow` as follows:
+In contrast to GLMs, in which the coefficient for each covariate is estimated, in Generalised Additive Models (GAMs) the linear predictor is the sum of smoothing functions fit to each measured variable. **(Add definition of smoothing functions?)**. This model can be fit to presence-background and presence-absence datasets. The `mgcv` module fits a GAM using generalised cross-validation via the `mgcv` package. To fit this model you need to define a basis dimension used to represent the smooth term, and a two-letter character string indicating the smoothing basis to use. You select this model in your `workflow()` as follows:
 
 ```{r eval=FALSE}
 model = mgcv(k = -1,   # default settings
@@ -333,7 +354,7 @@ model = mgcv(k = -1,   # default settings
 
 ### MaxEnt
 
-MaxEnt is the most widely used SDM algorithm **(Elith reference)** today. This is a machine learning method that computes a probability distribution over the environment data grid cells, and the chosen distribution is the one that maximises the entropy (hence, MaxEnt), subject to some constraints. This method works with presence-background data. The `MaxEnt` module uses the `maxent()` function in the `dismo` package, and requires a MaxEnt executable file saved in the correct location. The `zoon` helper function `GetMaxEnt()` is available to help with this installation. You select this model in your `workflow` as follows:
+MaxEnt is the most widely used SDM algorithm **(Elith reference)** today. This is a machine learning method that computes a probability distribution over the environment data grid cells, and the chosen distribution is the one that maximises the entropy (hence, MaxEnt), subject to some constraints. This method works with presence-background data. The `MaxEnt` module uses the `maxent()` function in the `dismo` package, and requires a MaxEnt executable file saved in the correct location. The `zoon` helper function `GetMaxEnt()` is available to help with this installation. You select this model in your `workflow()` as follows:
 
 ```{r eval=FALSE}
 model = MaxEnt
@@ -341,7 +362,7 @@ model = MaxEnt
 
 ### Boosted Regression Trees
 
-Boosted regression trees (BRTs; also known as Gradient Boosting Machine, or GBM), are a machine learning technique that produces a prediction model in the form of an ensemble of weak prediction models (i.e. decision trees). This differs from the standard regression approach of fitting a single best model by using the "boosting" technique to combine relatively large numbers of simple trees adaptively, optimising predictive performance. The `GBM` module fits a generalised boosted regression model using the `gbm` package. For this model you need to define the maximum number of trees, the maximum depth of variable interactions, and a shrinkage parameter (aka the learning rate). This model can be fit to presence-background and presence-absence data using the following call in your `workflow`:
+Boosted regression trees (BRTs; also known as Gradient Boosting Machine, or GBM), are a machine learning technique that produces a prediction model in the form of an ensemble of weak prediction models (i.e. decision trees). This differs from the standard regression approach of fitting a single best model by using the "boosting" technique to combine relatively large numbers of simple trees adaptively, optimising predictive performance. The `GBM` module fits a generalised boosted regression model using the `gbm` package. For this model you need to define the maximum number of trees, the maximum depth of variable interactions, and a shrinkage parameter (aka the learning rate). This model can be fit to presence-background and presence-absence data using the following call in your `workflow()`:
 
 ```{r eval=FALSE}
 model = GBM(max.trees = 1000,   # default values
@@ -351,7 +372,7 @@ model = GBM(max.trees = 1000,   # default values
 
 ### RandomForest
 
-Similar to the boosted regression trees in the `GBM` module, random forests are a machine learning technique that make use of an ensemble of weak prediction models (i.e. decision trees). Random forests differ from BRTs by fitting each decision tree independently from previously fit trees using bootstrapped samples of your data. **(need a better definition of the difference between BRT and RF?)**. The `RandomForest` module can be fit to presence-background or presence-absence data using the following call in your `workflow`:
+Similar to the boosted regression trees in the `GBM` module, random forests are a machine learning technique that make use of an ensemble of weak prediction models (i.e. decision trees). Random forests differ from BRTs by fitting each decision tree independently from previously fit trees using bootstrapped samples of your data. **(need a better definition of the difference between BRT and RF?)**. The `RandomForest` module can be fit to presence-background or presence-absence data using the following call in your `workflow()`:
 
 ```{r eval=FALSE}
 model = RandomForest
@@ -369,26 +390,28 @@ It is finally time to check out our results.
 
 
 ## Putting it all together
-
-Now that we have seen how to use each argument in the `workflow` function it is time to put all of the pieces together and fit our own SDM within `zoon`. Since MaxEnt it is the most popular SDM methodology, we will fit a MaxEnt model to our Carolina Wren presence-background data set, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow`.
+Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. Since MaxEnt it is the most popular SDM methodology, we will fit a MaxEnt model to our Carolina Wren presence-background data set, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
-myMaxEntWorkflow <- workflow(occurrence = CarolinaWrenPO,
+Logistic_Regression_Workflow <- workflow(occurrence = CarolinaWrenPO,
                        covariate = CarolinaWrenRasters,
-                       process = OneThousandBackground,
+                       process = Background(1000),
+                       model = LogisticRegression,
+                       output = PrintMap(points = FALSE))
+```
+
+
+Since MaxEnt it is the most popular SDM methodology, we will fit a MaxEnt model Now run the exact same `workflow()` but switch to a `MaxEnt` model. How do they compare?
+
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+MaxEnt_Workflow <- workflow(occurrence = CarolinaWrenPO,
+                       covariate = CarolinaWrenRasters,
+                       process = Background(1000),
                        model = MaxEnt,
                        output = PrintMap(points = FALSE))
 ```
 
-Now run the exact same `workflow` but switch to a `LogisticRegression` model. How do they compare?
 
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
-myLogisticflow <- workflow(occurrence = CarolinaWrenPO,
-                       covariate = CarolinaWrenRasters,
-                       process = OneThousandBackground,
-                       model = LogisticRegression,
-                       output = PrintMap(points = FALSE))
-```
 
 There are some obvious differences in the predicted distribution maps of these two approaches. The only thing to change betweeen the two workflows is our model of choice, so what causes the difference? Check out our more detailed guide on SDM model algorithm selection here **(insert plug for future guides)**
 
