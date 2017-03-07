@@ -70,6 +70,13 @@ The first module required in a `workflow` is `occurrence` and it is where you lo
 occurrence = CarolinaWrenPO
 ```
 
+UKMosquitoes <- workflow(occurrence = UKAnophelesPlumbeus,
+                             *covariate = UKAir*,
+                             process = OneHundredBackground,
+                             model = RandomForest,
+                             output = PrintMap)
+
+
 ### Data from online repositories
 You may want to source your species occurrence data from online repositories. Several online repositories are available to use [hint: use `ModuleHelp(“SpOcc”)` to see a list of options], 
 
@@ -192,6 +199,12 @@ Covariate(Your_Workflow_Name_Here)
 Covariate(hidden_PO_workflow)
 ```
 You can use the `?'RasterStack-class'` command to find a more detailed summary of your data. 
+
+### Exploring your data
+Thinking about your covariates. 
+
+
+
 
 ## Step 3. Process
 Now that you have loaded in your species and environmental data using the `occurrence` and `covariate` modules, the `process` modules will perform any modifications required before fitting the model itself. These modules can be broadly classified into those that alter your raw data, those that generate additional data, or those that set up model validation.
