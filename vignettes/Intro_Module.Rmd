@@ -41,16 +41,19 @@ But first, let's fit a quick and simple SDM with `zoon` as a means of introducti
 library(zoon)
 ```
 
-A basic workflow for the mosquito *Anopheles plumbeus* in the UK could look like this:  
-```{r message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=3}
-UKMosquitoes <- workflow(occurrence = UKAnophelesPlumbeus,
-                             covariate = UKAir,
-                             process = OneHundredBackground,
-                             model = RandomForest,
+A basic workflow for the Carolina Wren in the USA could look like this:  
+```{r message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
+                             covariate = CarolinaWrenRasters,
+                             process = Background(100),
+                             model = LogisticRegression,
                              output = PrintMap)
 ```
 
-In this workflow, we have loaded the *Anopheles plumbeus* occurrence data for the UK, loaded the environmental covariate UKAir, selected 100 background occurrence data (more on this later), fitted a random forest model, and printed a map. The map shows us how the probability of occurrence of *Anopheles plumbeus* varies across a region of the UK. The red dots show recorded presences. Most of the map has a low probability of occurrence (light green) but there is a patch of high occurrence probabilty (blue) in the centre. The model has estimated the area of detected presences as having a high likelihood of occurrence.
+In this workflow, we have loaded the Carolina Wren presence-only occurrence data for the USA, loaded the environmental covariates, selected 100 background occurrence data (more on this later), fitted a logistic regression model, and printed a map. The map shows us how the probability of occurrence of the Carolina Wren varies across the USA. The red dots show recorded presences. Most of the map has a low probility of occurance (light green) but there is a patch of high occurrence probabilty (blue) in the centre. The model has estimated the area of detected presences as havign a high liklihood of occurrence.
+
+`zoon` comes with several pre-existing modules for each argument. We will go through a key selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList` command.
+>>>>>>> upstream/master
 
 `zoon` comes with several pre-existing modules for each argument. We will go through a key selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList()` command.
 
@@ -107,7 +110,7 @@ occurrence = LocalOccurrenceData(filename = "myData.csv",
 
 **Add example here**
 
-`zoon` has several fucntions available to view the contents of each module in your workflow. For exmaple, you can view your species occurrence data using the `Occurrence()` function:
+`zoon` has several fucntions available to view the contents of each module in your workflow. These are called accessor fcuntions. For exmaple, you can view your species occurrence data using the `Occurrence()` function:
 
 ```{r eval=FALSE, message=FALSE, warning=FALSE}
 Occurrence(Your_Workflow_Name_Here)
@@ -116,25 +119,25 @@ Occurrence(Your_Workflow_Name_Here)
 The outputs of this accessor function are shown below for both the `CarolinaWrenPO` (top) and `CarolinaWrenPA` data modules (bottom). The first two columns provide the geographic location of the observation (as longitude and latitude), the third column is the observation value (1 = presence, 0 = absence), the fourth column is the type of observation, and the last column identifies the "fold" the data point is located in if utilising cross-validation (covered later in the section of `Process` modules, but a default model can be considered to always have one fold).
 
 ```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-hidden_PO_workflow <- workflow(occurrence = CarolinaWrenPO,    ### just some basic workflows so there
-                             covariate = CarolinaWrenRasters,  ### is something to run accessor functions
-                             process = OneHundredBackground,   ### on as examples
-                             model = MaxEnt,
-                             output = NoOutput)
+#hidden_PO_workflow <- workflow(occurrence = CarolinaWrenPO,    ### just some basic workflows so there
+#                             covariate = CarolinaWrenRasters,  ### is something to run accessor functions
+#                             process = Background,          ### on as examples
+#                             model = MaxEnt,
+#                             output = NoOutput)
 
-hidden_PA_workflow <- workflow(occurrence = CarolinaWrenPA,
-                             covariate = CarolinaWrenRasters,
-                             process = NoProcess,
-                             model = LogisticRegression,
-                             output = NoOutput)
+#hidden_PA_workflow <- workflow(occurrence = CarolinaWrenPA,
+#                             covariate = CarolinaWrenRasters,
+#                             process = NoProcess,
+#                             model = LogisticRegression,
+#                             output = NoOutput)
 ```
 
 ```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-head(Occurrence(hidden_PO_workflow))
+#head(Occurrence(hidden_PO_workflow))
 ```
 
 ```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-tail(Occurrence(hidden_PA_workflow))
+#tail(Occurrence(hidden_PA_workflow))
 ```
 
 ## Step 2. Covariates
@@ -190,11 +193,11 @@ covariate = LocalRaster(rasters = "MyRaster")
 Using the `Covariate()` accessor function will show you important details of your raster stack, including the extent of the dataset, the coordinate projection scheme (here, WGS84), and minimum/maximum value for your variables. 
 
 ```{r eval=FALSE}
-Covariate(Your_Workflow_Name_Here)
+#Covariate(Your_Workflow_Name_Here)
 ```
 
 ```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-Covariate(hidden_PO_workflow)
+#Covariate(hidden_PO_workflow)
 ```
 You can use the `?'RasterStack-class'` command to find a more detailed summary of your data. 
 
@@ -368,7 +371,8 @@ model = RandomForest
 ## Step 5. Output
 It is finally time to check out our results. 
 
-*Map
+*Map ()
+
 
 *response curves for logistic regression and/or GAM
 
@@ -376,26 +380,28 @@ It is finally time to check out our results.
 
 
 ## Putting it all together
-
 Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. Since MaxEnt it is the most popular SDM methodology, we will fit a MaxEnt model to our Carolina Wren presence-background data set, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
-myMaxEntWorkflow <- workflow(occurrence = CarolinaWrenPO,
+Logistic_Regression_Workflow <- workflow(occurrence = CarolinaWrenPO,
                        covariate = CarolinaWrenRasters,
-                       process = OneThousandBackground,
+                       process = Background(1000),
+                       model = LogisticRegression,
+                       output = PrintMap(points = FALSE))
+```
+
+
+Since MaxEnt it is the most popular SDM methodology, we will fit a MaxEnt model Now run the exact same `workflow()` but switch to a `MaxEnt` model. How do they compare?
+
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+MaxEnt_Workflow <- workflow(occurrence = CarolinaWrenPO,
+                       covariate = CarolinaWrenRasters,
+                       process = Background(1000),
                        model = MaxEnt,
                        output = PrintMap(points = FALSE))
 ```
 
-Now run the exact same `workflow()` but switch to a `LogisticRegression` model. How do they compare?
 
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
-myLogisticflow <- workflow(occurrence = CarolinaWrenPO,
-                       covariate = CarolinaWrenRasters,
-                       process = OneThousandBackground,
-                       model = LogisticRegression,
-                       output = PrintMap(points = FALSE))
-```
 
 There are some obvious differences in the predicted distribution maps of these two approaches. The only thing to change betweeen the two workflows is our model of choice, so what causes the difference? Check out our more detailed guide on SDM model algorithm selection here **(insert plug for future guides)**
 
