@@ -11,6 +11,16 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r knitrOpts, echo = FALSE, cache = FALSE, eval = TRUE}
+# set up knitr options
+knitr::opts_chunk$set(message = FALSE,
+               warning = FALSE,
+               fig.align = 'center',
+               dev = c('png'),
+               cache = TRUE,
+               cache.path = file.path(getwd(), 'vignettes/Intro_Module_cache'))
+```
+
 # Introduction
 ## Why do we fit species distribution models?
 In ecology, we often want to understand where a species is located in the environment and the restraints on that distribution so we can predict where the species may occur in the future. We typcially consider that species exist within their "ecological niche." In contrast to geographic space, the ecological niche does not describe a physical place, but rather the environmental conditions required for a species. 
