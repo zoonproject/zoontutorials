@@ -15,26 +15,8 @@ vignette: >
 ## Why do we fit species distribution models?
 In ecology, we often want to understand where a species is located in the environment and the restraints on that distribution so we can predict where the species may occur in the future. We typcially consider that species exist within their "ecological niche." In contrast to geographic space, the ecological niche does not describe a physical place, but rather the environmental conditions required for a species. 
 
-Ecologists typically consider species' ecological niche space to be constrained by three dominant factors: the abiotic environment, the biotic environment, and movement. Characteristics of the ecological niche include the abiotic and biotic habitat, the resources it obtains from the habitat, and the species' activity pattern that allow it to utilise its space. Examples of these include the climate required for a species to survive, the local vegetation types it depends on, and it's abillity to traverse different landscapes, respectively. The intersection of the abiotic and biotic environmental conditions constitutes the "fundamental niche," or where the species could physiologically occur given what we know of its biology and ecology. Experience tells us, however, that species are not always located where we expect them to be. Their "realised niche" is where they actually exist within the bounds of the environmental space where they could potentially exist. This is conceptualised by the bounds of the species' activity or movement, which may restrict to it where it can access. Invasive species are often those that are introduced to a new place by anthropogenic activity, thereby allowing them to overcome a movement barrier, and subsequently thrive in a region that exists within their fundamental niche. 
+Ecologists typically consider species' ecological niche space to be constrained by three dominant factors: the abiotic environment, the biotic environment, and movement. Characteristics of the ecological niche include the abiotic and biotic habitat, the resources it obtains from the habitat, and the species' activity pattern that allow it to utilise its space. Examples of these include the climate required for a species to survive, the local vegetation types it depends on, and it's abillity to traverse different landscapes, respectively. The intersection of the abiotic and biotic environmental conditions constitutes the "fundamental niche," or where the species could physiologically occur given what we know of its biology and ecology. Experience tells us, however, that species are not always located where we expect them to be. Their "realised niche" is where they actually exist within the bounds of the environmental space where they could potentially exist. 
 
-<<<<<<< HEAD
-## Types of SDMs
-There are two main types of SDMs: mechanistic and correlative. Mechanistic models are considered a "bottum-up" approach to modelling species distributions because they begin with mathematical formulations of the specific environmental and biologic processes that impact a species' distribution and scale up to predict occurrence in geographic space. Parameters included in this type of model have physical meaning, such as thermotolerance thresholds, and we use that understanding to expand to predictions at a larger scale. 
-
-Correlative models, which are the chief concern of the `zoon` workflow, are a "top-down" approach. These models lack a detailed mathematical formula to explain the physical processes underlying species' occurrence, and rather use statistical models to describe occurrence in relation to selected environmental and biological parameters. Correlative models use species occurrence data in combination with environmental preictors to use underpinning statistical models that help us derive new maps of the likelihood of species occurrence. 
-
-When we build SDM's, we are trying to describe the ecological niche of a species using statistical correlations with environmental predictors. The statistical models we use, therefore, have implications on the how generalisable the resulting conclusions are. We have to make trade-offs between how well our model will fit our data, and how applicable the results will be to the species in general. Correlative models are typically better at characterising the realised niche of a species, rather than the fundamental niche, because of the type of data they incorporate. 
-
-# Steps in a correlative SDM
-The basic steps of a correlative species distribution model are:
-    1. Occurence: Prepare and format species occurrence data 
-    2. Covariates: Preapre and format the environmental predictors you will use in your model
-    3. Process: Make any modifications and adjustments to your data sets
-    4. Model: Fit statistical models
-    5. Output: Produce either predictions or ecological inferences, for example in the form of maps
-
-The `zoon` `workflow` is designed to make building and fitting correlative SDMs based on the above steps as straight-forward and reproducible as possible. To fit an SDM you use the `workflow` function, and need only to select a module in each of the five main steps of a correlative SDM: occurrence, covariate, process, model, and output. The following sections of this tutorial will guide you through the process of selecting a module for each argument of the `workflow` function. But first, don't forget to load the package!
-=======
 ## What is a species distribution model?
 Species distribution models estimate the probabilty of occurrence of species along environmental gradients. They do this by estimating the correlation between enviornmental variables and species occurrence data. For example, using SDMs, we can estiamte the probability a species of bird will use forest habitat with high tree cover compared to open habitat with low tree cover. Or we might estimate the probability of occurrense for a frog across the a whole continent using climatic variables, such as rainfall and temperature. We can take these statisical relationships and project them onto geographic space, which allows us to visualise on a map how the probabilty of species occurrence varies in geographic space.
 
@@ -51,17 +33,12 @@ We implement a species distribution model with five steps:
 The `zoon` `workflow` is structured around these five steps and designed to make building and fitting SDMs straight-foward and reproducile. The primary zoon function is `workflow`, which we use to fit the SDM. The workflow function has five arguments, one for each step in the SDM fitting process. For each argument, we need only to select a 'module'. The modules we choose in each step determine what type of model we run with what data and what outputs we produce. This tutorial will guide you through the process of selecting a module for each argument of the `workflow` function. Along the way, we'll introduce some key factors that you should consider when fitting and evaluating an SDM.
 
 But first, let's fit a quick and simple SDM with `zoon` as a means of introdction. Don't forget to load the package!
->>>>>>> 7205783a632e59f0c95ec4f0f8380c057b16e49b
 
 ```{r message=FALSE, warning=FALSE}
 library(zoon)
 ```
-<<<<<<< HEAD
-A basic workflow, in this example for the mosquito *Anopheles Plumbeus* in the UK, might look like this:  
-=======
 
 A basic workflow for the mosquito *Anopheles plumbeus* in the UK could look like this:  
->>>>>>> 7205783a632e59f0c95ec4f0f8380c057b16e49b
 ```{r message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=3}
 UKMosquitoes <- workflow(occurrence = UKAnophelesPlumbeus,
                              covariate = UKAir,
@@ -70,14 +47,9 @@ UKMosquitoes <- workflow(occurrence = UKAnophelesPlumbeus,
                              output = PrintMap)
 ```
 
-<<<<<<< HEAD
-`zoon` comes with several pre-existing modules for each argument, which we will go through in more detail in the rest of this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList` command.
-=======
 In this workflow, we have loaded the *Anopheles plumbeus* occurrence data for the UK, loaded the environmental covariate UKAir, selected 100 background occurrence data (more on this later), fitted a random forest model, and printed a map. The map shows us how the probability of occurrence of *Anopheles plumbeus* varies across a region of the UK. The red dots show recorded presences. Most of the map has a low probility of occurance (light green) but there is a patch of high occurrence probabilty (blue) in the centre. The model has estimated the area of detected presences as havign a high liklihood of occurrence.
 
 `zoon` comes with several pre-existing modules for each argument. We will go through a key selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList` command.
->>>>>>> 7205783a632e59f0c95ec4f0f8380c057b16e49b
-
 
 # Zoon SDM Workflow
 ## Step 1. Occurrence
@@ -85,11 +57,7 @@ Species distribution models are fitted with species occurrence data, which is av
 
 * Presence-only data is usually sourced from museum or herbarium records, and is a list of all recorded sightings/captures of a species with its location. 
 
-<<<<<<< HEAD
-* Presence-background data is a type of presence-only data that combines presence records with a set amount of randomly generated background points, also called "pseudo-absences." This is the more common of the two types. 
-=======
 * Presence-background data is a type of presence-only data that combines presence records with randomly generated background points, also called 'pseudo-absences.' This is the more common of the two types. 
->>>>>>> 7205783a632e59f0c95ec4f0f8380c057b16e49b
 
 * Presence-absence data generally comes from structured field surveys where the presence *or* absence of the target species is recorded for a given site.
 
@@ -103,13 +71,6 @@ The first module required in a `workflow` is `occurrence` and it is where you lo
 ```{r eval=FALSE}
 occurrence = CarolinaWrenPO
 ```
-
-UKMosquitoes <- workflow(occurrence = UKAnophelesPlumbeus,
-                             *covariate = UKAir*,
-                             process = OneHundredBackground,
-                             model = RandomForest,
-                             output = PrintMap)
-
 
 ### Data from online repositories
 You may want to source your species occurrence data from online repositories. Several online repositories are available to use [hint: use `ModuleHelp(“SpOcc”)` to see a list of options], 
