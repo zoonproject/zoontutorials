@@ -90,21 +90,21 @@ ll <- ggplot(cov, aes(longitude, latitude)) +
   coord_fixed(ratio = 1)
   xlab('E') +
   ylab('N')
-env <- ggplot(cov, aes(pcMix, pcDec)) +
+env <- ggplot(cov, aes(pcDec, pcMix)) +
   geom_point(aes(colour = type), size = 1) +
   zoon_theme +
   theme(axis.title.y = element_text(hjust = 0.9)) +
   scale_colour_manual(values = c('grey', 'black')) +
-  xlab('Mixed Forest') +
-  ylab('Deciduous')
+  xlab('Deciduous') +
+  ylab('Mixed Forest')
 epre <- ggplot(mp, aes(Var2, Var1, fill = value)) + geom_raster() +
   scale_fill_viridis() +
   zoon_theme +
   theme(axis.title.y = element_text(hjust = 0.9)) +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0)) +
-  xlab('Mixed Forest') +
-  ylab('Deciduous')
+  xlab('Deciduous') +
+  ylab('Mixed Forest')
 pred <- ggplot(out.df) +
   geom_raster(aes(x, y, fill = pcMix)) +
   zoon_theme +
