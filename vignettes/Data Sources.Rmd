@@ -1,0 +1,99 @@
+---
+title: "Data Sources"
+author: "zoontutorials team"
+date: "7 March 2017"
+output:
+  rmarkdown::html_vignette:
+    toc: yes
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Data Sources}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+### Existing zoon data
+`zoon` comes with several pre-existing dataset modules that we can use. These are available with the `GetModuleList()` command. Under the `$occurrence` sub-heading you can see all available `occurrence` modules including these datasets. For this tutorial, we will be using the `CarolinaWrenPO` module, which is a presence-only dataset of the Carolina Wren in the USA. This is a common species in in North America whose range reaches from southern Canada to north-eastern Mexico, but the dataset has been cropped to the extent of the contiguous USA. To use this dataset, or any other module available within `zoon` for our `occurrence` data, we use the following line of code inside the `workflow()`:
+
+* `occurrence = CarolinaWrenPO`
+
+### Data from online repositories
+We may want to source our species occurrence data from online repositories. Several online repositories are available to use [hint: use `ModuleHelp(“SpOcc”)` to see a list of options], 
+
+The `SpOcc` module allows us to access data from these databases. This module requires a number of specifications: species, extent, database, type, and limit. Species refers to the scienfic name of our species of interest, extent describes the area we are interested in, database requires the name of the repository, type denotes the type of occurrence data we are interested in (for example presence-only), and limit corresponds to the number of records to be sourced. 
+
+In this example we will use GBIF. We are interested in obtaining presence-only data for the Giant Panda, so we set our `occurrence` module like this:
+
+* `occurrence = SpOcc(species = “Ailuropoda melanoleuca”, extent = “ ”, database = “GBIF”) `
+
+** Needs finishing when GBIF is working again to test **
+
+### Loading your own data
+If we have occurrence dataset from field surveys that we want to analyse, we can load it using the `LocalOccurrenceData` module. This requires a .csv file with three columns for the values of longitude, latitude, and value of species presence, in that order. For alternate coordinate systems refer to the information about a CRS column using `ModuleHelp("LocalOccurrenceData")`. 
+
+To load our own presence-only dataset, set the `occurrence` module within `workflow()` as follows:
+
+* `occurrence = LocalOccurrenceData(filename = "myData.csv",
+                                 occurrenceType = 'presence')`
+
+To load our own presence-absence dataset, set your `occurrence` module within `workflow()` as follows:
+
+* `occurrence = LocalOccurrenceData(filename = "myData.csv",
+                                 occurrenceType = 'presence/absence')`
+
+
+
+
+
+
+
+
+### Existing *zoon* data
+
+We still find the pre-existing `zoon` `covariate` modules using `GetModuleList()` under the `$covariate` sub-heading. For this tutorial, we will be using the `CarolinaWrenRasters` module. This is the complementary environmental data to our chosen `occurrence` module. To use this dataset, call your `covariate` data in the `workflow` as follows:
+
+* `covariate = CarolinaWrenRasters`
+
+### Data from online repositories
+
+The three main `covariate` modules for sourcing environmental data from an online repository are `NCEP`, `Bioclim`, and `Bioclim-future`.
+
+* `NCEP`: This module will grab coarse environmental data from the National Centers for Environmental Prediction (NCEP). This requires you to set the coordinates of the model extent and provide a character vector of which variables to select (use `ModuleHelp("NCEP")` to see the options).
+    + `covariate = NCEP(extent = c(-5,5,50,60), # default values for the NCEP module
+                  variables = "hgt")`
+
+* `Bioclim`: This module will grab bioclimatic variables data from WorldClim. This requires you to set the coordinates of the model extent, select a resolution for the data (in minutes), and a vector of integers to identify which bioclim variables to source. Refer to [WorldClim](http://www.worldclim.org/bioclim) for a list of available bioclim variables.
+    + `covariate = Bioclim(extent = c(-180,180,-90,90), # default values for the Bioclim module
+                     resolution = 10,
+                     layers = 1:5)`
+
+* `Bioclim_future`: This module will grab biolimatic variables data from WorldClim for the future (CMIP5). This requires you to set the coordinates of the model extent, select a resolution for the data (in minutes), a vector of integers to identify which bioclim variables to source, a [Representative Concentration Pathways trajectory](https://en.wikipedia.org/wiki/Representative_Concentration_Pathways), a General Circulation Model **(need a link!)**, a time period for the projection ('50' for the period 2041-2060, or '70' for 2061-2080).
+    + `covariate = Bioclim_future(extent = c(-10, 10, 45, 65),   # default values for the Bioclim_future module
+                            resolution = 10,
+                            layers = 1:19,
+                            rcp = 45,
+                            model = "AC",
+                            year = 70)`
+
+### Loading your own data
+
+We can load our own environmental data into the `workflow` uing the `LocalRaster` module. This will load in either a single raster or a list of rasters. If you load a list of rasters, the module will create a raster stack in the form of a string of the raster layer filenames, a list/vector of strings of raster filenames to be stacked, a RasterLayer, or a RasterStack object. The structure of this module call is:
+
+* `covariate = LocalRaster(rasters = "MyRaster")`
+
+
+
+`process` modules that generate new data include those that create background data points for models fit to presence-only data, or introduce interactions between variables in the model.
+
+All models that utilise presence-only data sets **(or almost all? at least within zoon)** require the generation of background data points (aka pseudo-absences). [WE MAY NEED A DISCUSSION HERE ABOUT WHY WE GENERATE PSEUDO-ABSENCES]
+These data points represent the range of environmental conditions present in the region being modelled. Broadly speaking, this is so models can compare the distribution of a species in environmental space compared to the entire range of environmental space. There are several modules in zoon that undertake this process: 
+
+* `Background` generates n background samples (default 100). You need to define the number of background samples you wish to generate, and have the option of defining a bias value (see `ModuleHelp("Background")`).
+
+** `process = Background(n = 100,  bias = NULL)  # generate 100 unbiased background points`
+
+* `OneHundredBackground` and `OneThousandBackground` generate 100 and 1000 background points, respectively.
+
+** `process = OneHundredBackground`
+
+** `process = OneThousandBackground`

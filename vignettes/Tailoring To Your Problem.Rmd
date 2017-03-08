@@ -1,0 +1,56 @@
+---
+title: "Tailoring To Your Problem"
+author: "zoontutorials team"
+date: "7 March 2017"
+output:
+  rmarkdown::html_vignette:
+    toc: yes
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Tailoring To Your Problem}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+`process` modules that modify our data improve interpretability of your results. They can involve, for example, tidying or transforming the raw data or standardising the covariates.
+
+*	Inaccurate data can lead you to draw false conclusions, so the `Clean` module removes impossible, incomplete, or unlikely occurrence points in a dataset based on longitude/latitude values. Use `ModuleHelp("Clean")` to see how to select a cleaning method.
+    + `process = Clean(which = c(1,2,3,4))   # default fit of the Clean module`
+
+*	The `Transform` module lets us apply a transformation (e.g. square or log) to the environmental variables. We often transform environemntal variables to normalise them. To use this module we need to define the transformation, provide a character vector listing the covariates to be transformed, and state whether we want to replace the original variable with the transformed version or add it as an extra layer.
+    + `process = Transform(trans = function(x) {x},
+                    which_cov = NULL,
+                    replace = TRUE)` # default form of the Transform module. Perform no transformations on any variable
+
+** `process = Transform(trans = function(x) {x^2},   # Add a new variable that is the squared transformation of the "cov1" variable
+                    which_cov = "cov1",
+                    replace = FALSE)`
+
+** `process = Transform(trans = function(x) {log(x)}, # Replace the "cov1" variable with the log-transformed version of "cov1"
+                    which_cov = "cov1",
+                    replace = TRUE)`
+
+*	Another transformation we often employ is to centre and standardise our environmental covariates. This common transformation allows us to directly compare the influence of different variables on species distributions and also improve the efficiency of model fitting alogorithms. We use the `StandardiseCov` module to standardise covariates in the model. By default, the module standardises all variables by subtracting the mean and dividing by the standard deviation. This standardisation places variables on the same scale. For example, the regression coefficient for the distance of a site to roads might be +3.0 when measured in kilometres, but +0.003 if measured in meters, and the effect of average temperature could be -10C. How would we compare the effect of these variables? Standardisation allows us to compare the relative effects of different covariates within a model. To use this module we need to choose which variables to exclude from standardisation (if any), and whether to use the Gelman variant (standardises by two standard deviations instead of one - **(link to this here)**.)
+
+** `process = StandardiseCov(Gelman = FALSE, exclude = NULL)   # default form of the StandardiseCov module.`
+
+
+Interactions between variables can have important implications for the interpretation of statistical models. **Expand when back in front of textbooks (Something about interpretation of response curves? Doesn't effect maps)**. The `addInteraction` module lets us define interactions between variables in our model. This is not generating new data per se, but adds additional variables to the model based on existing variables. There are three ways to implement the `addInteractions` module:
+
+* We can add all pair-wise interactions:
+
+** `process = addInteractions(which.covs = 'pairs')`
+
+* You can add all interactions between a select group of variables:
+
+** `process = addInteractions(which.covs = c(A,B))   # adds an interacton between A & B`
+
+** `process = addInteractions(which.covs = list(c(A,B), c(A,C)))   # adds interactions between A & B and A & C, but not B & C`
+
+** `process = addInteractions(which.covs = c(A,B,C))   # adds all two-way (e.g. A & B) interactions and a three-way interaction between A, B & C`
+
+* You can specify polynomial terms:
+
+** `process = addInteractions(which.covs = c(A,A))   # leads to a quadratic polynomial`
+
+** `process = addInteractions(which.covs = c(A,A,A))   # leads to a cubic, polynomial`
