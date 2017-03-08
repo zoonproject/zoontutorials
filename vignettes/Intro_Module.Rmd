@@ -53,19 +53,17 @@ library(zoon)
 
 A basic workflow for the Carolina Wren in the USA could look like this:  
 ```{r message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
-Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
-                             covariate = CarolinaWrenRasters,
-                             process = Background(100),
-                             model = LogisticRegression,
+zoon_workflow <- workflow(occurrence = Lorem_ipsum_UK,
+                             covariate = UKBioclim,
+                             process = OneHundredBackground,
+                             model = RandomForest,
                              output = PrintMap)
 ```
 
-In this workflow, we have loaded the Carolina Wren presence-only occurrence data for the USA, loaded the environmental covariates, selected 100 background occurrence data (more on this later), fitted a logistic regression model, and printed a map. The map shows us how the probability of occurrence of the Carolina Wren varies across the USA. The red dots show recorded presences. Most of the map has a low probility of occurance (light green) but there is a patch of high occurrence probabilty (blue) in the centre. The model has estimated the area of detected presences as havign a high liklihood of occurrence.
 
-`zoon` comes with several pre-existing modules for each argument. We will go through a key selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList` command.
->>>>>>> upstream/master
+In this workflow, we have loaded the *Lorem ipsum* presence-only occurrence data for the UK, loaded the Bioclim environmental covariates for the UK, selected 100 background occurrence data (more on this later), fit a Random Forest model, and printed a map. The map shows us how the probability of occurrence of *Lorem ipsum* varies across the UK. Throughout this tutorial we will guide you step-by-step through each of the arguments in a workflow as we update this `zoon_workflow`.
 
-`zoon` comes with several pre-existing modules for each argument. We will go through a key selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList()` command.
+`zoon` comes with several pre-existing modules for each argument, and we will go through a selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList()` command.
 
 # Zoon SDM Workflow
 ## Step 1. Occurrence
@@ -79,303 +77,75 @@ Species distribution models are fitted with species occurrence data, which is av
 
 Presence-only data is widely and freely accesible only and as a result is more commonly used than presence-absence data. As such, we write this tutorial for presence-only data and note any necessary alterations for presence-absence data.
 
-The first module required in a `workflow()` is `occurrence` and it is where we will load our species occurrence data. There are three methods for loading data into our `workflow()` depending on the source of our data: we can use pre-existing `occurrence` modules in `zoon`, download data from online repositories, or load in our own data from a local computer. All three methods are demonstrated below. 
+The first module required in a `workflow()` is `occurrence` and it is where we load our species occurrence data. There are three methods for loading data into your workflow depending where the data is sourced: we can use pre-existing `occurrence` modules in `zoon` like `Lorem_ipsum_UK`, download data from an online repository using `SpOcc`, or load in our own data from a local computer using `LocalOccurrenceData`. 
 
-### Existing zoon data
-`zoon` comes with several pre-existing dataset modules that you can use. These are available with the `GetModuleList()` command. Under the `$occurrence` sub-heading you can see all available `occurrence` modules including these datasets. For this tutorial, we will be using the `CarolinaWrenPO` module, which is a presence-only dataset of the Carolina Wren in the USA. This is a common species in in North America whose range reaches from southern Canada to north-eastern Mexico, but the dataset has been cropped to the extent of the contiguous USA. To use this dataset, or any other module available within `zoon` for your `occurrence` data, we use the following line of code inside the `workflow()`:
+`zoon` has several functions available to view the contents of each module in the workflow. For example, we can view our species occurrence data using the `Occurrence()` function (using the `head()` function to see only the first six lines):
 
-```{r eval=FALSE}
-occurrence = CarolinaWrenPO
+```{r eval=TRUE, message=FALSE, warning=FALSE}
+head(Occurrence(zoon_workflow))
 ```
 
-### Data from online repositories
-You may want to source your species occurrence data from online repositories. Several online repositories are available to use [hint: use `ModuleHelp(“SpOcc”)` to see a list of options].
-
-The `SpOcc` module allows you to access data from these databases. This module requires a number of specifications: species, extent, database, type, and limit. Species refers to the scienfic name of your species of interest, extent describes the area you are interested in, database requires the name of your repository, type denotes the type of occurrence data you are interested in (for example presence-only), and limit corresponds to the number of records to be sourced. 
-
-In this example we will use GBIF. We are interested in obtaining presence-only data for the Giant Panda, so we set our `occurrence` module like this:
-
-```{r eval=FALSE}
-occurrence = SpOcc(species = “Ailuropoda melanoleuca”, extent = “ ”, database = “GBIF”) 
-```
-
-** Needs finishing when GBIF is working again to test **
-
-### Loading your own data
-If you have occurrence dataset from field surveys that you want to analyse, you can load it using the `LocalOccurrenceData` module. This requires a .csv file with three columns for the values of longitude, latitude, and value of species presence, in that order. For alternate coordinate systems refer to the information about a CRS column using `ModuleHelp("LocalOccurrenceData")`. 
-
-To load your own presence-only dataset, set your `occurrence` module within `workflow()` as follows:
-
-```{r eval=FALSE}
-occurrence = LocalOccurrenceData(filename = "myData.csv",
-                                 occurrenceType = 'presence')
-```
-
-To load your own presence-absence dataset, set your `occurrence` module within `workflow()` as follows:
-
-```{r eval=FALSE}
-occurrence = LocalOccurrenceData(filename = "myData.csv",
-                                 occurrenceType = 'presence/absence')
-```
-
-**Add example here**
-
-`zoon` has several fucntions available to view the contents of each module in your workflow. These are called accessor fcuntions. For exmaple, you can view your species occurrence data using the `Occurrence()` function:
-
-```{r eval=FALSE, message=FALSE, warning=FALSE}
-Occurrence(Your_Workflow_Name_Here)
-```
-
-The outputs of this accessor function are shown below for both the `CarolinaWrenPO` (top) and `CarolinaWrenPA` data modules (bottom). The first two columns provide the geographic location of the observation (as longitude and latitude), the third column is the observation value (1 = presence, 0 = absence), the fourth column is the type of observation, and the last column identifies the "fold" the data point is located in if utilising cross-validation (covered later in the section of `Process` modules, but a default model can be considered to always have one fold).
-
-```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-#hidden_PO_workflow <- workflow(occurrence = CarolinaWrenPO,    ### just some basic workflows so there
-#                             covariate = CarolinaWrenRasters,  ### is something to run accessor functions
-#                             process = Background,          ### on as examples
-#                             model = MaxEnt,
-#                             output = NoOutput)
-
-#hidden_PA_workflow <- workflow(occurrence = CarolinaWrenPA,
-#                             covariate = CarolinaWrenRasters,
-#                             process = NoProcess,
-#                             model = LogisticRegression,
-#                             output = NoOutput)
-```
-
-```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-#head(Occurrence(hidden_PO_workflow))
-```
-
-```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-#tail(Occurrence(hidden_PA_workflow))
-```
+The first two columns provide the geographic location of the observation (as longitude and latitude), the third column is the observation value (1 = presence, 0 = absence), the fourth column is the type of observation, and the last column identifies the "fold" the data point is located in if utilising cross-validation (covered later in the section of `Process` modules, but a default model can be considered to always have one fold). 
 
 ## Step 2. Covariates
 
-The second module required in a `workflow()` is for your environmental data. As with the `occurrence` module, there are three ways to load `covariate` data into your model: pre-existing `zoon` modules, data from online sources, and your own data from a local computer.
+The second module required in a `workflow` is for environmental data. As with the `occurrence` module, there are three ways to load `covariate` data into the model: pre-existing `zoon` modules like `CarolinaWrenRasters`, data from online sources such as `Bioclim`, and our own data from a local computer using `LocalRaster`.
 
-### Existing *zoon* data
+Using the `Covariate()` accessor function shows important details of our raster stack, including the extent of the dataset, the coordinate projection scheme (here, WGS84), and minimum/maximum value for the variables. 
 
-You still find the pre-existing `zoon` `covariate` modules using `GetModuleList()` under the `$covariate` sub-heading. For this tutorial, we will be using the `CarolinaWrenRasters` module. This is the complementary environmental data to our chosen `occurrence` module. To use this dataset, call your `covariate` data in the `workflow()` as follows:
-
-```{r eval=FALSE}
-covariate = CarolinaWrenRasters
+```{r eval=TRUE, message=FALSE, warning=FALSE}
+Covariate(zoon_workflow)
 ```
 
-### Data from online repositories
+We can use the `?'RasterStack-class'` command to find a more detailed summary of the data format. 
 
-The three main `covariate` modules for sourcing environmental data from an online repository are `NCEP`, `Bioclim`, and `Bioclim-future`.
+Now using what we've learned here, lets update `zoon_workflow` so that we can build an SDM for the Carolina Wren in the USA. `zoon` has pre-loaded dataset modules for the Carolina Wren which is a common species in North America whose range reaches from southern Canada to north-eastern Mexico, but the dataset has been cropped to the extent of the contiguous USA. As presence-only data is the most commonly used data type for SDMs lets use the presence-only version of the dataset using `CarolinaWrenPO`, and we get the environmental data from `CarolinaWrenRasters`.
 
-* `NCEP`: This module will grab coarse environmental data from the National Centers for Environmental Prediction (NCEP). This requires you to set the coordinates of the model extent and provide a character vector of which variables to select (use `ModuleHelp("NCEP")` to see the options).
-
-```{r eval=FALSE}
-covariate = NCEP(extent = c(-5,5,50,60), # default values for the NCEP module
-                  variables = "hgt")   
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
+                                occurrence = CarolinaWrenPO,
+                                covariate = CarolinaWrenRasters)
 ```
-
-* `Bioclim`: This module will grab bioclimatic variables data from WorldClim. This requires you to set the coordinates of the model extent, select a resolution for the data (in minutes), and a vector of integers to identify which bioclim variables to source. Refer to [WorldClim](http://www.worldclim.org/bioclim) for a list of available bioclim variables.
-
-```{r eval=FALSE}
-covariate = Bioclim(extent = c(-180,180,-90,90), # default values for the Bioclim module
-                     resolution = 10,
-                     layers = 1:5)   
-```
-
-* `Bioclim_future`: This module will grab biolimatic variables data from WorldClim for the future (CMIP5). This requires you to set the coordinates of the model extent, select a resolution for the data (in minutes), a vector of integers to identify which bioclim variables to source, a [Representative Concentration Pathways trajectory](https://en.wikipedia.org/wiki/Representative_Concentration_Pathways), a General Circulation Model **(need a link!)**, a time period for the projection ('50' for the period 2041-2060, or '70' for 2061-2080).
-
-```{r eval=FALSE}
-covariate = Bioclim_future(extent = c(-10, 10, 45, 65),   # default values for the Bioclim_future module
-                            resolution = 10,
-                            layers = 1:19,
-                            rcp = 45,
-                            model = "AC",
-                            year = 70)
-```
-
-### Loading your own data
-
-You can load your own environmental data into your `workflow()` uing the `LocalRaster` module. This will load in either a single raster or a list of rasters. If you load a list of rasters, the module will create a raster stack in the form of a string of the raster layer filenames, a list/vector of strings of raster filenames to be stacked, a RasterLayer, or a RasterStack object. The structure of this module call is:
-
-```{r eval=FALSE}
-covariate = LocalRaster(rasters = "MyRaster")
-```
-
-Using the `Covariate()` accessor function will show you important details of your raster stack, including the extent of the dataset, the coordinate projection scheme (here, WGS84), and minimum/maximum value for your variables. 
-
-```{r eval=FALSE}
-#Covariate(Your_Workflow_Name_Here)
-```
-
-```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-#Covariate(hidden_PO_workflow)
-```
-You can use the `?'RasterStack-class'` command to find a more detailed summary of your data. 
-
-### Exploring your data
-Thinking about your covariates. 
-
-
-
 
 ## Step 3. Process
-Now that you have loaded in your species and environmental data using the `occurrence` and `covariate` modules, the `process` modules will perform any modifications required before fitting the model itself. These modules can be broadly classified into those that modify your data, generate additional data, or set up model validation.
 
-### Modify your data
-`process` modules that modify your data improve interpretability of your results. They can involve, for example, tidying or transforming your raw data or standardising your covariates.
+Now that we have loaded in our species and environmental data using the `occurrence` and `covariate` modules, the `process` modules will perform any pre-processing of our data required before fitting the model itself. This is where we can modify our raw data by removing poor data points using the `Clean` module or standardising our covariates using `StandardiseCov`, generate the background data points required for presence-only data analysis using `Background`, add interaction terms between our covariates using `addInteractions`, or set up model validation methods using modules like `CrossValidate`.
 
-*	Inaccurate data can lead you to draw false conclusions, so the `Clean` module removes impossible, incomplete, or unlikely occurrence points in a dataset based on longitude/latitude values. Use `ModuleHelp("Clean")` to see how to select a cleaning method.
+Lets see how the mimimum/maximum values for our environmental layers change after we standardise our covariates.
 
-```{r eval=FALSE}
-process = Clean(which = c(1,2,3,4))   # default fit of the Clean module
+```{r eval=TRUE}
+Covariate(zoon_workflow)   # Before standardisation
 ```
 
-*	The `Transform` module lets you apply a transformation (e.g. square or log) to your environmental variables. We often transform environemntal variables to normailise them. To use this module you need to define the transformation, provide a character vector listing the covariates to be transformed, and state whether you want to replace the original variable with the transformed version or add it as an extra layer.
-
-```{r eval=FALSE}
-process = Transform(trans = function(x) {x},   # default form of the Transform module. Perform no transformations on any variable
-                    which_cov = NULL,
-                    replace = TRUE)
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.show=FALSE}
+zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
+                                process = StandardiseCov)
 ```
 
-```{r eval=FALSE}
-process = Transform(trans = function(x) {x^2},   # Add a new variable that is the squared transformation of the "cov1" variable
-                    which_cov = "cov1",
-                    replace = FALSE)
+```{r eval=TRUE}
+Covariate(zoon_workflow)
 ```
 
-```{r eval=FALSE}
-process = Transform(trans = function(x) {log(x)}, # Replace the "cov1" variable with the log-transformed version of "cov1"
-                    which_cov = "cov1",
-                    replace = TRUE)
-```
+We can see that the standardised variables have a smaller range and are centered around zero.
 
-*	Another transformation we often employ is to centre and standardise our environmental covariations. This common transformation allows us to diretly compare the influence of different variables on species distributions and also improve the efficiency of model fitting alogorithms. We use the `StandardiseCov` module standardises covariates in your model. By default, the module standardises all variables by subtracting the mean and dividing by the standard deviation. This standardisation places variables on the same scale. For example, the regression coefficient for the distance of a site to roads might be +3.0 when measured in kilometres, but +0.003 if measured in meters, and the effect of average temperature could be -10C. How would you compare the effect of these variables? Standardisation allows you to compare the relative effects of different covariates within a model. To use this module you need to choose which variables to exclude from standardisation (if any), and whether to use the Gelman variant (standardises by two standard deviations instead of one - **(link to this here)**.)
+In some instances you may not require a `process` module in your `workflow`, however, it is a mandatory argument and so the `NoProcess` module can be used as a 'blank' module.
 
-```{r eval=FALSE}
-process = StandardiseCov(Gelman = FALSE, exclude = NULL)   # default form of the StandardiseCov module.
-```
+Since we are using presence-only data in our model we need to generate some background data, also known as pseudo-absences. Depending on the type of SDM model (see next section), this data is used to either sample the range of environmental space in the landscape to compare it to where the species in question has been found, or as a non-presence class of data. We also want to standardise our covariates, so to use multiple modules in an argument we can use the `Chain()` function. Here we use `StandardiseCov` to standardise our covariates and  `Background` to generate 100 background points.
 
-
-### Generate new data
-
-`process` modules that generate new data include those that create background data points for models fit to presence-only data, or introduce interactions between variables in the model.
-
-All models that utilise presence-only data sets **(or almost all? at least within zoon)** require the generation of background data points (aka pseudo-absences). [WE MAY NEED A DISCUSSION HERE ABOUT WHY WE GENERATE PSEUDO-ABSENCES]
-These data points represent the range of environmental conditions present in the region being modelled. There are several modules in zoon that undertake this process: 
-
-* `Background` generates n background samples (default 100). You need to define the number of background samples you wish to generate, and have the option of defining a bias value (see `ModuleHelp("Background")`).
-
-```{r eval=FALSE}
-process = Background(n = 100,   # generate 100 unbiased background points
-                     bias = NULL)
-```
-
-* `OneHundredBackground` and `OneThousandBackground` generate 100 and 1000 background points, respectively.
-
-```{r eval=FALSE}
-process = OneHundredBackground
-```
-
-```{r eval=FALSE}
-process = OneThousandBackground
-```
-
-Interactions between variables can have important implications for the interpretation of statistical models. Expand when back in front of textbooks (Something about interpretation of response curves? Doesn't effect maps). The `addInteraction` module lets you define interactions between variables in your model. This is not generating new data per se, but adds additional variables to the model based on existing variables. There are three ways to implement the `addInteractions` module:
-
-* You can add all pair-wise interactions:
-```{r eval=FALSE}
-process = addInteractions(which.covs = 'pairs')
-```
-
-* You can add all interactions between a select group of variables:
-```{r eval=FALSE}
-process = addInteractions(which.covs = c(A,B))   # adds an interacton between A & B
-
-process = addInteractions(which.covs = list(c(A,B), c(A,C)))   # adds interactions between A & B and A & C, but not B & C
-
-process = addInteractions(which.covs = c(A,B,C))   # adds all two-way (e.g. A & B) interactions and a three-way interaction between A, B & C
-```
-
-* You can specify polynomial terms:
-```{r eval=FALSE}
-process = addInteractions(which.covs = c(A,A))   # leads to a quadratic polynomial
-
-process = addInteractions(which.covs = c(A,A,A))   # leads to a cubic, polynomial
-```
-
-### Set up model validation
-
-Model validation is an important step in the model fitting process as it lets you determine if your model is an acceptable description of your data. Model validation can be as simple as including goodness-of-fit tests or analysing the residuals **can this be done for SDMs?** but the `zoon` package uses more complex methods that subset and/or resample the dataset. **[Expand on what model validation is/why it is important]** The `process` modules that set up model validation include:
-
-*	`Crossvalidate`: Run k fold crossvalidation (default = 5). If you are using presence-absence, this will split presences and absences separately so folds have equally balanced data, otherwise it just samples. This samples the dataset without replacement into k 'folds' or sub-datasets to be used for training and testing the model. A model is fit to the k-1 folds of training data and evaluated against the fold of testing data (and repeated so each fold is used as the testing data once, and then the results are averaged). This is mainly used where the goal is to use the model for prediction as it tests if the model is overfit to the training data and thus unlikely to be suitable for prediction across another dataset (i.e. the test fold). 
-
-```{r eval=FALSE}
-process = Crossvalidate(k = 5)   # 5-fold cross-validation
-```
-
-*	`Bootstrap`: This module generates random bootstraps of the data. **expand** It defaults to the number of points in the dataset
-
-```{r eval=FALSE}
-process = Bootstrap   # Bootstrap a number of points equal to the number of points in the dataset
-```
-
-*	`BackgroundAndCrossvalid`: This module generates up to 100 background records at random in the raster cells and splits all data in k folds for cross validation (default = 5).
-
-```{r eval=FALSE}
-process = BackgroundAndCrossvalid(k = 5)   # generate up to 100 background points, and the split all data into 5 folds for cross validation
-```
-
-In some instances you may not require a `process` module in your `workflow()`,  however, it is a mandatory argument and so the `NoProcess` module can be used as a 'blank' module.
-
-```{r eval=FALSE}
-process = NoProcess
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
+                                process = Chain(StandardiseCov, Background(n = 100)))
 ```
 
 ## Step 4. Model
 
-Arguably the most important part of your `workflow()` is the `model` module. **actually, probably not due to the variation in results with model choice** This is where you choose which type of SDM you want to fit to your data. There are many different SDM methods to choose from **(add Elith paper reference)** and each have their mertis. Here we provide a quick overview of some of the common methods. 
+Arguably the most important part of the `workflow` is the `model` module. **actually, probably not due to the variation in results with model choice** *but would that not mean that it is the most important since it can have such a large effect?* This is where we choose which type of SDM you want to fit to our data. There are multiple different SDM methods to choose from **(add Elith paper reference)** and each have their mertis. A few more common examples include the `LogisticRegression`, `mgcv`, `MaxEnt`, `RandomForest`, and `GBM` modules. For more detail on these methods you can refer to the "Choosing A Model" vignette **link later**.
 
-### Logistic Regression
+Now, lets update our `workflow` with one of the simplest model types, and a statistical approach many might be familiar with outside of SDMs, using the `LogisticRegression` module.
 
-Logistic regression is a type of Generalised Linear Model (GLM) that can be fit to presence-background and presence-absence datasets. Logistic regression fits binary data (presence represented as "1" and absence as "0," for example) that is dependent on one or more independent explanatory variables. Coefficients are estimated by choosing parameter values that maximise the likelihood of observing the sample values. You select `LogisticRegression` model by defining your `workflow()` as follows:
-
-```{r eval=FALSE}
-model = LogisticRegression
-```
-
-### Generalised Additive Model
-
-In contrast to GLMs, in which the coefficient for each covariate is estimated, in Generalised Additive Models (GAMs) the linear predictor is the sum of smoothing functions fit to each measured variable. **(Add definition of smoothing functions?)**. This model can be fit to presence-background and presence-absence datasets. The `mgcv` module fits a GAM using generalised cross-validation via the `mgcv` package. To fit this model you need to define a basis dimension used to represent the smooth term, and a two-letter character string indicating the smoothing basis to use. You select this model in your `workflow()` as follows:
-
-```{r eval=FALSE}
-model = mgcv(k = -1,   # default settings
-             bs = "tp")
-```
-
-### MaxEnt
-
-MaxEnt is the most widely used SDM algorithm **(Elith reference)** today. This is a machine learning method that computes a probability distribution over the environment data grid cells, and the chosen distribution is the one that maximises the entropy (hence, MaxEnt), subject to some constraints. This method works with presence-background data. The `MaxEnt` module uses the `maxent()` function in the `dismo` package, and requires a MaxEnt executable file saved in the correct location. The `zoon` helper function `GetMaxEnt()` is available to help with this installation. You select this model in your `workflow()` as follows:
-
-```{r eval=FALSE}
-model = MaxEnt
-```
-
-### Boosted Regression Trees
-
-Boosted regression trees (BRTs; also known as Gradient Boosting Machine, or GBM), are a machine learning technique that produces a prediction model in the form of an ensemble of weak prediction models (i.e. decision trees). This differs from the standard regression approach of fitting a single best model by using the "boosting" technique to combine relatively large numbers of simple trees adaptively, optimising predictive performance. The `GBM` module fits a generalised boosted regression model using the `gbm` package. For this model you need to define the maximum number of trees, the maximum depth of variable interactions, and a shrinkage parameter (aka the learning rate). This model can be fit to presence-background and presence-absence data using the following call in your `workflow()`:
-
-```{r eval=FALSE}
-model = GBM(max.trees = 1000,   # default values
-            interaction.depth = 5,
-            shrinkage = 0.001)
-```
-
-### RandomForest
-
-Similar to the boosted regression trees in the `GBM` module, random forests are a machine learning technique that make use of an ensemble of weak prediction models (i.e. decision trees). Random forests differ from BRTs by fitting each decision tree independently from previously fit trees using bootstrapped samples of your data. **(need a better definition of the difference between BRT and RF?)**. The `RandomForest` module can be fit to presence-background or presence-absence data using the following call in your `workflow()`:
-
-```{r eval=FALSE}
-model = RandomForest
+```{r eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=7, fig.width=7}
+zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
+                                model = LogisticRegression)
 ```
 
 ## Step 5. Output
@@ -387,6 +157,16 @@ It is finally time to check out our results.
 *response curves for logistic regression and/or GAM
 
 *model evaluation stats
+
+`########################`
+Code for Liz to modify as needed for changing output modules in zoon_workflow. While you could use List to do multiple outputs at once, it might be better to step through them one by one with multiple ChangeWorkflows? Or split into another best pratice guide?
+
+```{r eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=7, fig.width=7}
+zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
+                                output = )
+```
+
+
 
 
 ## Putting it all together

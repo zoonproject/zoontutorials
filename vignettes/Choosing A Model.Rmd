@@ -1,0 +1,56 @@
+---
+title: "Choosing A Model"
+author: "zoontutorials team"
+date: "7 March 2017"
+output:
+  rmarkdown::html_vignette:
+    toc: yes
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Choosing A Model}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+### Logistic Regression
+
+Logistic regression is a type of Generalised Linear Model (GLM) that can be fit to presence-background and presence-absence datasets. Logistic regression fits binary data (presence represented as "1" and absence as "0," for example) that is dependent on one or more independent explanatory variables. Coefficients are estimated by choosing parameter values that maximise the likelihood of observing the sample values. You select `LogisticRegression` model by defining your `workflow` as follows:
+
+```{r eval=FALSE}
+model = LogisticRegression
+```
+
+### Generalised Additive Model
+
+In contrast to GLMs, in which the coefficient for each covariate is estimated, in Generalised Additive Models (GAMs) the linear predictor is the sum of smoothing functions fit to each measured variable. **(Add definition of smoothing functions?)**. This model can be fit to presence-background and presence-absence datasets. The `mgcv` module fits a GAM using generalised cross-validation via the `mgcv` package. To fit this model you need to define a basis dimension used to represent the smooth term, and a two-letter character string indicating the smoothing basis to use. You select this model in your `workflow` as follows:
+
+```{r eval=FALSE}
+model = mgcv(k = -1,   # default settings
+             bs = "tp")
+```
+
+### MaxEnt
+
+MaxEnt is the most widely used SDM algorithm **(Elith reference)** today. This is a machine learning method that computes a probability distribution over the environment data grid cells, and the chosen distribution is the one that maximises the entropy (hence, MaxEnt), subject to some constraints. This method works with presence-background data. The `MaxEnt` module uses the `maxent()` function in the `dismo` package, and requires a MaxEnt executable file saved in the correct location. The `zoon` helper function `GetMaxEnt()` is available to help with this installation. You select this model in your `workflow` as follows:
+
+```{r eval=FALSE}
+model = MaxEnt
+```
+
+### Boosted Regression Trees
+
+Boosted regression trees (BRTs; also known as Gradient Boosting Machine, or GBM), are a machine learning technique that produces a prediction model in the form of an ensemble of weak prediction models (i.e. decision trees). This differs from the standard regression approach of fitting a single best model by using the "boosting" technique to combine relatively large numbers of simple trees adaptively, optimising predictive performance. The `GBM` module fits a generalised boosted regression model using the `gbm` package. For this model you need to define the maximum number of trees, the maximum depth of variable interactions, and a shrinkage parameter (aka the learning rate). This model can be fit to presence-background and presence-absence data using the following call in your `workflow`:
+
+```{r eval=FALSE}
+model = GBM(max.trees = 1000,   # default values
+            interaction.depth = 5,
+            shrinkage = 0.001)
+```
+
+### RandomForest
+
+Similar to the boosted regression trees in the `GBM` module, random forests are a machine learning technique that make use of an ensemble of weak prediction models (i.e. decision trees). Random forests differ from BRTs by fitting each decision tree independently from previously fit trees using bootstrapped samples of your data. **(need a better definition of the difference between BRT and RF?)**. The `RandomForest` module can be fit to presence-background or presence-absence data using the following call in your `workflow`:
+
+```{r eval=FALSE}
+model = RandomForest
+```
