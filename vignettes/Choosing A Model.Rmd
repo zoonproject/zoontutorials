@@ -11,10 +11,26 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+# Introduction
+
+With the abundance of species distribution modelling (SDM) algorithms to pick from, one might find themselves asking which model to choose? Some models can only be implemented on certain types of data, they can fall into the schools of 'profile', 'regression', or 'machine learning' based methods (although 'profile' methods are currently not implemented in `zoon`), and even within these schools there can be significant differences in how different models operate.
+
+So, which model should you choose to fit to your dataset? In this best practice guide we can into detail about the common SDM model types available in `zoon`. For each model we will cover which data types it is compatible with, explain the underlying statistical approach, and show you how to fit the model in `zoon`.
+
+Throughout this tutorial we will fit several example SDMs to highlight each model, and to keep comparisons straight forward we will fit them all to the same Carolina Wren dataset, standardise our covariates, and generate 1000 points of background data.
+
+
+# Models
+
+## Regression-based Models
+
+Regression analysis is a statistical method for estimating the relationships among variables, and the models found in this category are likely to be familiar to those with a statistical background. These models focus on the relationship between a dependent variable (like the presence of a species) and one or more independent variables (like our environmental predictor variables). The two regression-based SDMs covered here are logistic regression and generalised additive models.
 
 ### Logistic Regression
 
-Logistic regression is a type of Generalised Linear Model (GLM) that can be fit to presence-background and presence-absence datasets. Logistic regression fits binary data (presence represented as "1" and absence as "0," for example) that is dependent on one or more independent explanatory variables. Coefficients are estimated by choosing parameter values that maximise the likelihood of observing the sample values. You select `LogisticRegression` model by defining your `workflow` as follows:
+Logistic regression is a type of Generalised Linear Model (GLM) that can be fit to presence-background and presence-absence datasets. It uses the logit link function to estimate probability of a binary response variable (presence represented as "1" and absence as "0," for example) based on its relationship with one or more independent predictor variables. **insert example formula?**. The regression coefficients are estimated using maximum likelihood estimation. This method chooses parameter values that maximise the likelihood of observing the data given the parameters. 
+
+The `LogisticRegression` model fits a logistic regression model to your data using the `glm` package in R. There are no additional arguments to define for this model, so to fit it requires only seleting it as your model module within your `workflow`.
 
 ```{r eval=FALSE}
 model = LogisticRegression
