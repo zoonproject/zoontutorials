@@ -32,8 +32,12 @@ Logistic regression is a type of Generalised Linear Model (GLM) that can be fit 
 
 The `LogisticRegression` model fits a logistic regression model to your data using the `glm` package in R. There are no additional arguments to define for this model, so to fit it requires only seleting it as your model module within your `workflow`.
 
-```{r eval=FALSE}
-model = LogisticRegression
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+logistic_regression_workflow <- workflow(occurrence = CarolinaWrenPO,
+                                         covariate = CarolinaWrenRasters,
+                                         process = StandardiseCov,
+                                         model = LogisticRegression,
+                                         output = PrintMap)
 ```
 
 ### Generalised Additive Model
