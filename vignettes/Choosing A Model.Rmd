@@ -74,10 +74,18 @@ Machine learning is a subfield of computer science where models are built to lea
 
 ### MaxEnt
 
-MaxEnt is the most widely used SDM algorithm **(Elith reference)** today. This is a machine learning method that computes a probability distribution over the environment data grid cells, and the chosen distribution is the one that maximises the entropy (hence, MaxEnt), subject to some constraints. This method works with presence-background data. The `MaxEnt` module uses the `maxent()` function in the `dismo` package, and requires a MaxEnt executable file saved in the correct location. The `zoon` helper function `GetMaxEnt()` is available to help with this installation. You select this model in your `workflow` as follows:
+MaxEnt is the most widely used SDM algorithm in practice today **(Elith reference)**. This model compares the probability density of covariates across the landscape, *f(z)*, with the probability density of covariates across locations within the landscape in which the species is present, *f1(z)*, where *z* is the environmental covariates. The estimated ratio of *f1(z)*/*f(z)* provides insight on which covariates are important and establishes the relative suitability of one site over another. MaxEnt estimates *f1(z)* such that it is consistent with the occurrence data, but there are many possible distributions so it chooses the one closest to *f(z)*. Minimising this distance is sensible as without occurrence data there is no reason to expect a species to prefer a particular environmental conditions over another. This distance from *f(z)* is taken to be the relative entropy of *f1(z)* with respect to *f(z)*. Minimising this relative entropy is equivalent to maximising the entropy (hence, MaxEnt) of the ratio *f1(z)*/*f(z)*. This model can be described as maximising entropy in geographic space, or minimising entropy in environmental space.
 
-```{r eval=FALSE}
-model = MaxEnt
+During the model fitting procedure MaxEnt needs to estimate coefficient values such that they meet the above constraints, yet not fit them too closely and result in an overfit model that has limited generalisation ability. This is achieved using regularisation, which can be thought of as shrinking the coefficients towards zero by penalising them to balance model fit and complexity. Thus, MaxEnt can be seen as fitting a penalised maximum likelihood model.
+
+This method works with presence-background data. The `MaxEnt` module uses the `maxent()` function in the `dismo` package, and requires a MaxEnt executable file saved in the correct location. The `zoon` helper function `GetMaxEnt()` is available to help with this installation. You select this model in your `workflow` as follows:
+
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+MaxEnt_workflow <- workflow(occurrence = CarolinaWrenPO,
+                         covariate = CarolinaWrenRasters,
+                         process = Chain(StandardiseCov, Background(1000)),
+                         model = MaxEnt,
+                         output = PrintMap(points = FALSE))
 ```
 
 ### Boosted Regression Trees
