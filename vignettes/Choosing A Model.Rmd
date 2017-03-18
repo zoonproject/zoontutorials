@@ -11,6 +11,20 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+# set up knitr options
+knitr::opts_chunk$set(message = FALSE,
+               warning = FALSE,
+               fig.align = 'center',
+               dev = c('png'),
+               cache = TRUE,
+               cache.path = file.path(getwd(), 'vignettes/Choosing_A_Model_cache'))
+```
+
+```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+library(zoon)
+```
+
 # Introduction
 
 With the abundance of species distribution modelling (SDM) algorithms to pick from, one might find themselves asking which model to choose? Some models can only be implemented on certain types of data, they can fall into the schools of 'profile', 'regression', or 'machine learning' based methods (although 'profile' methods are currently not implemented in `zoon`), and even within these schools there can be significant differences in how different models operate.
@@ -30,24 +44,33 @@ Regression analysis is a statistical method for estimating the relationships amo
 
 Logistic regression is a type of Generalised Linear Model (GLM) that can be fit to presence-background and presence-absence datasets. It uses the logit link function to estimate probability of a binary response variable (presence represented as "1" and absence as "0," for example) based on its relationship with one or more independent predictor variables. **insert example formula?**. The regression coefficients are estimated using maximum likelihood estimation. This method chooses parameter values that maximise the likelihood of observing the data given the parameters. 
 
-The `LogisticRegression` model fits a logistic regression model to your data using the `glm` package in R. There are no additional arguments to define for this model, so to fit it requires only seleting it as your model module within your `workflow`.
+The `LogisticRegression` model fits a logistic regression model to your data using the `glm` package in R. There are no additional arguments to define for this model, so to fit it requires only selecting it as your model module within your `workflow`.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
 logistic_regression_workflow <- workflow(occurrence = CarolinaWrenPO,
                                          covariate = CarolinaWrenRasters,
-                                         process = StandardiseCov,
+                                         process = Chain(StandardiseCov, Background(1000)),
                                          model = LogisticRegression,
-                                         output = PrintMap)
+                                         output = PrintMap(points = FALSE))
 ```
 
 ### Generalised Additive Model
 
-In contrast to GLMs, in which the coefficient for each covariate is estimated, in Generalised Additive Models (GAMs) the linear predictor is the sum of smoothing functions fit to each measured variable. **(Add definition of smoothing functions?)**. This model can be fit to presence-background and presence-absence datasets. The `mgcv` module fits a GAM using generalised cross-validation via the `mgcv` package. To fit this model you need to define a basis dimension used to represent the smooth term, and a two-letter character string indicating the smoothing basis to use. You select this model in your `workflow` as follows:
+Generalised Additive Models (GAMs) can be thought of as an extension to the GLM framework, and can be fit to presence-background and presence-absence datasets. In contrast to GLMs, in which the coefficient for each covariate is estimated, in GAMs the linear predictor is the sum of smoothing functions fit to each measured variable. **(Add definition of smoothing functions?)**. If smoothing functions are used without restriction then maximum likelihood estimation of the model will result in a complex, overfit estimation of the smoothing functions. To avoid this GAMs are fit using penalised likelihood maximisation which adds a penalty for each additional smoothing function, thus penalising 'wiggliness'.
 
-```{r eval=FALSE}
-model = mgcv(k = -1,   # default settings
-             bs = "tp")
+The `mgcv` module fits a GAM using generalised cross-validation via the `mgcv` package. To fit this model you need to define the dimension of the basis used to fit the smooth term, *k*, and select which penalised smoothing basis, *bs*, to use. You can find more details on selecting these parameters using `?mgcv::choose.k` and `?mgcv::smooth.terms`. Here we fit the model using the default settings in our `workflow`.
+
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+GAM_workflow <- workflow(occurrence = CarolinaWrenPO,
+                         covariate = CarolinaWrenRasters,
+                         process = Chain(StandardiseCov, Background(1000)),
+                         model = mgcv(k = -1, bs = "tp"),
+                         output = PrintMap(points = FALSE))
 ```
+
+## Machine Learning Models
+
+Machine learning is a subfield of computer science where models are built to learn from and make predictions on data. 
 
 ### MaxEnt
 
