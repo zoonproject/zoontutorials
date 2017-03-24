@@ -90,12 +90,30 @@ MaxEnt_workflow <- workflow(occurrence = CarolinaWrenPO,
 
 ### Boosted Regression Trees
 
-Boosted regression trees (BRTs; also known as Gradient Boosting Machine, or GBM), are a machine learning technique that produces a prediction model in the form of an ensemble of weak prediction models (i.e. decision trees). This differs from the standard regression approach of fitting a single best model by using the "boosting" technique to combine relatively large numbers of simple trees adaptively, optimising predictive performance. The `GBM` module fits a generalised boosted regression model using the `gbm` package. For this model you need to define the maximum number of trees, the maximum depth of variable interactions, and a shrinkage parameter (aka the learning rate). This model can be fit to presence-background and presence-absence data using the following call in your `workflow`:
+Boosted regression trees (BRTs) are a machine learning technique that produces a prediction model in the form of an ensemble of weak prediction models (i.e. decision trees). BRTs are known by various names (including Gradient Boosting Machine or GBM), but this is the name most commonly used when referring to SDMs. This differs from the standard regression approach of fitting a single best model (using some information criterion) by using the "boosting" technique to combine relatively large numbers of simple trees adaptively, optimising predictive performance. 
 
-```{r eval=FALSE}
-model = GBM(max.trees = 1000,   # default values
-            interaction.depth = 5,
-            shrinkage = 0.001)
+Tree-based models partition the predictor space into rectangles by using a set of rules to identify regions with the most homogenous responses to predictors (see below). A constant value is then fit to each region (most probable class for classification models, mean response for regression models). Growing a tree involves recursive binary splits, such that binary splits are applied to its own outputs until some set criterion is met (such as tree depth).
+
+The "boosting" technique is an iterative procedure that attempts to reduce the deviance of the model by fitting another tree to account for the residuals of the previous tree. The core idea is that is it easier to build and average multiple rules of thumb than to find a single, highly accurate prediction rule. There are different boosting algorithms that differ in how they quantify lack of fit, but they all use a forward, stage-wise procedure to gradually increase emphasis on observations modelled poorly by existing trees.
+
+The `GBM` module fits a generalised boosted regression model using the `gbm` package, and it can be fit to presence-background and presence-absence datasets. There are several tree parameters **(hyperparamters?)** that you need to set to "tune" the model.
+
+*  Maximum number of trees: This is the equivalent to setting the number of iterations in the model. As a rule of thumb, more is better, but this just sets an upper limit and the optimal number will be selected by cross-validation.
+
+*  The maximum depth of variable interactions: This sets the number of nodes (or splits) in the decision trees. Interactions between variables is automatically modelled in BRTs due to the hierarchical structure of trees such that the response to an input variable is dependant on those higher up the tree. **(but as a tree can split multiple times in one variable 5 nodes does not necessarily mean 4 interactions?)**
+
+*  The learning rate/shrinkage factor: This is the contribution of each tree to the final model average. The sum of fitted values in all trees is multiplied by the learning rate to produce the fitted values in the final model. **(how does this work with cross-validation choosing final number of trees? Does it adjust the lr? Why wouldn't this be set to default to 1/number of trees?)**
+
+This model can be fit using the following call in your `workflow`:
+
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+BRT_workflow <- workflow(occurrence = CarolinaWrenPO,
+                         covariate = CarolinaWrenRasters,
+                         process = Chain(StandardiseCov, Background(1000)),
+                         model = GBM(max.trees = 1000,
+                                     interaction.depth = 5,
+                                     shrinkage = 0.001),
+                         output = PrintMap(points = FALSE))
 ```
 
 ### RandomForest
