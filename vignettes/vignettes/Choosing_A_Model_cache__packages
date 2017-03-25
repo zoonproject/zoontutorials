@@ -7,3 +7,8 @@ dismo
 nlme
 mgcv
 rJava
+survival
+lattice
+gbm
+randomForest
+gridExtra
