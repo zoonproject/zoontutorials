@@ -1,18 +1,9 @@
-## ----eval=FALSE----------------------------------------------------------
-#  model = LogisticRegression
-
-## ----eval=FALSE----------------------------------------------------------
-#  model = mgcv(k = -1,   # default settings
-#               bs = "tp")
-
-## ----eval=FALSE----------------------------------------------------------
-#  model = MaxEnt
-
-## ----eval=FALSE----------------------------------------------------------
-#  model = GBM(max.trees = 1000,   # default values
-#              interaction.depth = 5,
-#              shrinkage = 0.001)
-
-## ----eval=FALSE----------------------------------------------------------
-#  model = RandomForest
+## ----eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE-----------------
+# set up knitr options
+knitr::opts_chunk$set(message = FALSE,
+               warning = FALSE,
+               fig.align = 'center',
+               dev = c('png'),
+               cache = TRUE,
+               cache.path = file.path(getwd(), 'vignettes/Choosing_A_Model_cache'))
 
