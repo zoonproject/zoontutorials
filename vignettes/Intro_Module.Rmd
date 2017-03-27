@@ -25,12 +25,15 @@ knitr::opts_chunk$set(message = FALSE,
 ## Why do we fit species distribution models?
 In ecology, we often want to understand where a species is located in the environment and the restraints on that distribution so we can predict where the species may occur in the future. We typcially consider that species exist within their "ecological niche." In contrast to geographic space, the ecological niche does not describe a physical place, but rather the environmental conditions required for a species. 
 
-Ecologists typically consider species' ecological niche space to be constrained by three dominant factors: the abiotic environment, the biotic environment, and movement. Characteristics of the ecological niche include the abiotic and biotic habitat, the resources it obtains from the habitat, and the species' activity pattern that allow it to utilise its space. Examples of these include the climate required for a species to survive, the local vegetation types it depends on, and it's abillity to traverse different landscapes, respectively. The intersection of these three factors is the "fundamental niche." This niche space is where we expect a species to occur, given what we know of its biology and ecology. Experience tells us, however, that species are not always located where we expect them to be. Their "realised niche" is where they actually exist within the bounds of the environmental space where they could potentially exist. 
+Ecologists typically consider species' ecological niche space to be constrained by three dominant factors: the abiotic environment, the biotic environment, and its movement. Characteristics of the ecological niche include the abiotic and biotic habitat, the resources it obtains from the habitat, and the species' activity pattern that allow it to utilise its space. Examples of these include the climate required for a species to survive, the local vegetation types it depends on, and its abillity to traverse different landscapes, respectively. The intersection of the abiotic and biotic environmental conditions constitutes the "fundamental niche," or where the species could physiologically occur given what we know of its biology and ecology. Experience tells us, however, that species are not always located where we expect them to be. Their "realised niche" is where they actually exist within the bounds of the environmental space where they could potentially exist. 
 
 ## What is a species distribution model?
-Species distribution models estimate the probabilty of occurrence of species along environmental gradients. They do this by estimating the correlation between enviornmental variables and species occurrence data. For example, using SDMs, we can estiamte the probability a species of bird will use forest habitat with high tree cover compared to open habitat with low tree cover. Or we might estimate the probability of occurrense for a frog across the a whole continent using climatic variables, such as rainfall and temperature. We can take these statisical relationships and project them onto geographic space, which allows us to visualise on a map how the probabilty of species occurrence varies in geographic space.
+Species distribution models estimate the probabilty of occurrence of species along environmental gradients. They do this by estimating the correlation between environmental variables and species occurrence data. For example, using SDMs, we can estiamte the probability a species of bird will use forest habitat with high tree cover compared to open habitat with low tree cover. Or we might estimate the probability of occurrence for a frog across the a whole continent using climatic variables, such as rainfall and temperature. We can take these statisical relationships and project them onto geographic space, which allows us to visualise on a map how the probabilty of species occurrence varies in geographic space.
 
-There are many types of species distribution models and the field is rapidly expanding. `zoon` is concerned with correlative SDMs, as described above, which are the most widley used SDM. This tutoiral will focus on models which estimate probability of occurrence, however, we could also use species abundance data to estimate how abundance varies along environemntal gradients. As well as correlative SDMs, there are also mechanistic SDMs. Where correlative SDMs use statiscs to estimate relatinoships between occurreance data and environemntal covariates, mechanistic SDMs use mathematical relationships between species energy requirements and environmental covaraites. Where correlative SDMs estimate a species realised niche, mechanistic SDMs estimates the fundemental niche. The field of mechanistic models is ... and we encourage the read to pursue their interest further, as we leave the topic here. 
+*figure here*
+*also pull out figures from papers*
+
+There are many types of species distribution models and the field is rapidly expanding. `zoon` is concerned with correlative SDMs, as described above, which are the most widely used SDM. This tutoiral will focus on models which estimate probability of occurrence, however, we could also use species abundance data to estimate how abundance varies along environemntal gradients. As well as correlative SDMs, there are also mechanistic SDMs. Where correlative SDMs use statistics to estimate relationships between occurrence data and environmental covariates, mechanistic SDMs use mathematical relationships between species energy requirements and environmental covaraites. Where correlative SDMs estimate a species realised niche, mechanistic SDMs estimates the fundemental niche. The field of mechanistic models is ... and we encourage the read to pursue their interest further, as we leave the topic here. 
 
 # How do I fit a species distribution model?
 We implement a species distribution model with five steps:
@@ -40,7 +43,7 @@ We implement a species distribution model with five steps:
     4. Model: We then fit one or more statistical models to our data to estimate species probability of occurrence.
     5. Output: Finally, after fitting our model, we produce model outputs, such as graphs and maps, to enable us to make ecological inference about the species.
     
-The `zoon` `workflow` is structured around these five steps and designed to make building and fitting SDMs straight-foward and reproducile. The primary zoon function is `workflow`, which we use to fit the SDM. The workflow function has five arguments, one for each step in the SDM fitting process. For each argument, we need only to select a 'module'. The modules we choose in each step determine what type of model we run with what data and what outputs we produce. This tutorial will guide you through the process of selecting a module for each argument of the `workflow` function. Along the way, we'll introduce some key factors that you should consider when fitting and evaluating an SDM.
+The `zoon` workflow is structured around these five steps and designed to make building and fitting SDMs straight-foward and reproducible. The primary zoon function is `workflow()`, which we use to fit the SDM. The workflow function has five arguments, one for each step in the SDM fitting process. For each argument, we need only to select a 'module.' The modules we choose in each step determine what type of model we run with what data and what outputs we produce. This tutorial will guide you through the process of selecting a module for each argument of the `workflow()` function. Along the way, we'll introduce some key factors that you should consider when fitting and evaluating an SDM.
 
 But first, let's fit a quick and simple SDM with `zoon` as a means of introduction. Don't forget to load the package!
 
@@ -56,6 +59,7 @@ zoon_workflow <- workflow(occurrence = Lorem_ipsum_UK,
                              model = RandomForest,
                              output = PrintMap)
 ```
+
 
 In this workflow, we have loaded the *Lorem ipsum* presence-only occurrence data for the UK, loaded the Bioclim environmental covariates for the UK, selected 100 background occurrence data (more on this later), fit a Random Forest model, and printed a map. The map shows us how the probability of occurrence of *Lorem ipsum* varies across the UK. Throughout this tutorial we will guide you step-by-step through each of the arguments in a workflow as we update this `zoon_workflow`.
 
@@ -147,7 +151,8 @@ zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
 ## Step 5. Output
 It is finally time to check out our results. 
 
-*Map
+*Map ()
+
 
 *response curves for logistic regression and/or GAM
 
@@ -165,8 +170,7 @@ zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
 
 
 ## Putting it all together
-
-Now that we have seen how to use each argument in the `workflow` function it is time to put all of the pieces together and fit our own SDM within `zoon`. Here we fit a logistic regression model to Carolina Wren presence-background data set, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow`.
+Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. Since MaxEnt it is the most popular SDM methodology, we will fit a MaxEnt model to our Carolina Wren presence-background data set, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 Logistic_Regression_Workflow <- workflow(occurrence = CarolinaWrenPO,
@@ -176,7 +180,8 @@ Logistic_Regression_Workflow <- workflow(occurrence = CarolinaWrenPO,
                        output = PrintMap(points = FALSE))
 ```
 
-Since MaxEnt it is the most popular SDM methodology, we will fit a MaxEnt model Now run the exact same `workflow` but switch to a `MaxEnt` model. How do they compare?
+
+Since MaxEnt it is the most popular SDM methodology, we will fit a MaxEnt model Now run the exact same `workflow()` but switch to a `MaxEnt` model. How do they compare?
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 MaxEnt_Workflow <- workflow(occurrence = CarolinaWrenPO,
