@@ -1,5 +1,4 @@
 base
-rmarkdown
 sp
 raster
 zoon
@@ -13,3 +12,4 @@ lattice
 gbm
 randomForest
 gridExtra
+rmarkdown
