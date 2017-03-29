@@ -119,7 +119,7 @@ Covariate(zoon_workflow)   # Before standardisation
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.show=FALSE}
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
-                                process = StandardiseCov)
+                                process = Chain(Background(n=100), StandardiseCov))
 ```
 
 ```{r eval=TRUE}
@@ -175,14 +175,15 @@ ChangeWorkflow(zoon_workflow, output = SurfaceMap)
 Now we've seen how our model of Carolina Wren occurrence varies over geographic space, we can look more closely at what is driving that variation in occurrence probability. That is, how does the probability of occurrence for the species vary along the environmental gradients we included in our model. Remember, we included climatic variables 
 
 ```{r}
-Covariates()
-#Plot response curve
+#Covariates()
+# Plot response curve
 ChangeWorkflow(zoon_workflow, output = ResponseCurve('Lat'))
 
-#Plot response curve Viz
+# Plot response curve Viz
 ChangeWorkflow(zoon_workflow, output = ResponseCurveViz(1))
 
-ChangeWorkflow(zoon_workflow, output = "ROCcurve")
+# 
+#ChangeWorkflow(zoon_workflow, output = "ROCcurve")
 
 
 
