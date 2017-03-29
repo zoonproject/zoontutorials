@@ -3,3 +3,4 @@
 .RData
 .Ruserdata
 */.DS_Store$
+vignettes/Intro_Module_cache/*
