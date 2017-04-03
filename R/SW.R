@@ -1,3 +1,6 @@
+# next : the legend
+# and additional interesting imagery like elith
+
 
 library(zoon)
 library(ggplot2)
@@ -5,8 +8,8 @@ library(ggmap)
 library(raster)
 library(RStoolbox)
 library(viridis)
-library(reshape2
-        )
+library(reshape2)
+
 Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
                                    covariate = CarolinaWrenRasters,
                                    process = Background(1000),
@@ -76,7 +79,7 @@ zoon_theme <- theme_bw() +
   )
 
 png('vignettes/Intro_Module_files/SDM_theory.png',
-    width     = 12,
+    width     = 14,
     height    = 3,
     units     = "in",
     res       = 1200,
@@ -85,33 +88,36 @@ require(gridExtra)
 ll <- ggplot(cov, aes(longitude, latitude)) +
   geom_point(aes(colour = type), size = 1) +
   scale_colour_manual(values = c('grey', 'black')) +
-  theme(axis.title.y = element_text(angle = 180, vjust = 0.1)) +
   zoon_theme +
-  coord_fixed(ratio = 1)
+  theme(axis.title.y = element_text(angle = 180, vjust = 0.1)) +
+  xlim(-126, -66) +
+  ylim(22, 52) +
   xlab('E') +
   ylab('N')
-env <- ggplot(cov, aes(pcDec, pcMix)) +
+env <- ggplot(cov, aes(pcMix, pcDec)) +
   geom_point(aes(colour = type), size = 1) +
   zoon_theme +
   theme(axis.title.y = element_text(hjust = 0.9)) +
   scale_colour_manual(values = c('grey', 'black')) +
-  xlab('Deciduous') +
-  ylab('Mixed Forest')
-epre <- ggplot(mp, aes(Var2, Var1, fill = value)) + geom_raster() +
-  scale_fill_viridis() +
+  xlab('Mixed Forest') +
+  ylab('Deciduous')
+epre <- ggplot(mp, aes(Var1, Var2, fill = value)) + geom_raster() +
+  scale_fill_viridis(direction = -1) +
   zoon_theme +
   theme(axis.title.y = element_text(hjust = 0.9)) +
-  scale_x_continuous(expand = c(0,0)) +
-  scale_y_continuous(expand = c(0,0)) +
-  xlab('Deciduous') +
-  ylab('Mixed Forest')
+  #scale_x_continuous(expand = c(0,0)) +
+  #scale_y_continuous(expand = c(0,0)) +
+  xlab('Mixed Forest') +
+  ylab('Deciduous')
 pred <- ggplot(out.df) +
   geom_raster(aes(x, y, fill = pcMix)) +
   zoon_theme +
   theme(axis.title.y = element_text(angle = 180, vjust = 0.1)) +
   scale_fill_viridis(direction = -1) +
-  scale_x_continuous(expand = c(0,0)) +
-  scale_y_continuous(expand = c(0,0)) +
+  #scale_x_continuous(expand = c(0,0)) +
+  #scale_y_continuous(expand = c(0,0)) +
+  xlim(-126, -66) +
+  ylim(22, 52) +
   xlab('E') +
   ylab('N')
 grid.arrange(ll, env, epre, pred, ncol=4)

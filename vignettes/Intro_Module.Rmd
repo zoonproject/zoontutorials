@@ -161,8 +161,8 @@ It is finally time to check out our results.
 Code for Liz to modify as needed for changing output modules in zoon_workflow. While you could use List to do multiple outputs at once, it might be better to step through them one by one with multiple ChangeWorkflows? Or split into another best pratice guide?
 
 ```{r eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=7, fig.width=7}
-zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
-                                output = )
+#zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
+                                #output = )
 ```
 
 
