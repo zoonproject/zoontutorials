@@ -11,6 +11,16 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+# set up knitr options
+knitr::opts_chunk$set(message = FALSE,
+               warning = FALSE,
+               fig.align = 'center',
+               dev = c('png'),
+               cache = TRUE,
+               cache.path = 'Tailoring_To_Your_Problem_cache/')
+```
+
 **Should this have a different title? This seems rather nondescriptive. Data modification? Data processing? Something data related anyway.**
 
 **Come back and rework parts of this after the No Model module is created? I.e. run a no process/model/output workflow so that you can use Occurrence/Covariate to perform data checks with summary()?**
