@@ -28,17 +28,21 @@ Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
                                    output = PrintMap)
 ```
 
-We can take a look at our covariate data by calling the accessor function `Process`. This  
+We can take a look at our covariate data by calling the accessor function `Process`. This will take the covariate data along with the occurrence data. `str()` will show us the structure of our data, allowing us to confirm the form our data are stored in. 
 ```{r}
 cov <- Process(Carolina_Wren_Workflow)$df
 levels(cov) <- c('background', 'presence')
 str(cov)
 ```
+In this case, we can see that data type is stored as a factor, and the continuous variables are stored as numeric variables. This is correct. 
 
+Next we might want to check that there is roughly even coverage of our two types of data, or our factor variable. 
 ```{r}
 table(cov$type)
 ```
+There are!
 
+At this point we can begin our data exploration. The first thing to do is to check for outliers in our data. These may indicate data entry errors when using your own data, or access errors,  example. 
 Data exploration
 A Outliers in Y / Outliers in X
 B Collinearity X
