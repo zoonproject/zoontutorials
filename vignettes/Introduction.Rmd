@@ -162,7 +162,7 @@ It is finally time to check out our results. We'll continue with our zoon_workfl
 We often want to see how our predictions of probability of occurrence in environemntal space fit onto real geographic space. We do this by projecting our predictions onto a map using the module 'PrintMap'.
 
 
-```{r}
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
                                 output = InteractiveMap)
@@ -179,7 +179,7 @@ The map produced by the `InteractiveMap` module shows our model of Carolina wren
 
 Now we've seen how our model of Carolina Wren occurrence varies over geographic space, we can look more closely at what is driving that variation in occurrence probability. That is, how does the probability of occurrence for the species vary along the environmental gradients we included in our model. Remember, we included climatic variables 
 
-```{r}
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(zoon_workflow,
                                 output = ResponseCurveViz(1:4))
 ```
@@ -188,7 +188,7 @@ Now we've plotted our predictions in both geographic and environmental space, we
 
 One simple and common statistic is the Area under the receiver operating curve or AUC. The AUC measures how well our model predicts our observed presences and absences. It ranges from 0 to 1, where 0.5 means our model is no better than random and one means our model is a perfect predictor of our data.
 
-```{r}
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(zoon_workflow,
                                 output = ROCcurve)
 ```
@@ -209,7 +209,7 @@ Logistic_Regression_Workflow <- workflow(occurrence = CarolinaWrenPO,
 MaxEnt is arguably one of the modt widley used SDM methodologies, so let's fit a MaxEnt model. Now run the exact same `workflow()` but switch to a `MaxEnt` model. You can use the output modules to see how they compare.
 
 
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 MaxEnt_Workflow <- workflow(occurrence = CarolinaWrenPO,
                             covariate = CarolinaWrenRasters,
                             process = Background(1000),
