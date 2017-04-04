@@ -97,7 +97,7 @@ A pairwise interaction is the interaction between two variables in a model such 
 
 **how to put a formula into this?**
 
-Y = b0 + b1X1 + b2X2 + b3(x1*x2)
+$Y = b_0 + b_1*X_1 + b_2*X_2 + b_3(x_1*x_2)$
 
 where b3 is the interaction term between the variables x1 and x2. This is achieved in `zoon` like this:
 
