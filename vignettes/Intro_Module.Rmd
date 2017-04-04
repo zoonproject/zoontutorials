@@ -23,7 +23,9 @@ knitr::opts_chunk$set(message = FALSE,
 
 # Introduction
 ## Why do we fit species distribution models?
-In ecology, we often want to understand where a species is located in the environment and the restraints on that distribution so we can predict where the species may occur in the future. We typcially consider that species exist within their "ecological niche." In contrast to geographic space, the ecological niche does not describe a physical place, but rather the environmental conditions required for a species. 
+In ecology, we often want to understand where a species is located in the environment and why they occur there. Sometimes we ask these questions to gain more understanding of a species and other times we need to know where a species is so we can manage it.
+
+We typcially consider that species exist within their "ecological niche." In contrast to geographic space, the ecological niche does not describe a physical place, but rather the environmental conditions required for a species. 
 
 Ecologists typically consider species' ecological niche space to be constrained by three dominant factors: the abiotic environment, the biotic environment, and its movement. Characteristics of the ecological niche include the abiotic and biotic habitat, the resources it obtains from the habitat, and the species' activity pattern that allow it to utilise its space. Examples of these include the climate required for a species to survive, the local vegetation types it depends on, and its abillity to traverse different landscapes, respectively. The intersection of the abiotic and biotic environmental conditions constitutes the "fundamental niche," or where the species could physiologically occur given what we know of its biology and ecology. Experience tells us, however, that species are not always located where we expect them to be. Their "realised niche" is where they actually exist within the bounds of the environmental space where they could potentially exist. 
 
@@ -33,7 +35,7 @@ Species distribution models estimate the probabilty of occurrence of species alo
 *figure here*
 *also pull out figures from papers*
 
-There are many types of species distribution models and the field is rapidly expanding. `zoon` is concerned with correlative SDMs, as described above, which are the most widely used SDM. This tutoiral will focus on models which estimate probability of occurrence, however, we could also use species abundance data to estimate how abundance varies along environemntal gradients. As well as correlative SDMs, there are also mechanistic SDMs. Where correlative SDMs use statistics to estimate relationships between occurrence data and environmental covariates, mechanistic SDMs use mathematical relationships between species energy requirements and environmental covaraites. Where correlative SDMs estimate a species realised niche, mechanistic SDMs estimates the fundemental niche. The field of mechanistic models is ... and we encourage the read to pursue their interest further, as we leave the topic here. 
+There are many types of species distribution models and the field is rapidly expanding. `zoon` is concerned with correlative SDMs, as described above, which are the most widely used SDM. This tutoiral will focus on distribution models which estimate probability of occurrence, however, we could also use species abundance data to estimate how abundance varies along environemntal gradients. As well as correlative SDMs, there are also mechanistic SDMs. Where correlative SDMs use statistics to estimate relationships between occurrence data and environmental covariates, mechanistic SDMs use mathematical relationships between species energy requirements and environmental covaraites. Where correlative SDMs estimate a species realised niche, mechanistic SDMs estimates the fundemental niche. The field of mechanistic models is ... and we encourage the read to pursue their interest further, as we leave the topic here. 
 
 # How do I fit a species distribution model?
 We implement a species distribution model with five steps:
@@ -139,7 +141,7 @@ zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
 
 ## Step 4. Model
 
-Arguably the most important part of the `workflow` is the `model` module. **actually, probably not due to the variation in results with model choice** *but would that not mean that it is the most important since it can have such a large effect?* This is where we choose which type of SDM you want to fit to our data. There are multiple different SDM methods to choose from **(add Elith paper reference)** and each have their mertis. A few more common examples include the `LogisticRegression`, `mgcv`, `MaxEnt`, `RandomForest`, and `GBM` modules. For more detail on these methods you can refer to the "Choosing A Model" vignette **link later**.
+Arguably the most important part of the `workflow` is the `model` module. **actually, probably not due to the variation in results with model choice** *but would that not mean that it is the most important since it can have such a large effect?* **How can it be the most important if we have no way of knowing which model is correct? I.e., they're all wrong, you just need to decide how you want to be wrong. The things that influence varition in model results *within* a model, I argue, are more important** This is where we choose which type of SDM you want to fit to our data. There are multiple different SDM methods to choose from **(add Elith paper reference)** and each have their mertis. A few more common examples include the `LogisticRegression`, `mgcv`, `MaxEnt`, `RandomForest`, and `GBM` modules. For more detail on these methods you can refer to the "Choosing A Model" vignette **link later**.
 
 Now, let's update our `workflow` with another common model type, logistic regression. We do this by using the aptly names `LogisticRegression` module.
 
@@ -205,11 +207,11 @@ Logistic_Regression_Workflow <- workflow(occurrence = CarolinaWrenPO,
 MaxEnt is arguably one of the modt widley used SDM methodologies, so let's fit a MaxEnt model. Now run the exact same `workflow()` but switch to a `MaxEnt` model. You can use the output modules to see how they compare.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
-MaxEnt_Workflow <- workflow(occurrence = CarolinaWrenPO,
-                       covariate = CarolinaWrenRasters,
-                       process = Background(1000),
-                       model = MaxEnt,
-                       output = PrintMap(points = FALSE))
+#MaxEnt_Workflow <- workflow(occurrence = CarolinaWrenPO,
+           #            covariate = CarolinaWrenRasters,
+               #        process = Background(1000),
+               #        model = MaxEnt,
+               #        output = PrintMap(points = FALSE))
 ```
 
 
