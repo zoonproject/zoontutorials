@@ -3,3 +3,7 @@
 .RData
 .Ruserdata
 */.DS_Store$
+vignettes/*_cache
+vignettes/*.html
+vignettes/*_files
+
