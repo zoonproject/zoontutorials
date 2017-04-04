@@ -1,0 +1,49 @@
+language: r
+dist: trusty
+cache: packages
+sudo: required
+
+addons:
+  apt:
+    packages:
+      - libgdal-dev
+      - libproj-dev
+      - r-cran-rjava
+      - libv8-dev 
+      - libmagick++-dev
+      
+r_binary_packages:
+ - rgdal
+
+r_packages:
+ - knitr
+ - gam
+ - spocc
+
+## After success update the code coverage and deploy the pkgdown to gh-pages
+after_success:
+ - Rscript -e 'devtools::build_vignettes()'
+ 
+# Warnings don't fail build
+warnings_are_errors: false
+ 
+## Email notification if the package pass status changes
+notifications:
+email:
+  recipients:
+    - zoonproject@gmail.com
+  on_success: change
+  on_failure: change
+  
+## Set up the matrix of different runs
+env:
+  global:
+    - COMMIT_AUTHOR_EMAIL: "zoonproject@gmail.com"
+  matrix:
+    - r: release
+      not_cran: true
+      r_check_args: "--no-manual"
+    - r: devel
+      not_cran: true
+      r_check_args: "--no-manual"
+      
