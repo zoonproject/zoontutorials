@@ -1,5 +1,8 @@
-PairPlot <- function(){
 
+
+MyCovariates <- cov[,c('pcCon', 'pcDec', 'pcMix', 'pcGr')]
+
+PairPlot <- function(MyCovariates){
   panel.cor <- function(x, y, digits = 2, cex.cor, ...)
   {
     usr <- par("usr"); on.exit(par(usr))
@@ -17,8 +20,14 @@ PairPlot <- function(){
     if(p<0.01) txt2 <- paste("p= ", "<0.01", sep = "")
     text(0.5, 0.4, txt2)
   }
-
-  pairplot <- pairs(cov[,c('pcCon', 'pcDec', 'pcMix', 'pcGr')], upper.panel = panel.cor)
-
-  return(pairplot)
+    return(pairs(x, upper.panel = panel.cor))
 }
+
+
+PairPlot(MyCovariates)
+
+
+
+
+
+
