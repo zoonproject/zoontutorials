@@ -18,11 +18,14 @@ knitr::opts_chunk$set(message = FALSE,
                fig.align = 'center',
                dev = c('png'),
                cache = TRUE)
+
 ```
 
 # Introduction
 ## Why do we fit species distribution models?
-In ecology, we often want to understand where a species is located in the environment and the restraints on that distribution so we can predict where the species may occur in the future. We typcially consider that species exist within their "ecological niche." In contrast to geographic space, the ecological niche does not describe a physical place, but rather the environmental conditions required for a species. 
+In ecology, we often want to understand where a species is located in the environment and why they occur there. Sometimes we ask these questions to gain more understanding of a species and other times we need to know where a species is so we can manage it.
+
+We typcially consider that species exist within their "ecological niche." In contrast to geographic space, the ecological niche does not describe a physical place, but rather the environmental conditions required for a species. 
 
 Ecologists typically consider species' ecological niche space to be constrained by three dominant factors: the abiotic environment, the biotic environment, and the species' movement. Characteristics of the ecological niche include the abiotic and biotic habitat, the resources it obtains from the habitat, and the species' activity pattern that allow it to utilise its space. Examples of these include the climate required for a species to survive, the local vegetation types it depends on, and its abillity to traverse different landscapes, respectively. The intersection of the abiotic and biotic environmental conditions constitutes the "fundamental niche," or where the species could physiologically occur given what we know of its biology and ecology. Experience tells us, however, that species are not always located where we expect them to be. Their "realised niche" is where they actually exist within the bounds of the environmental space where they could potentially exist. 
 
@@ -36,7 +39,7 @@ knitr::include_graphics("../vignettes/Images/SDM_theory.png")
 ```
 Figure 1: Species Distribution Model Theory. Presence-background points plotted on geographic space, on environmental space, and probability of occurrence predictions plotted on environmental and geographic space. 
 
-There are many types of species distribution models and the field is rapidly expanding. `zoon` is concerned with correlative SDMs, as described above, which are the most widely used SDM. This tutoiral will focus on models which estimate probability of occurrence, however, we could also use species abundance data to estimate how abundance varies along environemntal gradients. As well as correlative SDMs, there are also mechanistic SDMs. Where correlative SDMs use statistics to estimate relationships between occurrence data and environmental covariates, mechanistic SDMs use mathematical relationships between species energy requirements and environmental covaraites. Where correlative SDMs estimate a species realised niche, mechanistic SDMs estimates the fundemental niche. The field of mechanistic models is ... and we encourage the read to pursue their interest further, as we leave the topic here. 
+There are many types of species distribution models and the field is rapidly expanding. `zoon` is concerned with correlative SDMs, as described above, which are the most widely used SDM. This tutoiral will focus on distribution models which estimate probability of occurrence, however, we could also use species abundance data to estimate how abundance varies along environemntal gradients. As well as correlative SDMs, there are also mechanistic SDMs. Where correlative SDMs use statistics to estimate relationships between occurrence data and environmental covariates, mechanistic SDMs use mathematical relationships between species energy requirements and environmental covaraites. Where correlative SDMs estimate a species realised niche, mechanistic SDMs estimates the fundemental niche. The field of mechanistic models is ... and we encourage the read to pursue their interest further, as we leave the topic here. 
 
 # How do I fit a species distribution model?
 We implement a species distribution model with five steps:
@@ -119,9 +122,10 @@ Lets see how the mimimum/maximum values for our environmental layers change afte
 Covariate(zoon_workflow)   # Before standardisation
 ```
 
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.show=FALSE, cache=TRUE}
+```{r eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
-                                process = Chain(OneHundredBackground, StandardiseCov))
+                                process = Chain(Background(n=100), StandardiseCov))
+
 ```
 
 ```{r eval=TRUE, cache=TRUE}
@@ -141,77 +145,77 @@ zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
 
 ## Step 4. Model
 
-Arguably the most important part of the `workflow` is the `model` module. **actually, probably not due to the variation in results with model choice** *but would that not mean that it is the most important since it can have such a large effect?* This is where we choose which type of SDM you want to fit to our data. There are multiple different SDM methods to choose from **(add Elith paper reference)** and each have their mertis. A few more common examples include the `LogisticRegression`, `mgcv`, `MaxEnt`, `RandomForest`, and `GBM` modules. For more detail on these methods you can refer to the "Choosing A Model" vignette **link later**.
+Arguably the most important part of the `workflow` is the `model` module. **actually, probably not due to the variation in results with model choice** *but would that not mean that it is the most important since it can have such a large effect?* **How can it be the most important if we have no way of knowing which model is correct? I.e., they're all wrong, you just need to decide how you want to be wrong. The things that influence varition in model results *within* a model, I argue, are more important** This is where we choose which type of SDM you want to fit to our data. There are multiple different SDM methods to choose from **(add Elith paper reference)** and each have their mertis. A few more common examples include the `LogisticRegression`, `mgcv`, `MaxEnt`, `RandomForest`, and `GBM` modules. For more detail on these methods you can refer to the "Choosing A Model" vignette **link later**.
 
-Now, lets update our `workflow` with one of the simplest model types, and a statistical approach many might be familiar with outside of SDMs, using the `LogisticRegression` module.
+Now, let's update our `workflow` with another common model type, logistic regression. We do this by using the aptly names `LogisticRegression` module.
 
 ```{r eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
                                 model = LogisticRegression)
+
 ```
+
 
 ## Step 5. Output
-It is finally time to check out our results.
+It is finally time to check out our results. We'll continue with our zoon_workflow object, which we've just updated to use a logistic regression statistical model.
 
-Often we want to see how the probability of occurrence in environemntal space is projected into real geographic space. We do this by asking our workflow to output a map. 
+We often want to see how our predictions of probability of occurrence in environemntal space fit onto real geographic space. We do this by projecting our predictions onto a map using the module 'PrintMap'.
 
-Interogating estiamted model coefficients can help us make ecological inferences. Model coefficientsNot all types of species distribtion models produce coefficient estimates.
 
 ```{r}
-Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
-                             covariate = CarolinaWrenRasters,
-                             process = Background(100),
-                             model = LogisticRegression,
-                             output = PrintMap)
 
-#Make a .
-ChangeWorkflow(Carolina_Wren_Workflow, output = SurfaceMap)
-
-#Interactive map of probabilities and occurrence data, and background points
-ChangeWorkflow(Carolina_Wren_Workflow, output = InteractiveMap)
-
-#Plot response curve
-ChangeWorkflow(Carolina_Wren_Workflow, output = ResponseCurve())
-
-#Plot response curve Viz
-ChangeWorkflow(Carolina_Wren_Workflow, output = ResponseCurveViz(1:4))
-
-#Predict to new place or time
-ChangeWorkflow(Carolina_Wren_Workflow, output = PredictNewRasterMap(rasterB))
-
-#Plot performance measures
-ChangeWorkflow(Carolina_Wren_Workflow,
-               process = BackgroundAndCrossvalid,
-               output = PerformanceMeasures)
-
-#Get coefficient estimates
-ChangeWorkflow(Carolina_Wren_Workflow, output = VariableImportance)
-
-#density box plot of presence versus absense. No key
-ChangeWorkflow(Carolina_Wren_Workflow, output = SeparatePA)
+zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
+                                output = InteractiveMap)
 
 ```
+
+```{r hidden chunk to embed interative map in html}
+
+
+```
+The `InteractiveMap` module produces a map of the probability of occurrence on the geographic region of our study, in our example the USA, that we can interact with. The map includes a scale from light green to blue, so we can interpret the map and also plots our raw data on top of the map so we can see how our data align with model predictions. We can click on our raw data to get information about it.
+
+The map produced by the `InteractiveMap` module shows our model of Carolina wren occurrence has predicted that the species is most likely to occur in the southeat of the country and is less likely to exist in the northwest of the country. These quantitative predictions fit with a qualitative analysis of our data. We can see most of our presence records (red dots) are in the southeast and the absence records are in the northwest.
+
+Now we've seen how our model of Carolina Wren occurrence varies over geographic space, we can look more closely at what is driving that variation in occurrence probability. That is, how does the probability of occurrence for the species vary along the environmental gradients we included in our model. Remember, we included climatic variables 
+
+```{r}
+zoon_workflow <- ChangeWorkflow(zoon_workflow,
+                                output = ResponseCurveViz(1:4))
+```
+
+Now we've plotted our predictions in both geographic and environmental space, we should test how good our model fit is. That is, how well does our model fit the data we built it with. There's lots of different way sto do this, which we expand on in our 'Model Validation' guide (*linky link*).
+
+One simple and common statistic is the Area under the receiver operating curve or AUC. The AUC measures how well our model predicts our observed presences and absences. It ranges from 0 to 1, where 0.5 means our model is no better than random and one means our model is a perfect predictor of our data.
+
+```{r}
+zoon_workflow <- ChangeWorkflow(zoon_workflow,
+                                output = ROCcurve)
+```
+
 
 ## Putting it all together
 Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. Since MaxEnt it is the most popular SDM methodology, we will fit a MaxEnt model to our Carolina Wren presence-background data set, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 Logistic_Regression_Workflow <- workflow(occurrence = CarolinaWrenPO,
-                       covariate = CarolinaWrenRasters,
-                       process = Background(1000),
-                       model = LogisticRegression,
-                       output = PrintMap(points = FALSE))
+                                         covariate = CarolinaWrenRasters,
+                                         process = Background(1000),
+                                         model = LogisticRegression,
+                                         output = PrintMap(points = FALSE))
 ```
 
 
-Since MaxEnt it is the most popular SDM methodology, we will fit a MaxEnt model Now run the exact same `workflow()` but switch to a `MaxEnt` model. How do they compare?
+MaxEnt is arguably one of the modt widley used SDM methodologies, so let's fit a MaxEnt model. Now run the exact same `workflow()` but switch to a `MaxEnt` model. You can use the output modules to see how they compare.
 
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
+
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
 MaxEnt_Workflow <- workflow(occurrence = CarolinaWrenPO,
-                       covariate = CarolinaWrenRasters,
-                       process = Background(1000),
-                       model = MaxEnt,
-                       output = InteractiveMap)
+                            covariate = CarolinaWrenRasters,
+                            process = Background(1000),
+                            model = MaxEnt,
+                            output = PrintMap(points = FALSE))
+
 ```
 
 
