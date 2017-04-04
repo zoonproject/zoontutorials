@@ -86,22 +86,26 @@ zoon_theme <- theme_bw() +
   )
 
 require(gridExtra)
-png('vignettes/Intro_Module_files/SDM_theory_pb.png',
+png('vignettes/Images/SDM_theory_pb.png',
     width     = 7,
     height    = 3,
     units     = "in",
     res       = 1200,
     pointsize = 4)
 # presence-background map
+usa <- map_data('usa')
 pb_map <- ggplot(cov, aes(longitude, latitude)) +
   geom_point(aes(colour = type), size = 0.3) +
-  scale_colour_manual(values = c('grey', 'black')) +
+  #scale_colour_manual(values = c('green', 'black')) +
+  scale_color_viridis(discrete=TRUE) +
   zoon_theme +
   theme(axis.title.y = element_text(angle = 180, vjust = 0.1)) +
   xlim(-126, -66) +
   ylim(22, 52) +
   xlab('E') +
-  ylab('N')
+  ylab('N') +
+  geom_polygon(data = usa, aes(x=long, y = lat, group = group), fill = NA, color = 'grey') +
+  coord_fixed(1.3)
 # presence-background on environmental space
 pb_env <- ggplot(cov, aes(pcMix, pcDec)) +
   geom_point(aes(colour = type), size = 0.3) +
@@ -113,7 +117,7 @@ pb_env <- ggplot(cov, aes(pcMix, pcDec)) +
 grid.arrange(pb_map, pb_env, ncol=2)
 dev.off()
 
-png('vignettes/Intro_Module_files/SDM_theory_pred.png',
+png('vignettes/Images/SDM_theory_pred.png',
     width     = 7,
     height    = 3,
     units     = "in",
@@ -158,7 +162,7 @@ zoon_theme_legend <- theme_bw() +
   )
 
 # figure to extract legend from
-png('vignettes/Intro_Module_files/SDM_theory_legend.png',
+png('vignettes/Images/SDM_theory_legend.png',
     width     = 7,
     height    = 3,
     units     = "in",

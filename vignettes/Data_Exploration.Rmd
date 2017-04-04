@@ -42,7 +42,7 @@ table(cov$type)
 ```
 There are!
 
-At this point we can begin our data exploration. The first thing to do is to check for outliers in our data. These may indicate data entry errors when using your own data, or access errors,  example. 
+At this point we can begin our data exploration. The first thing to do is to check for outliers in our data. These may indicate data entry errors when using your own data, or errors in 
 Data exploration
 A Outliers in Y / Outliers in X
 B Collinearity X
