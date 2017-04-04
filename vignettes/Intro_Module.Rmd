@@ -151,6 +151,7 @@ zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
                                 model = LogisticRegression)
 ```
 
+
 ## Step 5. Output
 It is finally time to check out our results. We'll continue with our zoon_workflow object, which we've just updated to use a logistic regression statistical model.
 
