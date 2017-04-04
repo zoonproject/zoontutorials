@@ -211,7 +211,7 @@ MaxEnt_Workflow <- workflow(occurrence = CarolinaWrenPO,
                        covariate = CarolinaWrenRasters,
                        process = Background(1000),
                        model = MaxEnt,
-                       output = PrintMap(points = FALSE))
+                       output = InteractiveMap)
 ```
 
 
