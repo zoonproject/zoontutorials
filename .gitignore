@@ -3,11 +3,8 @@
 .RData
 .Ruserdata
 */.DS_Store$
-<<<<<<< HEAD
-vignettes/Intro_Module_cache/*
-=======
 vignettes/*_cache
+vignettes/*.R
 vignettes/*.html
 vignettes/*_files
-
->>>>>>> upstream/master
+vignettes/.build.timestamp
