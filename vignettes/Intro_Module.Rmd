@@ -149,15 +149,48 @@ zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
 ```
 
 ## Step 5. Output
-It is finally time to check out our results. 
+It is finally time to check out our results.
 
-*Map ()
+Often we want to see how the probability of occurrence in environemntal space is projected into real geographic space. We do this by asking our workflow to output a map. 
 
+Interogating estiamted model coefficients can help us make ecological inferences. Model coefficientsNot all types of species distribtion models produce coefficient estimates.
 
-*response curves for logistic regression and/or GAM
+```{r}
+Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
+                             covariate = CarolinaWrenRasters,
+                             process = Background(100),
+                             model = LogisticRegression,
+                             output = PrintMap)
 
-*model evaluation stats
+#Make a .
+ChangeWorkflow(Carolina_Wren_Workflow, output = SurfaceMap)
 
+#Interactive map of probabilities and occurrence data, and background points
+ChangeWorkflow(Carolina_Wren_Workflow, output = InteractiveMap)
+
+#Plot response curve
+ChangeWorkflow(Carolina_Wren_Workflow, output = ResponseCurve())
+
+<<<<<<< HEAD
+#Plot response curve Viz
+ChangeWorkflow(Carolina_Wren_Workflow, output = ResponseCurveViz(1:4))
+
+#Predict to new place or time
+ChangeWorkflow(Carolina_Wren_Workflow, output = PredictNewRasterMap(rasterB))
+
+#Plot performance measures
+ChangeWorkflow(Carolina_Wren_Workflow,
+               process = BackgroundAndCrossvalid,
+               output = PerformanceMeasures)
+
+#Get coefficient estimates
+ChangeWorkflow(Carolina_Wren_Workflow, output = VariableImportance)
+
+#density box plot of presence versus absense. No key
+ChangeWorkflow(Carolina_Wren_Workflow, output = SeparatePA)
+
+```
+=======
 `########################`
 Code for Liz to modify as needed for changing output modules in zoon_workflow. Need to change eval to TRUE, currently FALSE so doc can knit. While you could use List to do multiple outputs at once, it might be better to step through them one by one with multiple ChangeWorkflows? Or split into another best pratice guide?
 
@@ -168,6 +201,7 @@ zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
 
 
 
+>>>>>>> 04d6ae8a86f59f24c7be58eb62d57639099158e3
 
 ## Putting it all together
 Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. Since MaxEnt it is the most popular SDM methodology, we will fit a MaxEnt model to our Carolina Wren presence-background data set, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
