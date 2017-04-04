@@ -85,17 +85,24 @@ zoon_theme <- theme_bw() +
   legend.position = 'none'
   )
 
+# PrintMap colour palette
+cls <- colorRampPalette(c('#e0f3db', '#a8ddb5', '#4eb3d3', '#08589e'))(10)
+
 require(gridExtra)
-png('vignettes/Intro_Module_files/SDM_theory_pb.png',
+png('vignettes/Images/SDM_theory_pb.png',
     width     = 7,
     height    = 3,
     units     = "in",
     res       = 1200,
     pointsize = 4)
 # presence-background map
+usa <- map_data('usa')
+mycolour <- viridis(1000)[800]
+
 pb_map <- ggplot(cov, aes(longitude, latitude)) +
+  geom_polygon(data = usa, aes(x=long, y = lat, group = group), fill = grey(0.9), color = grey(0.9)) +
   geom_point(aes(colour = type), size = 0.3) +
-  scale_colour_manual(values = c('grey', 'black')) +
+  scale_colour_manual(values = c(mycolour, 'black')) +
   zoon_theme +
   theme(axis.title.y = element_text(angle = 180, vjust = 0.1)) +
   xlim(-126, -66) +
@@ -107,13 +114,13 @@ pb_env <- ggplot(cov, aes(pcMix, pcDec)) +
   geom_point(aes(colour = type), size = 0.3) +
   zoon_theme +
   theme(axis.title.y = element_text(hjust = 0.9)) +
-  scale_colour_manual(values = c('grey', 'black')) +
+  scale_colour_manual(values = c(mycolour, 'black')) +
   xlab('Mixed Forest') +
   ylab('Deciduous')
 grid.arrange(pb_map, pb_env, ncol=2)
 dev.off()
 
-png('vignettes/Intro_Module_files/SDM_theory_pred.png',
+png('vignettes/Images/SDM_theory_pred.png',
     width     = 7,
     height    = 3,
     units     = "in",
@@ -158,7 +165,7 @@ zoon_theme_legend <- theme_bw() +
   )
 
 # figure to extract legend from
-png('vignettes/Intro_Module_files/SDM_theory_legend.png',
+png('vignettes/Images/SDM_theory_legend.png',
     width     = 7,
     height    = 3,
     units     = "in",
