@@ -17,8 +17,7 @@ knitr::opts_chunk$set(message = FALSE,
                warning = FALSE,
                fig.align = 'center',
                dev = c('png'),
-               cache = TRUE,
-               cache.path = file.path(getwd(), 'vignettes/Intro_Module_cache'))
+               cache = TRUE)
 ```
 
 # Introduction
@@ -171,7 +170,6 @@ ChangeWorkflow(Carolina_Wren_Workflow, output = InteractiveMap)
 #Plot response curve
 ChangeWorkflow(Carolina_Wren_Workflow, output = ResponseCurve())
 
-<<<<<<< HEAD
 #Plot response curve Viz
 ChangeWorkflow(Carolina_Wren_Workflow, output = ResponseCurveViz(1:4))
 
@@ -190,18 +188,6 @@ ChangeWorkflow(Carolina_Wren_Workflow, output = VariableImportance)
 ChangeWorkflow(Carolina_Wren_Workflow, output = SeparatePA)
 
 ```
-=======
-`########################`
-Code for Liz to modify as needed for changing output modules in zoon_workflow. Need to change eval to TRUE, currently FALSE so doc can knit. While you could use List to do multiple outputs at once, it might be better to step through them one by one with multiple ChangeWorkflows? Or split into another best pratice guide?
-
-```{r eval=FALSE, warning=FALSE, message=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
-zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
-                                output = )
-```
-
-
-
->>>>>>> 04d6ae8a86f59f24c7be58eb62d57639099158e3
 
 ## Putting it all together
 Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. Since MaxEnt it is the most popular SDM methodology, we will fit a MaxEnt model to our Carolina Wren presence-background data set, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
