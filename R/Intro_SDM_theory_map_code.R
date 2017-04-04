@@ -1,7 +1,5 @@
-# next : the legend
-# and additional interesting imagery like elith
 
-
+# packages
 library(zoon)
 library(ggplot2)
 library(ggmap)
@@ -9,7 +7,10 @@ library(raster)
 library(RStoolbox)
 library(viridis)
 library(reshape2)
+library(gridExtra)
+library(grid)
 
+# zoon workflow to build carolina wren results
 Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
                                    covariate = CarolinaWrenRasters,
                                    process = Background(1000),
@@ -31,11 +32,7 @@ Carolina_Wren_Workflow2 <- workflow(occurrence = CarolinaWrenPO,
 # plot square raster of predictions on two covariates we care about
 df <- Process(Carolina_Wren_Workflow2)$df
 model <- Model(Carolina_Wren_Workflow2)
-
-
 covs <- c('pcMix', 'pcDec')
-# not_covs <- all_covs[!all_covs %in% covs]
-# mn <- as.list(colMeans(df[, not_covs]))
 
 # range of values
 pcMix_lim <- range(df[, 'pcMix'])
@@ -55,14 +52,24 @@ coords <- expand.grid(pcMix = pcMix,
                       Lon = mean(df[, 'Lon']))
 
 p <- predict(model$model$model, coords, type = 'response')
-
 p_mat <- matrix(p,
                 nrow = res,
                 ncol = res,
                 byrow = FALSE)
 
+# base map version of predictions on environmental space
+image(p_mat,
+      xlab = 'pcMix',
+      ylab = 'pcDec',
+      col = rev(viridis::viridis(1000)),
+      asp = 1,
+      pty = 's')
+
+# melted data to use to ggplot version
 mp <- melt(p_mat)
 
+## PLOTTING
+# preparing ggplot theme settings
 zoon_theme <- theme_bw() +
   theme(
   plot.background = element_blank(),
@@ -78,15 +85,16 @@ zoon_theme <- theme_bw() +
   legend.position = 'none'
   )
 
-png('vignettes/Intro_Module_files/SDM_theory.png',
-    width     = 14,
+require(gridExtra)
+png('vignettes/Intro_Module_files/SDM_theory_pb.png',
+    width     = 7,
     height    = 3,
     units     = "in",
     res       = 1200,
     pointsize = 4)
-require(gridExtra)
-ll <- ggplot(cov, aes(longitude, latitude)) +
-  geom_point(aes(colour = type), size = 1) +
+# presence-background map
+pb_map <- ggplot(cov, aes(longitude, latitude)) +
+  geom_point(aes(colour = type), size = 0.3) +
   scale_colour_manual(values = c('grey', 'black')) +
   zoon_theme +
   theme(axis.title.y = element_text(angle = 180, vjust = 0.1)) +
@@ -94,42 +102,79 @@ ll <- ggplot(cov, aes(longitude, latitude)) +
   ylim(22, 52) +
   xlab('E') +
   ylab('N')
-env <- ggplot(cov, aes(pcMix, pcDec)) +
-  geom_point(aes(colour = type), size = 1) +
+# presence-background on environmental space
+pb_env <- ggplot(cov, aes(pcMix, pcDec)) +
+  geom_point(aes(colour = type), size = 0.3) +
   zoon_theme +
   theme(axis.title.y = element_text(hjust = 0.9)) +
   scale_colour_manual(values = c('grey', 'black')) +
   xlab('Mixed Forest') +
   ylab('Deciduous')
-epre <- ggplot(mp, aes(Var1, Var2, fill = value)) + geom_raster() +
+grid.arrange(pb_map, pb_env, ncol=2)
+dev.off()
+
+png('vignettes/Intro_Module_files/SDM_theory_pred.png',
+    width     = 7,
+    height    = 3,
+    units     = "in",
+    res       = 1200,
+    pointsize = 4)
+# probability of occurrence predictions in environmental space
+pred_env <- ggplot(mp, aes(Var1, Var2, fill = value)) + geom_raster() +
   scale_fill_viridis(direction = -1) +
   zoon_theme +
-  theme(axis.title.y = element_text(hjust = 0.9)) +
-  #scale_x_continuous(expand = c(0,0)) +
-  #scale_y_continuous(expand = c(0,0)) +
+  theme(axis.title.y = element_text(hjust = 0.1)) +
   xlab('Mixed Forest') +
   ylab('Deciduous')
-pred <- ggplot(out.df) +
+# probability of occurrence predictions map
+pred_map <- ggplot(out.df) +
   geom_raster(aes(x, y, fill = pcMix)) +
   zoon_theme +
   theme(axis.title.y = element_text(angle = 180, vjust = 0.1)) +
   scale_fill_viridis(direction = -1) +
-  #scale_x_continuous(expand = c(0,0)) +
-  #scale_y_continuous(expand = c(0,0)) +
   xlim(-126, -66) +
   ylim(22, 52) +
   xlab('E') +
   ylab('N')
-grid.arrange(ll, env, epre, pred, ncol=4)
+grid.arrange(pred_map, pred_env, ncol=2)
+dev.off()
 
+# legend plot
+zoon_theme_legend <- theme_bw() +
+  theme(
+    plot.background = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.ticks.y = element_blank(),
+    panel.border = element_rect(colour = "black", fill = NA, size = 2.5),
+    axis.title.x = element_text(hjust = 0.9, size = 20, face = 'bold'),
+    axis.title.y = element_text(size = 20, face = 'bold'),
+    legend.position = 'right',
+    legend.key.height = unit(6, "line"),
+    legend.key.width = unit(3, "line")
+  )
+
+# figure to extract legend from
+png('vignettes/Intro_Module_files/SDM_theory_legend.png',
+    width     = 7,
+    height    = 3,
+    units     = "in",
+    res       = 1200,
+    pointsize = 4)
+pred_legend <- ggplot(out.df) +
+  geom_raster(aes(x, y, fill = pcMix)) +
+  zoon_theme_legend +
+  theme(axis.title.y = element_text(angle = 180, vjust = 0.1)) +
+  scale_fill_viridis(name = "", direction = -1) +
+  xlim(-126, -66) +
+  ylim(22, 52) +
+  xlab('E') +
+  ylab('N')
+pred_legend
 dev.off()
 
 
-
-image(p_mat,
-      xlab = 'pcMix',
-      ylab = 'pcDec',
-      col = rev(viridis::viridis(1000)),
-      asp = 1,
-      pty = 's')
 
