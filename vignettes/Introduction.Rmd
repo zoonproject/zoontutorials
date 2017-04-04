@@ -41,7 +41,7 @@ Figure 1: Species Distribution Model Theory. Presence-background points plotted 
 
 There are many types of species distribution models and the field is rapidly expanding. `zoon` is concerned with correlative SDMs, as described above, which are the most widely used SDM. This tutoiral will focus on distribution models which estimate probability of occurrence, however, we could also use species abundance data to estimate how abundance varies along environemntal gradients. As well as correlative SDMs, there are also mechanistic SDMs. Where correlative SDMs use statistics to estimate relationships between occurrence data and environmental covariates, mechanistic SDMs use mathematical relationships between species energy requirements and environmental covaraites. Where correlative SDMs estimate a species realised niche, mechanistic SDMs estimates the fundemental niche. The field of mechanistic models is ... and we encourage the read to pursue their interest further, as we leave the topic here. 
 
-# How do I fit a species distribution model?
+## How do I fit a species distribution model?
 We implement a species distribution model with five steps:
 
 1.  Occurence: We first gather and format our species occurrence data.
