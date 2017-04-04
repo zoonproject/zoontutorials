@@ -4,6 +4,7 @@
 .Ruserdata
 */.DS_Store$
 vignettes/*_cache
+vignettes/*.R
 vignettes/*.html
 vignettes/*_files
-
+vignettes/.build.timestamp
