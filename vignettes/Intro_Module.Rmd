@@ -11,7 +11,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r knitrOpts, echo = FALSE, cache = FALSE, eval = TRUE}
+```{r eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
 # set up knitr options
 knitr::opts_chunk$set(message = FALSE,
                warning = FALSE,
@@ -49,12 +49,12 @@ The `zoon` workflow is structured around these five steps and designed to make b
 
 But first, let's fit a quick and simple SDM with `zoon` as a means of introduction. Don't forget to load the package!
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, cache=TRUE}
 library(zoon)
 ```
 
 A basic workflow for the Carolina Wren in the USA could look like this:  
-```{r message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+```{r message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 zoon_workflow <- workflow(occurrence = Lorem_ipsum_UK,
                              covariate = UKBioclim,
                              process = OneHundredBackground,
@@ -83,7 +83,7 @@ The first module required in a `workflow()` is `occurrence` and it is where we l
 
 `zoon` has several functions available to view the contents of each module in the workflow. For example, we can view our species occurrence data using the `Occurrence()` function (using the `head()` function to see only the first six lines):
 
-```{r eval=TRUE, message=FALSE, warning=FALSE}
+```{r eval=TRUE, message=FALSE, warning=FALSE, cache=TRUE}
 head(Occurrence(zoon_workflow))
 ```
 
@@ -95,7 +95,7 @@ The second module required in a `workflow` is for environmental data. As with th
 
 Using the `Covariate()` accessor function shows important details of our raster stack, including the extent of the dataset, the coordinate projection scheme (here, WGS84), and minimum/maximum value for the variables. 
 
-```{r eval=TRUE, message=FALSE, warning=FALSE}
+```{r eval=TRUE, message=FALSE, warning=FALSE, cache=TRUE}
 Covariate(zoon_workflow)
 ```
 
@@ -103,7 +103,7 @@ We can use the `?'RasterStack-class'` command to find a more detailed summary of
 
 Now using what we've learned here, lets update `zoon_workflow` so that we can build an SDM for the Carolina Wren in the USA. `zoon` has pre-loaded dataset modules for the Carolina Wren which is a common species in North America whose range reaches from southern Canada to north-eastern Mexico, but the dataset has been cropped to the extent of the contiguous USA. As presence-only data is the most commonly used data type for SDMs lets use the presence-only version of the dataset using `CarolinaWrenPO`, and we get the environmental data from `CarolinaWrenRasters`.
 
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
                                 occurrence = CarolinaWrenPO,
                                 covariate = CarolinaWrenRasters)
@@ -113,18 +113,19 @@ zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
 
 Now that we have loaded in our species and environmental data using the `occurrence` and `covariate` modules, the `process` modules will perform any pre-processing of our data required before fitting the model itself. This is where we can modify our raw data by removing poor data points using the `Clean` module or standardising our covariates using `StandardiseCov`, generate the background data points required for presence-only data analysis using `Background`, add interaction terms between our covariates using `addInteractions`, or set up model validation methods using modules like `CrossValidate`.
 
-Lets see how the mimimum/maximum values for our environmental layers change after we standardise our covariates.
+Lets see how the mimimum/maximum values for our environmental layers change after we standardise our covariates. As we still need to generate background data to work with our presence-only dataset (more on this below), we can use the `Chain()` function to run multiple models in a single workflow argument.
 
-```{r eval=TRUE}
+```{r eval=TRUE, cache=TRUE}
 Covariate(zoon_workflow)   # Before standardisation
 ```
 
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.show=FALSE}
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.show=FALSE, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
                                 process = Chain(Background(n=100), StandardiseCov))
+
 ```
 
-```{r eval=TRUE}
+```{r eval=TRUE, cache=TRUE}
 Covariate(zoon_workflow)
 ```
 
@@ -134,7 +135,7 @@ In some instances you may not require a `process` module in your `workflow`, how
 
 Since we are using presence-only data in our model we need to generate some background data, also known as pseudo-absences. Depending on the type of SDM model (see next section), this data is used to either sample the range of environmental space in the landscape to compare it to where the species in question has been found, or as a non-presence class of data. We also want to standardise our covariates, so to use multiple modules in an argument we can use the `Chain()` function. Here we use `StandardiseCov` to standardise our covariates and  `Background` to generate 100 background points.
 
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
                                 process = Chain(StandardiseCov, Background(n = 100)))
 ```
@@ -145,7 +146,7 @@ Arguably the most important part of the `workflow` is the `model` module. **actu
 
 Now, let's update our `workflow` with another common model type, logistic regression. We do this by using the aptly names `LogisticRegression` module.
 
-```{r eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=7, fig.width=7}
+```{r eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
                                 model = LogisticRegression)
 ```
@@ -171,7 +172,7 @@ If we want to see the map without the overlaid raw data, we can use the SurfaceM
 
 #Make a .
 ChangeWorkflow(zoon_workflow, output = SurfaceMap)
-
+                             
 ```
 
 Now we've seen how our model of Carolina Wren occurrence varies over geographic space, we can look more closely at what is driving that variation in occurrence probability. That is, how does the probability of occurrence for the species vary along the environmental gradients we included in our model. Remember, we included climatic variables 
@@ -195,7 +196,7 @@ ChangeWorkflow(zoon_workflow, output = ResponseCurveViz(1))
 ## Putting it all together
 Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. Since MaxEnt it is the most popular SDM methodology, we will fit a MaxEnt model to our Carolina Wren presence-background data set, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
 
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 Logistic_Regression_Workflow <- workflow(occurrence = CarolinaWrenPO,
                        covariate = CarolinaWrenRasters,
                        process = Background(1000),
@@ -206,12 +207,14 @@ Logistic_Regression_Workflow <- workflow(occurrence = CarolinaWrenPO,
 
 MaxEnt is arguably one of the modt widley used SDM methodologies, so let's fit a MaxEnt model. Now run the exact same `workflow()` but switch to a `MaxEnt` model. You can use the output modules to see how they compare.
 
+
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
-#MaxEnt_Workflow <- workflow(occurrence = CarolinaWrenPO,
-           #            covariate = CarolinaWrenRasters,
-               #        process = Background(1000),
-               #        model = MaxEnt,
-               #        output = PrintMap(points = FALSE))
+MaxEnt_Workflow <- workflow(occurrence = CarolinaWrenPO,
+           covariate = CarolinaWrenRasters,
+       process = Background(1000),
+       model = MaxEnt,
+       output = PrintMap(points = FALSE))
+
 ```
 
 
