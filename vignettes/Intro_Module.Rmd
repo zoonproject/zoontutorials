@@ -17,12 +17,8 @@ knitr::opts_chunk$set(message = FALSE,
                warning = FALSE,
                fig.align = 'center',
                dev = c('png'),
-<<<<<<< HEAD
-               cache = TRUE,
-               cache.path = 'Intro_Module_cache/')
-=======
                cache = TRUE)
->>>>>>> upstream/master
+
 ```
 
 # Introduction
@@ -126,7 +122,7 @@ Lets see how the mimimum/maximum values for our environmental layers change afte
 Covariate(zoon_workflow)   # Before standardisation
 ```
 
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.show=FALSE, cache=TRUE}
+```{r eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
                                 process = Chain(Background(n=100), StandardiseCov))
 
@@ -159,6 +155,7 @@ zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
 
 ```
 
+
 ## Step 5. Output
 It is finally time to check out our results. We'll continue with our zoon_workflow object, which we've just updated to use a logistic regression statistical model.
 
@@ -168,57 +165,44 @@ We often want to see how our predictions of probability of occurrence in environ
 ```{r}
 
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
-                                output = PrintMap)
+                                output = InteractiveMap)
 
 ```
 
-The `PrintMap` module produces a map of the probability of occurrence on the geographic region of our study, in our example the USA. The map includes a scale from light green to blue, so we can interpret the map and also plots our raw data on top of the map so we can see how our data align with model predictions. The map produced by the `PrintMap` module shows our model of carolina wren occurrence  has predicted that the species is most likely to occur in the southeat of the country and is less likely to exist in the northwest of the country. These qualitative predictions fit with a qualitative analysis of our data. We can see most of our presence records (red dots) are in the southeast and the absence records are in the northwest.
+```{r hidden chunk to embed interative map in html}
 
-If we want to see the map without the overlaid raw data, we can use the SurfaceMap module, as below. SurfaceMap produces a slightly less elegant map, but nonetheless, is still informative.
 
-<<<<<<< HEAD
-```{r}
-=======
-#Plot response curve Viz
-ChangeWorkflow(Carolina_Wren_Workflow, output = ResponseCurveViz(1:4))
->>>>>>> upstream/master
-
-#Make a .
-ChangeWorkflow(zoon_workflow, output = SurfaceMap)
-                             
 ```
+The `InteractiveMap` module produces a map of the probability of occurrence on the geographic region of our study, in our example the USA, that we can interact with. The map includes a scale from light green to blue, so we can interpret the map and also plots our raw data on top of the map so we can see how our data align with model predictions. We can click on our raw data to get information about it.
+
+The map produced by the `InteractiveMap` module shows our model of Carolina wren occurrence has predicted that the species is most likely to occur in the southeat of the country and is less likely to exist in the northwest of the country. These quantitative predictions fit with a qualitative analysis of our data. We can see most of our presence records (red dots) are in the southeast and the absence records are in the northwest.
 
 Now we've seen how our model of Carolina Wren occurrence varies over geographic space, we can look more closely at what is driving that variation in occurrence probability. That is, how does the probability of occurrence for the species vary along the environmental gradients we included in our model. Remember, we included climatic variables 
 
 ```{r}
-#Covariates()
-# Plot response curve
-ChangeWorkflow(zoon_workflow, output = ResponseCurve('Lat'))
-
-# Plot response curve Viz
-ChangeWorkflow(zoon_workflow, output = ResponseCurveViz(1))
-
-<<<<<<< HEAD
-# 
-#ChangeWorkflow(zoon_workflow, output = "ROCcurve")
-
-
-
+zoon_workflow <- ChangeWorkflow(zoon_workflow,
+                                output = ResponseCurveViz(1:4))
 ```
 
-=======
+Now we've plotted our predictions in both geographic and environmental space, we should test how good our model fit is. That is, how well does our model fit the data we built it with. There's lots of different way sto do this, which we expand on in our 'Model Validation' guide (*linky link*).
+
+One simple and common statistic is the Area under the receiver operating curve or AUC. The AUC measures how well our model predicts our observed presences and absences. It ranges from 0 to 1, where 0.5 means our model is no better than random and one means our model is a perfect predictor of our data.
+
+```{r}
+zoon_workflow <- ChangeWorkflow(zoon_workflow,
+                                output = ROCcurve)
 ```
->>>>>>> upstream/master
+
 
 ## Putting it all together
 Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. Since MaxEnt it is the most popular SDM methodology, we will fit a MaxEnt model to our Carolina Wren presence-background data set, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 Logistic_Regression_Workflow <- workflow(occurrence = CarolinaWrenPO,
-                       covariate = CarolinaWrenRasters,
-                       process = Background(1000),
-                       model = LogisticRegression,
-                       output = PrintMap(points = FALSE))
+                                         covariate = CarolinaWrenRasters,
+                                         process = Background(1000),
+                                         model = LogisticRegression,
+                                         output = PrintMap(points = FALSE))
 ```
 
 
@@ -227,10 +211,10 @@ MaxEnt is arguably one of the modt widley used SDM methodologies, so let's fit a
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
 MaxEnt_Workflow <- workflow(occurrence = CarolinaWrenPO,
-           covariate = CarolinaWrenRasters,
-       process = Background(1000),
-       model = MaxEnt,
-       output = PrintMap(points = FALSE))
+                            covariate = CarolinaWrenRasters,
+                            process = Background(1000),
+                            model = MaxEnt,
+                            output = PrintMap(points = FALSE))
 
 ```
 
