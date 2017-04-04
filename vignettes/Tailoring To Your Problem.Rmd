@@ -17,8 +17,7 @@ knitr::opts_chunk$set(message = FALSE,
                warning = FALSE,
                fig.align = 'center',
                dev = c('png'),
-               cache = TRUE,
-               cache.path = 'Tailoring_To_Your_Problem_cache/')
+               cache = TRUE)
 ```
 
 **Should this have a different title? This seems rather nondescriptive. Data modification? Data processing? Something data related anyway.**
