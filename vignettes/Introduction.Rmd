@@ -34,8 +34,8 @@ Species distribution models estimate the probabilty of occurrence of species alo
 
 We have visualised this theory in Figure 1 below. This dataset uses presence data of the Carolina Wren as well as a suite of environmental predictors such as cover of different forest types. In the top left corner we have mapped onto geographic space the records of species occurrence (black dots) as well as the background points we will use in our model. In the top right we see these same points plotted in environmental space against two covariates. We can see that the presence points are clustered at higher percents of deciduous forest and lower percents of mixed forest. The model uses this presence background data to construct predictions of species occurrence in environmental space, as seen in the bottom right plot. In the final plot, bottom left, we see these probability predictions mapped back onto geographic space in a way that allows us to understand where and by what drivers the species is likely to occur. 
 
-```{r echo = F, out.width= 700}
-knitr::include_graphics("../vignettes/Intro_Module_files/SDM_theory.png")
+```{r echo = FALSE, out.width= 700}
+# knitr::include_graphics("../vignettes/Intro_Module_files/SDM_theory.png")
 ```
 Figure 1: Species Distribution Model Theory. Presence-background points plotted on geographic space, on environmental space, and probability of occurrence predictions plotted on environmental and geographic space. 
 
@@ -43,11 +43,12 @@ There are many types of species distribution models and the field is rapidly exp
 
 # How do I fit a species distribution model?
 We implement a species distribution model with five steps:
-    1. Occurence: We first gather and format our species occurrence data.
-    2. Covariates: Next, we gather and format the environmental variables we believe are important to our species of interest.
-    3. Process: Often our data, both occurrence and environmental, will need some pre-processing before we fit our models.
-    4. Model: We then fit one or more statistical models to our data to estimate species probability of occurrence.
-    5. Output: Finally, after fitting our model, we produce model outputs, such as graphs and maps, to enable us to make ecological inference about the species.
+
+1.  Occurence: We first gather and format our species occurrence data.
+2.  Covariates: Next, we gather and format the environmental variables we believe are important to our species of interest.
+3.  Process: Often our data, both occurrence and environmental, will need some pre-processing before we fit our models.
+4.  Model: We then fit one or more statistical models to our data to estimate species probability of occurrence.
+5.  Output: Finally, after fitting our model, we produce model outputs, such as graphs and maps, to enable us to make ecological inference about the species.
     
 The `zoon` workflow is structured around these five steps and designed to make building and fitting SDMs straight-foward and reproducible. The primary zoon function is `workflow()`, which we use to fit the SDM. The workflow function has five arguments, one for each step in the SDM fitting process. For each argument, we need only to select a 'module.' The modules we choose in each step determine what type of model we run with what data and what outputs we produce. This tutorial will guide you through the process of selecting a module for each argument of the `workflow()` function. Along the way, we'll introduce some key factors that you should consider when fitting and evaluating an SDM.
 
