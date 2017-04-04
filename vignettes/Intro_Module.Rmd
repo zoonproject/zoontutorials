@@ -149,8 +149,8 @@ Now, let's update our `workflow` with another common model type, logistic regres
 ```{r eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
                                 model = LogisticRegression)
-```
 
+```
 
 ## Step 5. Output
 It is finally time to check out our results. We'll continue with our zoon_workflow object, which we've just updated to use a logistic regression statistical model.
