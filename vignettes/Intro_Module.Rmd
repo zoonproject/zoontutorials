@@ -30,7 +30,7 @@ Ecologists typically consider species' ecological niche space to be constrained 
 ## What is a species distribution model?
 Species distribution models estimate the probabilty of occurrence of species along environmental gradients. They do this by estimating the correlation between environmental variables and species occurrence data. For example, using SDMs, we can estiamte the probability a species of bird will use forest habitat with high tree cover compared to open habitat with low tree cover. We can take these statisical relationships and project them onto geographic space, which allows us to visualise on a map how the probability of species occurrence varies in geographic space.
 
-We have visualised this theory in Figure 1 below (see XXXX for model description). This dataset uses presence data of the Carolina Wren as well as a suite of environmental predictors such as cover of different forest types. In the top left corner we have mapped onto geographic space the records of species occurrence (black dots) as well as the background points we will use in our model. In the top right we see these same points plotted in environmental space against two covariates. We can see that the presence points are clustered at higher percents of deciduous forest and lower percents of mixed forest. The model uses this presence background data to construct predictions of species occurrence in environmental space, as seen in the bottom right plot. In the final plot, bottom left, we see these probability predictions mapped back onto geographic space in a way that allows us to understand where and by what drivers the species is likely to occur. 
+We have visualised this theory in Figure 1 below. This dataset uses presence data of the Carolina Wren as well as a suite of environmental predictors such as cover of different forest types. In the top left corner we have mapped onto geographic space the records of species occurrence (black dots) as well as the background points we will use in our model. In the top right we see these same points plotted in environmental space against two covariates. We can see that the presence points are clustered at higher percents of deciduous forest and lower percents of mixed forest. The model uses this presence background data to construct predictions of species occurrence in environmental space, as seen in the bottom right plot. In the final plot, bottom left, we see these probability predictions mapped back onto geographic space in a way that allows us to understand where and by what drivers the species is likely to occur. 
 
 ```{r echo = F, out.width= 700}
 knitr::include_graphics("../vignettes/Intro_Module_files/SDM_theory.png")
@@ -55,7 +55,7 @@ But first, let's fit a quick and simple SDM with `zoon` as a means of introducti
 library(zoon)
 ```
 
-A basic workflow for the Carolina Wren in the USA could look like this:  
+A basic workflow could look like this:  
 ```{r message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
 zoon_workflow <- workflow(occurrence = Lorem_ipsum_UK,
                              covariate = UKBioclim,
