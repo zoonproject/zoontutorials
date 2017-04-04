@@ -18,7 +18,7 @@ knitr::opts_chunk$set(message = FALSE,
                fig.align = 'center',
                dev = c('png'),
                cache = TRUE,
-               cache.path = file.path(getwd(), 'vignettes/Intro_Module_cache'))
+               cache.path = 'Intro_Module_cache/')
 ```
 
 # Introduction
