@@ -21,6 +21,7 @@ r_packages:
  - spocc
  - zoon
  - gridExtra
+ - lattice
 
 ## After success update the code coverage and deploy the pkgdown to gh-pages
 after_success:
