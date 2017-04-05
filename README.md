@@ -15,5 +15,7 @@ library(zoontutorials)
 vignette('Intro_Module')
 ```
 
-The introductory tutorial is only in a very early draft stage at the moment, please let us know what you think we should cover in the repo's issues tracker.
+Alternatively, you can check some of the tutorials and guides out in your browser, e.g. [the basic introduction](https://cdn.rawgit.com/goldingn/zoontutorials/563c74c1/inst/doc/Introduction.html)
+
+The introductory tutorials are only in a very early draft stage at the moment. Please let us know what you think we should cover in the repo's issues tracker!
 

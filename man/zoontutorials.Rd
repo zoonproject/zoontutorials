@@ -6,4 +6,3 @@
 \description{
 See vignette for an introductory tutorial to SDM using zoon
 }
-
