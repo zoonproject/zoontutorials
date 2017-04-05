@@ -6,4 +6,3 @@ knitr::opts_chunk$set(message = FALSE,
                dev = c('png'),
                cache = TRUE)
 
-
