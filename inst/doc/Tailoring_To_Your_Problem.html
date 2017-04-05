@@ -129,7 +129,7 @@ process =<span class="st"> </span><span class="kw">StandardiseCov</span>(<span c
 <p>The <code>addInteraction</code> module in <code>zoon</code> lets us define the interactions between variables in our model. There are multiple ways to implement this module: adding all pairwise interactions, defining set interactions between a select group of variables, and specifying polynomial terms.</p>
 <p>A pairwise interaction is the interaction between two variables in a model such that:</p>
 <p><strong>how to put a formula into this?</strong></p>
-<p>Y = b0 + b1X1 + b2X2 + b3(x1*x2)</p>
+<p><span class="math inline">\(Y = b_0 + b_1*X_1 + b_2*X_2 + b_3(x_1*x_2)\)</span></p>
 <p>where b3 is the interaction term between the variables x1 and x2. This is achieved in <code>zoon</code> like this:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">addInteraction</span>(<span class="dt">which.covs =</span> <span class="st">'pairs'</span>)</code></pre></div>
 <p>Rather than a blanket application of interaction terms across our model, we might decide that it is more ecologically reasonable to define interactions only between a select group of variables. For example, we might not expect to see an interaction between average rainfall and distance to roads, but to see one between elevation and percentage forest cover. There are multiple ways to achieve this so lets go through them one at a time:</p>
