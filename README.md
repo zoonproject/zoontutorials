@@ -15,5 +15,5 @@ library(zoontutorials)
 vignette('Intro_Module')
 ```
 
-The intriductory tutorial is only in a very early draft stage at the moment, please let us know what you think we should cover in the repo's issues tracker.
+The introductory tutorial is only in a very early draft stage at the moment, please let us know what you think we should cover in the repo's issues tracker.
 
