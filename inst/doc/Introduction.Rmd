@@ -167,10 +167,11 @@ zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
 
 ```
 
-```{r hidden chunk to embed interative map in html}
-
-
+```{r echo=FALSE, fig.align='center', fig.height=7, fig.width=7}
+# force the htmlwidget to render in the vignette
+Output(zoon_workflow)
 ```
+
 The `InteractiveMap` module produces a map of the probability of occurrence on the geographic region of our study, in our example the USA, that we can interact with. The map includes a scale from light green to blue, so we can interpret the map and also plots our raw data on top of the map so we can see how our data align with model predictions. We can click on our raw data to get information about it.
 
 The map produced by the `InteractiveMap` module shows our model of Carolina wren occurrence has predicted that the species is most likely to occur in the southeat of the country and is less likely to exist in the northwest of the country. These quantitative predictions fit with a qualitative analysis of our data. We can see most of our presence records (red dots) are in the southeast and the absence records are in the northwest.
