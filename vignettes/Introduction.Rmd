@@ -70,17 +70,17 @@ In this workflow, we have loaded the *Lorem ipsum* presence-only occurrence data
 
 # Zoon SDM Workflow
 ## Step 1. Occurrence
-Species distribution models are fitted with species occurrence data, which is available in three formats: presence-only, presence-background, and presence-absence. Less commonly, species distribution models can be fitted with abundance data. 
+Species distribution models are fitted with species occurrence data, which is available in three formats: presence-only, presence-background, and presence-absence. Less commonly, species distribution models can be fitted with abundance data.
 
-* Presence-only data is usually sourced from museum or herbarium records, and is a list of all recorded sightings/captures of a species with its location. 
+* Presence-only data is usually sourced from museum or herbarium records, and is a list of all recorded sightings/captures of a species with its location.
 
-* Presence-background data is a type of presence-only data that combines presence records with randomly generated background points, also called 'pseudo-absences.' This is the more common of the two types. 
+* Presence-background data is a type of presence-only data that combines presence records with randomly generated background points, also called 'pseudo-absences.' This is the more common of the two types.
 
 * Presence-absence data generally comes from structured field surveys where the presence *or* absence of the target species is recorded for a given site.
 
 Presence-only data is widely and freely accesible only and as a result is more commonly used than presence-absence data. As such, we write this tutorial for presence-only data and note any necessary alterations for presence-absence data.
 
-The first module required in a `workflow()` is `occurrence` and it is where we load our species occurrence data. There are three methods for loading data into your workflow depending where the data is sourced: we can use pre-existing `occurrence` modules in `zoon` like `Lorem_ipsum_UK`, download data from an online repository using `SpOcc`, or load in our own data from a local computer using `LocalOccurrenceData`. 
+The first module required in a `workflow()` is `occurrence` and it is where we load our species occurrence data. There are three methods for loading data into your workflow depending where the data is sourced: we can use pre-existing `occurrence` modules in `zoon` like `Lorem_ipsum_UK`, download data from an online repository using `SpOcc`, or load in our own data from a local computer using `LocalOccurrenceData`.
 
 `zoon` has several functions available to view the contents of each module in the workflow. For example, we can view our species occurrence data using the `Occurrence()` function (using the `head()` function to see only the first six lines):
 
@@ -88,19 +88,19 @@ The first module required in a `workflow()` is `occurrence` and it is where we l
 head(Occurrence(zoon_workflow))
 ```
 
-The first two columns provide the geographic location of the observation (as longitude and latitude), the third column is the observation value (1 = presence, 0 = absence), the fourth column is the type of observation, and the last column identifies the "fold" the data point is located in if utilising cross-validation (covered later in the section of `Process` modules, but a default model can be considered to always have one fold). 
+The first two columns provide the geographic location of the observation (as longitude and latitude), the third column is the observation value (1 = presence, 0 = absence), the fourth column is the type of observation, and the last column identifies the "fold" the data point is located in if utilising cross-validation (covered later in the section of `Process` modules, but a default model can be considered to always have one fold).
 
 ## Step 2. Covariates
 
 The second module required in a `workflow` is for environmental data. As with the `occurrence` module, there are three ways to load `covariate` data into the model: pre-existing `zoon` modules like `CarolinaWrenRasters`, data from online sources such as `Bioclim`, and our own data from a local computer using `LocalRaster`.
 
-Using the `Covariate()` accessor function shows important details of our raster stack, including the extent of the dataset, the coordinate projection scheme (here, WGS84), and minimum/maximum value for the variables. 
+Using the `Covariate()` accessor function shows important details of our raster stack, including the extent of the dataset, the coordinate projection scheme (here, WGS84), and minimum/maximum value for the variables.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, cache=TRUE}
 Covariate(zoon_workflow)
 ```
 
-We can use the `?'RasterStack-class'` command to find a more detailed summary of the data format. 
+We can use the `?'RasterStack-class'` command to find a more detailed summary of the data format.
 
 Now using what we've learned here, lets update `zoon_workflow` so that we can build an SDM for the Carolina Wren in the USA. `zoon` has pre-loaded dataset modules for the Carolina Wren which is a common species in North America whose range reaches from southern Canada to north-eastern Mexico, but the dataset has been cropped to the extent of the contiguous USA. As presence-only data is the most commonly used data type for SDMs lets use the presence-only version of the dataset using `CarolinaWrenPO`, and we get the environmental data from `CarolinaWrenRasters`.
 
@@ -143,7 +143,7 @@ zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
 
 ## Step 4. Model
 
-Arguably the most important part of the `workflow` is the `model` module. **actually, probably not due to the variation in results with model choice** *but would that not mean that it is the most important since it can have such a large effect?* **How can it be the most important if we have no way of knowing which model is correct? I.e., they're all wrong, you just need to decide how you want to be wrong. The things that influence varition in model results *within* a model, I argue, are more important** This is where we choose which type of SDM you want to fit to our data. There are multiple different SDM methods to choose from **(add Elith paper reference)** and each have their mertis. A few more common examples include the `LogisticRegression`, `mgcv`, `MaxEnt`, `RandomForest`, and `GBM` modules. For more detail on these methods you can refer to the "Choosing A Model" vignette **link later**.
+Arguably the most important part of the `workflow` is the `model` module. **actually, probably not due to the variation in results with model choice** *but would that not mean that it is the most important since it can have such a large effect?* **How can it be the most important if we have no way of knowing which model is correct? I.e., they're all wrong, you just need to decide how you want to be wrong. The things that influence varition in model results *within* a model, I argue, are more important** This is where we choose which type of SDM you want to fit to our data. There are multiple different SDM methods to choose from **(add Elith paper reference)** and each have their mertis. A few more common examples include the `LogisticRegression`, `mgcv`, `MaxEnt`, `RandomForest`, and `GBM` modules. For more detail on these methods you can refer to the ["Choosing A Model" vignette](Choosing_A_Model.html).
 
 Now, let's update our `workflow` with another common model type, logistic regression. We do this by using the aptly names `LogisticRegression` module.
 
@@ -175,14 +175,14 @@ The `InteractiveMap` module produces a map of the probability of occurrence on t
 
 The map produced by the `InteractiveMap` module shows our model of Carolina wren occurrence has predicted that the species is most likely to occur in the southeat of the country and is less likely to exist in the northwest of the country. These quantitative predictions fit with a qualitative analysis of our data. We can see most of our presence records (red dots) are in the southeast and the absence records are in the northwest.
 
-Now we've seen how our model of Carolina Wren occurrence varies over geographic space, we can look more closely at what is driving that variation in occurrence probability. That is, how does the probability of occurrence for the species vary along the environmental gradients we included in our model. Remember, we included climatic variables 
+Now we've seen how our model of Carolina Wren occurrence varies over geographic space, we can look more closely at what is driving that variation in occurrence probability. That is, how does the probability of occurrence for the species vary along the environmental gradients we included in our model. Remember, we included climatic variables
 
 ```{r}
 zoon_workflow <- ChangeWorkflow(zoon_workflow,
                                 output = ResponseCurveViz(1:4))
 ```
 
-Now we've plotted our predictions in both geographic and environmental space, we should test how good our model fit is. That is, how well does our model fit the data we built it with. There's lots of different way sto do this, which we expand on in our 'Model Validation' guide (*linky link*).
+Now we've plotted our predictions in both geographic and environmental space, we should test how good our model fit is. That is, how well does our model fit the data we built it with. There's lots of different way sto do this, which we expand on in our ['Model Validation' guide](Model_Validation.html).
 
 One simple and common statistic is the Area under the receiver operating curve or AUC. The AUC measures how well our model predicts our observed presences and absences. It ranges from 0 to 1, where 0.5 means our model is no better than random and one means our model is a perfect predictor of our data.
 
