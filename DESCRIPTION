@@ -16,7 +16,8 @@ Depends:
 Suggests:
     knitr,
     rmarkdown,
-    gridExtra
+    gridExtra,
+    lattice
 VignetteBuilder: knitr
 LazyData: true
 RoxygenNote: 5.0.1
