@@ -9,9 +9,9 @@ addons:
       - libgdal-dev
       - libproj-dev
       - r-cran-rjava
-      - libv8-dev 
+      - libv8-dev
       - libmagick++-dev
-      
+
 r_binary_packages:
  - rgdal
 
@@ -20,14 +20,15 @@ r_packages:
  - gam
  - spocc
  - zoon
+ - gridExtra
 
 ## After success update the code coverage and deploy the pkgdown to gh-pages
 after_success:
  - Rscript -e 'devtools::build_vignettes()'
- 
+
 # Warnings don't fail build
 warnings_are_errors: false
- 
+
 ## Email notification if the package pass status changes
 notifications:
 email:
@@ -35,7 +36,7 @@ email:
     - zoonproject@gmail.com
   on_success: change
   on_failure: change
-  
+
 ## Set up the matrix of different runs
 env:
   global:
@@ -47,4 +48,4 @@ env:
     - r: devel
       not_cran: true
       r_check_args: "--no-manual"
-      
+
