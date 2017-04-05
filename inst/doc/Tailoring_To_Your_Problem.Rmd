@@ -1,0 +1,143 @@
+---
+title: "Tailoring To Your Problem"
+author: "zoontutorials team"
+date: "7 March 2017"
+output:
+  rmarkdown::html_vignette:
+    toc: yes
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Tailoring To Your Problem}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+# set up knitr options
+knitr::opts_chunk$set(message = FALSE,
+               warning = FALSE,
+               fig.align = 'center',
+               dev = c('png'),
+               cache = TRUE)
+```
+
+**Should this have a different title? This seems rather nondescriptive. Data modification? Data processing? Something data related anyway.**
+
+**Come back and rework parts of this after the No Model module is created? I.e. run a no process/model/output workflow so that you can use Occurrence/Covariate to perform data checks with summary()?**
+
+Species Distribution Models (SDMs) are built upon species occurrence records collected from field surveys or collated observation records. Rarely, however, do we build an SDM on this raw data without undertaking some sort of data processing. These processes can include the cleaning up of the raw data, standardising of covariates, transforming data, and creating interactions between measured variables. Within `zoon` these processes are achieved using `process` modules in your `workflow()`.
+
+# Data Cleaning
+
+Species distribution datasets are, to varying degrees, reliant on manually-compiled data from observations. Even in situations where we are fitting a model to entirely remotely-sensed data such as bioclimatic variables, our species occurrence records are usually pen-and-paper recordings from the field that have been manually transcribed into an excel file. Even with modern technology where the need for physical record taking can be replaced with data entry into hand-held computing devices in the field, this process still relies on manual data entry and this can lead to mistakes in the data entry procedure.
+
+Inaccurate data can lead us to draw false conclusions, and for conservation work this could mean squandering our limited resources for a species in locations where the species is not likely to occur. Some basic checks that it is wise to perform are using some of `zoon's` accessor functions in conjunction with the `summary()` function from base R to perform visual checks on your raw data. This will provide some numerical summaries of your data which can be used to check for inaccurate data. Maybe the maximum value in your elevation variable is 1000m, but you know that the highest peak in your study region is only 500m? During the data entry process someone may have added an extra 0 to a 100m measurement by mistake. Maybe your vegetation classification is showing as having ten levels despite it being an eight-category scale? Chances are a spelling mistake as benign as 'forest' instead of 'Forest' is present.
+
+**add example using summary(Covariate(Logistic_Regression_workflow)) or something similar**
+
+One of the `zoon` modules, `Clean`, removes impossible, incomplete, or unlikely species occurrence points in the dataset based on the listed longitude and latitude values. Impossible latitude/longitude points are removed because the location doesn't exist, incomplete occurrence records are missing either a longitude or latitude value (or both) are removed as they cannot be plotted or used, and unlikely data points are those like 0,0 as you are unlikely to be surveying hundreds of kilometers offshore in the Gulf of Guinea but it is possibly an artifact of data entry if used as default values and the correct values aren't entered in their place. Within `Clean` these are referred to by number as impossible (1), incomplete (2), and unlikely (3), and this module is used as follows:
+
+```{r eval=FALSE}
+process = Clean(which = c(1,2,3))
+```
+
+# Data Transformation
+
+** insert paragraph on what transformation is/why you should/when you should **
+
+This is achieved in `zoon` using the `Transform` module. To use this module we need to define the transformation, nominate the variable to be transformed, and whether to replace the original variable or create a new one. We define the transformation in a similar manner to defining a function in base R. This takes the format of setting the `trans` argument in this module to the format of `function(x) {our transformation}`. We select the variables we want to apply this transformation to by supplying a character vector to the `which_cov` argument, and choose to replace the original variable or not by setting the `replace` argument to `TRUE` or `FALSE`.
+
+Let's run through a couple of examples. If we want to square a variable called VarA and make it an additional variable in our dataset we would use this:
+
+```{r eval=FALSE}
+process = Transform(trans = function(x) {x^2},
+                    which_cov = "VarA",
+                    replace = FALSE)
+```
+
+If we want to perform a log transformation to the variables VarA, VarB, and VarC, and replace the original variables in the dataset we would use this:
+
+```{r eval=FALSE}
+process = Transform(trans = function(x) {log(x)},
+                    which_cov = c("VarA", "VarB", "VarC"),
+                    replace = TRUE)
+```
+
+If we want to get fancy and provide different transformations to different variables we can achieve this using the `Chain()` function in `zoon`.
+
+```{r eval=FALSE}
+process = Chain(Transform(trans = function(x) {x^2},
+                          which_cov = c("VarA", "VarB"),
+                          replace = FALSE),
+                Transform(trans = function(x) {log(x)},
+                          which_cov = c("VarC", "VarD")))
+```
+
+# Standardising Variables
+
+A common transformation, so common in fact that it is standard practice for most analyses nowadays and not really thought of in the same vein as transformation anymore, is the standarisation of variables. While it can improve the efficiency of model fitting algorithms, the main benefit of this transformation allows us to directly compare the influence of different variables on species distributions by placing them on the same scale. For example, the regression coefficient for the distance of a site to roads might be +3.0 when measured in kilometres, but +0.003 if measured in meters, and the effect of average temperature in celsius could be -10. How would we compare the effect of these variables?
+
+We do this with the `StandardiseCov` module in `zoon` to standardise covariates in the model. By default, the module standardises all variables by subtracting their mean and dividing by their standard deviation. This standardisation places variables on the same scale, allowing us to compare the relative effects of different covariates within a model. To use this module we need to choose which variables to exclude from standardisation (if any), and whether to use the Gelman variant (standardises by two standard deviations instead of one - **(link to this here)**). Some examples of how we achieve this like so:
+
+```{r eval=FALSE}
+process = StandardiseCov(Gelman = FALSE, exclude = NULL) # default form: standardise all covariates normally
+
+process = StandardiseCov() # short form of the default fit
+
+process = StandardiseCov(Gelman = TRUE,
+                         exclude = c("VarB", "VarC"))
+```
+
+# Interactions
+
+Interactions between variables can have important implications for the interpretation of statistical models. **Expand when back in front of textbooks (Something about interpretation of response curves? Doesn't effect maps)**. 
+
+The `addInteraction` module in `zoon` lets us define the interactions between variables in our model. There are multiple ways to implement this module: adding all pairwise interactions, defining set interactions between a select group of variables, and specifying polynomial terms.
+
+A pairwise interaction is the interaction between two variables in a model such that:
+
+**how to put a formula into this?**
+
+Y = b0 + b1X1 + b2X2 + b3(x1*x2)
+
+where b3 is the interaction term between the variables x1 and x2. This is achieved in `zoon` like this:
+
+```{r eval=FALSE}
+process = addInteraction(which.covs = 'pairs')
+```
+
+Rather than a blanket application of interaction terms across our model, we might decide that it is more ecologically reasonable to define interactions only between a select group of variables. For example, we might not expect to see an interaction between average rainfall and distance to roads, but to see one between elevation and percentage forest cover. There are multiple ways to achieve this so lets go through them one at a time:
+
+*  To define the pairwise interaction between any two variables as a character vector:
+
+```{r eval=FALSE}
+process = addInteraction(which.covs = c("A","B"))   # adds an interaction between A & B
+```
+
+*  To define multiple pairwise interactions, but not *all* pairwise interactions, we make use of R's `list()` function. We provide a list of interaction terms as character vectors like so:
+
+```{r eval=FALSE}
+process = addInteraction(which.covs = list(c("A","B"), c("A","C")))   # adds interactions between A & B and A & C, but not B & C
+```
+
+*  To define higher order interactions between more than two variables we just need to extend the length of our character vectors. This will define the highest order interaction term between all of the selected variables as well as all combinations of lower-order interaction terms.
+
+```{r eval=FALSE}
+process = addInteraction(which.covs = c(A,B,C))   # adds all two-way (e.g. A & B) interactions and a three-way interaction between A, B & C
+```
+
+# Polynomial Terms
+
+Sometimes the relationship between our response variable and predictor variable is not adequately represented using a standard linear relationship. For example, the probability of species occurrence might increase with elevation, but beyond a certain point it starts to decrease again. Polynomial terms are used to capture these relationships.
+
+Now, it may not be intuitive to think of polynomial terms as interactions, but the structure of defining interactions in the manner of the `addInteraction` module also suits defining polynomial terms. Rather than using characters vectors of multiple variables like defining interactions, we define a character vector of repeated instances of the same variable name of a length equal to the order of polynomial term we want to define. For example:
+
+```{r eval=FALSE}
+process = addInteractions(which.covs = c(A,A))   # leads to a quadratic polynomial
+
+process = addInteractions(which.covs = c(A,A,A))   # leads to a cubic, polynomial
+```
+
+While polynomial terms let us represent non-linear relationships between the response and predictor variables, we have to be careful in our application of them. Polynomial terms add extra parameters in the model to be estimated, and we need to be careful that we don't overload the model with additional terms unless we have enough data to be confident in estimating that many terms **(rule of thumb being 1 parameter for every 10 observations, or every 10 presences? I've heard different from different sources)**. To this end we should only apply polynomial terms to predictor variables where it is ecologically defensible. Variables like elevation, temperature, and rainfall where we could expect there to be a "sweet spot" for species occurrence, such that probability of occurrence would decrease outside of a certain variable range, would be suitable candidates for polynomial terms. Variables where we might expect a linear response for species occurrence include distance-based ones such as distance to roads, disturbances, or food/water resources. Categorical variables are another one where we would not use polynomial terms.
+
+
+**Anything else we feel needs to be added here?**
