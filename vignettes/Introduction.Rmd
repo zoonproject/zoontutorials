@@ -195,32 +195,17 @@ zoon_workflow <- ChangeWorkflow(zoon_workflow,
 
 
 ## Putting it all together
-Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. Since MaxEnt it is the most popular SDM methodology, we will fit a MaxEnt model to our Carolina Wren presence-background data set, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
+Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. As MaxEnt is arguably one of the most popular SDM methodologies, lets fit a MaxEnt model in addition to the LogisticRegression module. This is achieved using the `List()` function. We will fit these models to the Carolina Wren presence-background data set, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
-Logistic_Regression_Workflow <- workflow(occurrence = CarolinaWrenPO,
-                                         covariate = CarolinaWrenRasters,
-                                         process = Background(1000),
-                                         model = LogisticRegression,
-                                         output = PrintMap(points = FALSE))
+Dual_Model_Workflow <- workflow(occurrence = CarolinaWrenPO,
+                                covariate = CarolinaWrenRasters,
+                                process = Background(1000),
+                                model = list(LogisticRegression, MaxEnt),
+                                output = PrintMap(points = FALSE))
 ```
 
-
-MaxEnt is arguably one of the modt widley used SDM methodologies, so let's fit a MaxEnt model. Now run the exact same `workflow()` but switch to a `MaxEnt` model. You can use the output modules to see how they compare.
-
-
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
-MaxEnt_Workflow <- workflow(occurrence = CarolinaWrenPO,
-                            covariate = CarolinaWrenRasters,
-                            process = Background(1000),
-                            model = MaxEnt,
-                            output = PrintMap(points = FALSE))
-
-```
-
-
-
-There are some obvious differences in the predicted distribution maps of these two approaches. The only thing to change betweeen the two workflows is our model of choice, so what causes the difference? Check out our more detailed guide on SDM model algorithm selection here **(insert plug for future guides)**
+There are some obvious differences in the predicted distribution maps of these two models. As this was done in a single workflow there are no differences between the outputs except our model of choice (as they each use the same background data), so what causes the difference? Check out our more detailed guide on SDM model algorithm selection here **(insert plug for future guides)**
 
 
 # Conclusion
