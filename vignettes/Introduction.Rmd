@@ -59,14 +59,14 @@ library(zoon)
 
 A basic workflow could look like this:  
 ```{r message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
-zoon_workflow <- workflow(occurrence = Lorem_ipsum_UK,
-                             covariate = UKBioclim,
-                             process = OneHundredBackground,
+zoon_workflow <- workflow(occurrence = SugarMaple,
+                             covariate = Bioclim(extent = c(-170, -20, 10, 80)),
+                             process = Background(100),
                              model = RandomForest,
                              output = PrintMap)
 ```
 
-In this workflow, we have loaded the *Lorem ipsum* presence-only occurrence data for the UK, loaded the Bioclim environmental covariates for the UK, selected 100 background occurrence data (more on this later), fit a Random Forest model, and printed a map. The map shows us how the probability of occurrence of *Lorem ipsum* varies across the UK. Throughout this tutorial we will guide you step-by-step through each of the arguments in a workflow as we update this `zoon_workflow`.
+In this workflow, we have loaded the Sugar Maple presence-only occurrence data for the USA, loaded the Bioclim environmental covariates, selected 100 background occurrence data (more on this later), fit a Random Forest model, and printed a map. The map shows us how the probability of occurrence of Sugar Maple varies across the USA. Throughout this tutorial we will guide you step-by-step through each of the arguments in a workflow as we update this `zoon_workflow`.
 
 `zoon` comes with several pre-existing modules for each argument, and we will go through a selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList()` command.
 
