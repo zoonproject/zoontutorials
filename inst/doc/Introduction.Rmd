@@ -66,7 +66,7 @@ zoon_workflow <- workflow(occurrence = SpOcc("Yucca brevifolia", extent = c(-119
                           output = PrintMap)
 ```
 
-In this workflow, we have obtained occurrence records for *Yucca brevifolia* (Joshua Tree), loaded the Bioclim environmental covariates, selected 100 background occurrence data (more on this later), fit a Random Forest model, and printed a map. The map shows us how the probability of occurrence of *Yucca brevifolia* varies across south-eastern USA. Throughout this tutorial we will guide you step-by-step through each of the arguments in a workflow as we update this `zoon_workflow`.
+In this workflow, we have loaded the Sugar Maple presence-only occurrence data for the USA, loaded the Bioclim environmental covariates, selected 100 background occurrence data (more on this later), fit a Random Forest model, and printed a map. The map shows us how the probability of occurrence of Sugar Maple varies across the USA. Throughout this tutorial we will guide you step-by-step through each of the arguments in a workflow as we update this `zoon_workflow`.
 
 `zoon` comes with several pre-existing modules for each argument, and we will go through a selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList()` command.
 
