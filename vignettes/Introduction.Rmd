@@ -57,14 +57,14 @@ library(zoon)
 
 A basic workflow could look like this:  
 ```{r message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
-zoon_workflow <- workflow(occurrence = Lorem_ipsum_UK,
-                             covariate = UKBioclim,
-                             process = OneHundredBackground,
-                             model = RandomForest,
-                             output = PrintMap)
+zoon_workflow <- workflow(occurrence = SpOcc("Yucca brevifolia", extent = c(-119, -113, 34, 39)),
+                          covariate = Bioclim(extent = c(-120, -112, 33, 40)),
+                          process = Background(100),
+                          model = RandomForest,
+                          output = PrintMap)
 ```
 
-In this workflow, we have loaded the *Lorem ipsum* presence-only occurrence data for the UK, loaded the Bioclim environmental covariates for the UK, selected 100 background occurrence data (more on this later), fit a Random Forest model, and printed a map. The map shows us how the probability of occurrence of *Lorem ipsum* varies across the UK. Throughout this tutorial we will guide you step-by-step through each of the arguments in a workflow as we update this `zoon_workflow`.
+In this workflow, we have obtained occurrence records for *Yucca brevifolia* (Joshua Tree), loaded the Bioclim environmental covariates, selected 100 background occurrence data (more on this later), fit a Random Forest model, and printed a map. The map shows us how the probability of occurrence of *Yucca brevifolia* varies across south-eastern USA. Throughout this tutorial we will guide you step-by-step through each of the arguments in a workflow as we update this `zoon_workflow`.
 
 `zoon` comes with several pre-existing modules for each argument, and we will go through a selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList()` command.
 
@@ -104,7 +104,7 @@ We can use the `?'RasterStack-class'` command to find a more detailed summary of
 
 Now using what we've learned here, lets update `zoon_workflow` so that we can build an SDM for the Carolina Wren in the USA. `zoon` has pre-loaded dataset modules for the Carolina Wren which is a common species in North America whose range reaches from southern Canada to north-eastern Mexico, but the dataset has been cropped to the extent of the contiguous USA. As presence-only data is the most commonly used data type for SDMs lets use the presence-only version of the dataset using `CarolinaWrenPO`, and we get the environmental data from `CarolinaWrenRasters`.
 
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
                                 occurrence = CarolinaWrenPO,
                                 covariate = CarolinaWrenRasters)
@@ -120,7 +120,7 @@ Lets see how the mimimum/maximum values for our environmental layers change afte
 Covariate(zoon_workflow)   # Before standardisation
 ```
 
-```{r eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
+```{r eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
                                 process = Chain(Background(n=100), StandardiseCov))
 
@@ -136,18 +136,18 @@ In some instances you may not require a `process` module in your `workflow`, how
 
 Since we are using presence-only data in our model we need to generate some background data, also known as pseudo-absences. Depending on the type of SDM model (see next section), this data is used to either sample the range of environmental space in the landscape to compare it to where the species in question has been found, or as a non-presence class of data. We also want to standardise our covariates, so to use multiple modules in an argument we can use the `Chain()` function. Here we use `StandardiseCov` to standardise our covariates and  `Background` to generate 100 background points.
 
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
                                 process = Chain(StandardiseCov, Background(n = 100)))
 ```
 
 ## Step 4. Model
 
-Arguably the most important part of the `workflow` is the `model` module. **actually, probably not due to the variation in results with model choice** *but would that not mean that it is the most important since it can have such a large effect?* **How can it be the most important if we have no way of knowing which model is correct? I.e., they're all wrong, you just need to decide how you want to be wrong. The things that influence varition in model results *within* a model, I argue, are more important** This is where we choose which type of SDM you want to fit to our data. There are multiple different SDM methods to choose from **(add Elith paper reference)** and each have their mertis. A few more common examples include the `LogisticRegression`, `mgcv`, `MaxEnt`, `RandomForest`, and `GBM` modules. For more detail on these methods you can refer to the ["Choosing A Model" vignette](Choosing_A_Model.html).
+A fundamental aspect of the `workflow` is the `model` module. This is where we choose which type of SDM you want to fit to our data. There are multiple different SDM methods to choose from **(add Elith paper reference)** and each have their mertis. A few more common examples include the `LogisticRegression`, `mgcv`, `MaxEnt`, `RandomForest`, and `GBM` modules. For more detail on these methods you can refer to the ["Choosing A Model" vignette](Choosing_A_Model.html).
 
 Now, let's update our `workflow` with another common model type, logistic regression. We do this by using the aptly names `LogisticRegression` module.
 
-```{r eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
+```{r eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
                                 model = LogisticRegression)
 
@@ -160,7 +160,7 @@ It is finally time to check out our results. We'll continue with our zoon_workfl
 We often want to see how our predictions of probability of occurrence in environemntal space fit onto real geographic space. We do this by projecting our predictions onto a map using the module 'PrintMap'.
 
 
-```{r}
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
                                 output = InteractiveMap)
@@ -178,7 +178,7 @@ The map produced by the `InteractiveMap` module shows our model of Carolina wren
 
 Now we've seen how our model of Carolina Wren occurrence varies over geographic space, we can look more closely at what is driving that variation in occurrence probability. That is, how does the probability of occurrence for the species vary along the environmental gradients we included in our model. Remember, we included climatic variables
 
-```{r}
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(zoon_workflow,
                                 output = ResponseCurveViz(1:4))
 ```
@@ -187,39 +187,24 @@ Now we've plotted our predictions in both geographic and environmental space, we
 
 One simple and common statistic is the Area under the receiver operating curve or AUC. The AUC measures how well our model predicts our observed presences and absences. It ranges from 0 to 1, where 0.5 means our model is no better than random and one means our model is a perfect predictor of our data.
 
-```{r}
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(zoon_workflow,
                                 output = ROCcurve)
 ```
 
 
 ## Putting it all together
-Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. Since MaxEnt it is the most popular SDM methodology, we will fit a MaxEnt model to our Carolina Wren presence-background data set, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
+Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. As MaxEnt is arguably one of the most popular SDM methodologies, lets fit a MaxEnt model in addition to the LogisticRegression module. This is achieved using the `List()` function. We will fit these models to the Carolina Wren presence-background data set, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
 
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
-Logistic_Regression_Workflow <- workflow(occurrence = CarolinaWrenPO,
-                                         covariate = CarolinaWrenRasters,
-                                         process = Background(1000),
-                                         model = LogisticRegression,
-                                         output = PrintMap(points = FALSE))
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
+Dual_Model_Workflow <- workflow(occurrence = CarolinaWrenPO,
+                                covariate = CarolinaWrenRasters,
+                                process = Background(1000),
+                                model = list(LogisticRegression, MaxEnt),
+                                output = PrintMap(points = FALSE))
 ```
 
-
-MaxEnt is arguably one of the modt widley used SDM methodologies, so let's fit a MaxEnt model. Now run the exact same `workflow()` but switch to a `MaxEnt` model. You can use the output modules to see how they compare.
-
-
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
-MaxEnt_Workflow <- workflow(occurrence = CarolinaWrenPO,
-                            covariate = CarolinaWrenRasters,
-                            process = Background(1000),
-                            model = MaxEnt,
-                            output = PrintMap(points = FALSE))
-
-```
-
-
-
-There are some obvious differences in the predicted distribution maps of these two approaches. The only thing to change betweeen the two workflows is our model of choice, so what causes the difference? Check out our more detailed guide on SDM model algorithm selection here **(insert plug for future guides)**
+There are some obvious differences in the predicted distribution maps of these two models. As this was done in a single workflow there are no differences between the outputs except our model of choice (as they each use the same background data), so what causes the difference? Check out our more detailed guide on SDM model algorithm selection here **(insert plug for future guides)**
 
 
 # Conclusion
