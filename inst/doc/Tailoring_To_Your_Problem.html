@@ -98,18 +98,18 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>** insert paragraph on what transformation is/why you should/when you should **</p>
 <p>This is achieved in <code>zoon</code> using the <code>Transform</code> module. To use this module we need to define the transformation, nominate the variable to be transformed, and whether to replace the original variable or create a new one. We define the transformation in a similar manner to defining a function in base R. This takes the format of setting the <code>trans</code> argument in this module to the format of <code>function(x) {our transformation}</code>. We select the variables we want to apply this transformation to by supplying a character vector to the <code>which_cov</code> argument, and choose to replace the original variable or not by setting the <code>replace</code> argument to <code>TRUE</code> or <code>FALSE</code>.</p>
 <p>Let’s run through a couple of examples. If we want to square a variable called VarA and make it an additional variable in our dataset we would use this:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">Transform</span>(<span class="dt">trans =</span> function(x) {x^<span class="dv">2</span>},
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">Transform</span>(<span class="dt">trans =</span> <span class="cf">function</span>(x) {x<span class="op">^</span><span class="dv">2</span>},
                     <span class="dt">which_cov =</span> <span class="st">&quot;VarA&quot;</span>,
                     <span class="dt">replace =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <p>If we want to perform a log transformation to the variables VarA, VarB, and VarC, and replace the original variables in the dataset we would use this:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">Transform</span>(<span class="dt">trans =</span> function(x) {<span class="kw">log</span>(x)},
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">Transform</span>(<span class="dt">trans =</span> <span class="cf">function</span>(x) {<span class="kw">log</span>(x)},
                     <span class="dt">which_cov =</span> <span class="kw">c</span>(<span class="st">&quot;VarA&quot;</span>, <span class="st">&quot;VarB&quot;</span>, <span class="st">&quot;VarC&quot;</span>),
                     <span class="dt">replace =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p>If we want to get fancy and provide different transformations to different variables we can achieve this using the <code>Chain()</code> function in <code>zoon</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">Chain</span>(<span class="kw">Transform</span>(<span class="dt">trans =</span> function(x) {x^<span class="dv">2</span>},
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">Chain</span>(<span class="kw">Transform</span>(<span class="dt">trans =</span> <span class="cf">function</span>(x) {x<span class="op">^</span><span class="dv">2</span>},
                           <span class="dt">which_cov =</span> <span class="kw">c</span>(<span class="st">&quot;VarA&quot;</span>, <span class="st">&quot;VarB&quot;</span>),
                           <span class="dt">replace =</span> <span class="ot">FALSE</span>),
-                <span class="kw">Transform</span>(<span class="dt">trans =</span> function(x) {<span class="kw">log</span>(x)},
+                <span class="kw">Transform</span>(<span class="dt">trans =</span> <span class="cf">function</span>(x) {<span class="kw">log</span>(x)},
                           <span class="dt">which_cov =</span> <span class="kw">c</span>(<span class="st">&quot;VarC&quot;</span>, <span class="st">&quot;VarD&quot;</span>)))</code></pre></div>
 </div>
 <div id="standardising-variables" class="section level1">
