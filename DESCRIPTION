@@ -3,7 +3,9 @@ Type: Package
 Title: Tutorials and Best Practice Guides for Species Distribution Modelling using zoon
 Version: 0.1
 Authors@R: c(person("Nick", "Golding", role = c("aut", "cre"),
-                    email = "nick.golding.research@gmail.com"))
+                    email = "nick.golding.research@gmail.com"),
+			       person("David", "Wilkinson", role = c("aut"),
+                    email = "davidpw@student.unimelb.edu.au"))
 Maintainer: Nick Golding <nick.golding.research@gmail.com>
 Description: The zoon package enables reproducible, shareable and extensible species distribution modelling (SDM) from R, and provides vignettes on how to use the package's functionality.
     This package provides tutorials to help beginners get started with SDM, as well as best practice guides to advise on some of the more tricky and contentious aspects of SDM.

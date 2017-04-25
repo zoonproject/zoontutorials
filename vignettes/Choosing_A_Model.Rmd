@@ -74,9 +74,9 @@ Machine learning is a subfield of computer science where models are built to lea
 
 ### MaxEnt
 
-MaxEnt is the most widely used SDM algorithm in practice today **(Elith reference)**. This model compares the probability density of covariates across the landscape, *f(z)*, with the probability density of covariates across locations within the landscape in which the species is present, *f1(z)*, where *z* is the environmental covariates. The estimated ratio of *f1(z)*/*f(z)* provides insight on which covariates are important and establishes the relative suitability of one site over another. MaxEnt estimates *f1(z)* such that it is consistent with the occurrence data, but there are many possible distributions so it chooses the one closest to *f(z)*. Minimising this distance is sensible as without occurrence data there is no reason to expect a species to prefer a particular environmental conditions over another. This distance from *f(z)* is taken to be the relative entropy of *f1(z)* with respect to *f(z)*. Minimising this relative entropy is equivalent to maximising the entropy (hence, MaxEnt) of the ratio *f1(z)*/*f(z)*. This model can be described as maximising entropy in geographic space, or minimising entropy in environmental space.
+MaxEnt is one of the most widely used SDM algorithm in practice today **(Elith reference)**. This model compares the probability density of covariates across the landscape, *f(z)*, with the probability density of covariates across locations within the landscape in which the species is present, *f1(z)*, where *z* is the environmental covariates. The estimated ratio of *f1(z)*/*f(z)* provides insight on which covariates are important and establishes the relative suitability of one site over another. MaxEnt estimates *f1(z)* such that it is consistent with the occurrence data, but there are many possible distributions so it chooses the one closest to *f(z)*. Minimising this distance is sensible as without occurrence data there is no reason to expect a species to prefer a particular environmental conditions over another. This distance from *f(z)* is taken to be the relative entropy of *f1(z)* with respect to *f(z)*. Minimising this relative entropy is equivalent to maximising the entropy (hence, MaxEnt) of the ratio *f1(z)*/*f(z)*. This model can be described as maximising entropy in geographic space, or minimising entropy in environmental space.
 
-During the model fitting procedure MaxEnt needs to estimate coefficient values such that they meet the above constraints, yet not fit them too closely and result in an overfit model that has limited generalisation ability. This is achieved using regularisation, which can be thought of as shrinking the coefficients towards zero by penalising them to balance model fit and complexity. Thus, MaxEnt can be seen as fitting a penalised maximum likelihood model.
+During the model fitting procedure MaxEnt needs to estimate coefficient values such that they meet the above constraints, yet not fit them too closely and result in an overfit model that has limited generalisation ability. This is achieved using regularisation, which can be thought of as shrinking the coefficients towards zero by penalising them to balance model fit and complexity. Thus, MaxEnt can be seen as fitting a penalised maximum likelihood model. MaxEnt models are also the same as a Poisson point process model **insert Ian Renner MEE 2016 reference**.
 
 This method works with presence-background data. The `MaxEnt` module uses the `maxent()` function in the `dismo` package, and requires a MaxEnt executable file saved in the correct location. The `zoon` helper function `GetMaxEnt()` is available to help with this installation. You select this model in your `workflow` as follows:
 
@@ -98,13 +98,13 @@ Tree-based models partition the predictor space into rectangles by using a set o
 
 The "boosting" technique is an iterative procedure that attempts to reduce the deviance of the model by fitting another tree to account for the residuals of the previous tree. The core idea is that is it easier to build and average multiple rules of thumb than to find a single, highly accurate prediction rule. There are different boosting algorithms that differ in how they quantify lack of fit, but they all use a forward, stage-wise procedure to gradually increase emphasis on observations modelled poorly by existing trees.
 
-The `GBM` module fits a generalised boosted regression model using the `gbm` package, and it can be fit to presence-background and presence-absence datasets. There are several tree parameters **(hyperparamters?)** that you need to set to "tune" the model.
+The `GBM` module fits a generalised boosted regression model using the `gbm` package, and it can be fit to presence-background and presence-absence datasets. There are several tuning parameters that you need to set to "tune" the model.
 
 *  Maximum number of trees: This is the equivalent to setting the number of iterations in the model. As a rule of thumb, more is better, but this just sets an upper limit and the optimal number will be selected by cross-validation.
 
-*  The maximum depth of variable interactions: This sets the number of nodes (or splits) in the decision trees. Interactions between variables is automatically modelled in BRTs due to the hierarchical structure of trees such that the response to an input variable is dependant on those higher up the tree. **(but as a tree can split multiple times in one variable 5 nodes does not necessarily mean 4 interactions?)**
+*  The maximum depth of variable interactions: This sets the number of nodes (or splits) in the decision trees. Interactions between variables is automatically modelled in BRTs due to the hierarchical structure of trees such that the response to an input variable is dependant on those higher up the tree. 
 
-*  The learning rate/shrinkage factor: This is the contribution of each tree to the final model average. The sum of fitted values in all trees is multiplied by the learning rate to produce the fitted values in the final model. **(how does this work with cross-validation choosing final number of trees? Does it adjust the lr? Why wouldn't this be set to default to 1/number of trees?)**
+*  The learning rate/shrinkage factor: This is the contribution of each tree to the final model average. The sum of fitted values in all trees is multiplied by the learning rate to produce the fitted values in the final model.
 
 This model can be fit using the following call in your `workflow`:
 
@@ -117,6 +117,8 @@ BRT_workflow <- workflow(occurrence = CarolinaWrenPO,
                                      shrinkage = 0.001),
                          output = PrintMap(points = FALSE))
 ```
+
+The `XGBoost` software for fitting BRTs is increasingly used in machine learning applications to really big datasets. You can use the `MachineLearn` module to fit BRT models with XGBoost by replacing the model module above with: `MachineLearn(method = 'xgbTree')`
 
 ### RandomForest
 
