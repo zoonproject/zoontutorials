@@ -35,7 +35,6 @@ Throughout this tutorial we will fit several example SDMs to highlight each mode
 
 
 # Models
-
 ## Regression-based Models
 
 Regression analysis is a statistical method for estimating the relationships among variables, and the models found in this category are likely to be familiar to those with a statistical background. These models focus on the relationship between a dependent variable (like the presence of a species) and one or more independent variables (like our environmental predictor variables). The two regression-based SDMs covered here are logistic regression and generalised additive models.
