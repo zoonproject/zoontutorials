@@ -11,15 +11,23 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-## Data Exploration
-Data exploration is a key first step before you begin to think about what kind of model module you will use. 
+```{r eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+# set up knitr options
+knitr::opts_chunk$set(message = FALSE,
+               warning = FALSE,
+               fig.align = 'center',
+               dev = c('png'),
+               cache = TRUE)
+```
+
+Species Distribution Models (SDMs) are built upon species occurrence records collected from field surveys or collated observation records. Rarely, however, do we build an SDM on this raw data without undertaking some sort of data exploration and processing. Data exploration is a key first step before analysing our data. Exploring the structure and patterns in data allow us to identify any errors and select and format appropriate covariates. Data processing can include the cleaning up of the raw data, standardising of covariates, transforming data, and creating interactions between measured variables. Within `zoon`, these visualisations are achieved with `output` modules, and data processes are achieved using `process` modules in your `workflow()`. 
 
 ```{r message = F, warning = F}
 library(zoon)
 library(lattice)
 ```
 
-In this module we will use the Carolina Wren dataset as an example. 
+In this vignette we will use the Carolina Wren dataset as an example. 
 ```{r model, warning = F}
 Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
                                    covariate = CarolinaWrenRasters,
@@ -28,7 +36,10 @@ Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
                                    output = PrintMap)
 ```
 
-We can take a look at our covariate data by calling the accessor function `Process`. This will take the covariate data along with the occurrence data. `str()` will show us the structure of our data, allowing us to confirm the form our data are stored in. 
+# Data Structure
+
+We can take a look at our covariate data by calling the accessor function `Process`. This will show us both the covariate data and the occurrence data. `str()` will show us the structure of our data, allowing us to confirm the form our data are stored in. 
+
 ```{r}
 cov <- Process(Carolina_Wren_Workflow)$df
 levels(cov) <- c('background', 'presence')
@@ -36,16 +47,34 @@ str(cov)
 ```
 In this case, we can see that data type is stored as a factor, and the continuous variables are stored as numeric variables. This is correct. 
 
-Next we might want to check that there is roughly even coverage of our two types of data, or our factor variable. 
+Next we might want to check that there is roughly even coverage of our two types of data, or our factor variable. This is important for XXXXXXX .. 
 ```{r}
 table(cov$type)
 ```
 There are!
 
-At this point we can begin our data exploration. The first thing to do is to check for outliers in our data. These may indicate data entry errors when using your own data, or errors in 
+# Outliers
+
+Species distribution datasets are, to varying degrees, reliant on manually-compiled data from observations. Even in situations where we are fitting a model to entirely remotely-sensed data such as bioclimatic variables, our species occurrence records are usually pen-and-paper recordings from the field that have been manually transcribed into an excel file. Even with modern technology where the need for physical record taking can be replaced with data entry into hand-held computing devices in the field, this process still relies on manual data entry and this can lead to mistakes in the data entry procedure.
+
+Inaccurate data can lead us to draw false conclusions, and for conservation work this could mean squandering our limited resources for a species in locations where the species is not likely to occur. Some basic checks that it is wise to perform are using some of `zoon's` accessor functions in conjunction with the `summary()` function from base R to perform visual checks on your raw data. This will provide some numerical summaries of your data which can be used to check for inaccurate data. Maybe the maximum value in your elevation variable is 1000m, but you know that the highest peak in your study region is only 500m? During the data entry process someone may have added an extra 0 to a 100m measurement by mistake. Maybe your vegetation classification is showing as having ten levels despite it being an eight-category scale? Chances are a spelling mistake as benign as 'forest' instead of 'Forest' is present.
+
+**add example using summary(Covariate(Logistic_Regression_workflow)) or something similar**
+
+One of the `zoon` modules, `Clean`, removes impossible, incomplete, or unlikely species occurrence points in the dataset based on the listed longitude and latitude values. Impossible latitude/longitude points are removed because the location doesn't exist, incomplete occurrence records are missing either a longitude or latitude value (or both) are removed as they cannot be plotted or used, and unlikely data points are those like 0,0 as you are unlikely to be surveying hundreds of kilometers offshore in the Gulf of Guinea but it is possibly an artifact of data entry if used as default values and the correct values aren't entered in their place. Within `Clean` these are referred to by number as impossible (1), incomplete (2), and unlikely (3), and this module is used as follows:
+
+```{r eval=FALSE}
+process = Clean(which = c(1,2,3))
+```
+
+
+
 Data exploration
 A Outliers in Y / Outliers in X
 B Collinearity X
+
+Some `output` modules exist for visualising your data exploration. For example, you may want to  
+
 C Relationships Y vs X
 D Spatial/temporal aspects of sampling design 
 E Interactions (is the quality of the data good enough to
