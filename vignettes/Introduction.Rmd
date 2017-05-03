@@ -23,8 +23,6 @@ knitr::opts_chunk$set(message = FALSE,
 # Why do we fit species distribution models?
 In ecology, we often want to understand where species are distributed in the environment and why. Sometimes we ask these questions to gain more knowledge about a species, yet other times we simply need to know where it is to better manage it.
 
-
-
 # What is a species distribution model?
 Where we find species in geographic species is the result of three factors: the abiotic environment, the biotic environment, and the species' movement. Together, these three factors determine the species' ecological niche. For example, a species may be constrained by the climate required for individuals to survive, the local vegetation types it depends on, and its abillity to traverse different landscapes. The intersection of the abiotic and biotic environmental conditions constitutes the *fundamental niche*, or where the species could physiologically occur given what we know of its biology and ecology. However, experience tells us that species are not always located where we expect them to be. Their *realised niche* is where they actually exist within the bounds of the environmental space where they could potentially exist.
 
@@ -71,7 +69,7 @@ In this workflow, we have obtained occurrence records for *Yucca brevifolia* (Jo
 
 `zoon` comes with several pre-existing modules for each argument, and we will go through a selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList()` command.
 
-# The five `zoon` workflow steps *edit
+# The five `zoon` workflow steps
 ## Step 1. Occurrence
 Species distribution models are fitted with species occurrence data, the most common of which are: presence-only, presence-background, and presence-absence. Less commonly, species distribution models can be fitted with abundance data.
 
@@ -183,9 +181,13 @@ The `InteractiveMap` shows us, accoridng to the data we included, the Carolina w
 Now we've seen how Carolina wren occurrence varies over geographic space, let's look more closely at what is driving that variation. That is, how does probability of occurrence vary along the environmental gradients we included in our model. For this, we can use the `ResponsePlot` module to make graphs of the predicted relationships between probabilty of occurrence and our environmental covariate.
 
 Without input arguments, `ResponsePlot` plots a graph for each covariate included in our model. We can also specify, which covariate we want to plot.
+```{r echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.height=5, fig.width=7, cache=TRUE}
+zoon_workflow <- ChangeWorkflow(zoon_workflow,
+                                output = ResponsePlot())
+```
 
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
-
+```{r echo=FALSE, eval=TRUE, cache = TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=5, fig.width=7, cache=TRUE}
+par(mfrow=c(2,3))
 zoon_workflow <- ChangeWorkflow(zoon_workflow,
                                 output = ResponsePlot())
 ```
