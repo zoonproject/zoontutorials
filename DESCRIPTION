@@ -4,6 +4,10 @@ Title: Tutorials and Best Practice Guides for Species Distribution Modelling usi
 Version: 0.1
 Authors@R: c(person("Nick", "Golding", role = c("aut", "cre"),
                     email = "nick.golding.research@gmail.com"), 
+                    person("David", "Wilkinson", role = c("aut"),
+                    email = "davidpw@student.unimelb.edu.au"),
+                    person("Liz", "Martin", role = c("aut"),
+                    email = "emartin@student.unimelb.edu.au"),
                     person("Saras", "Windecker", role = "aut", 
                     email = "saras.windecker@gmail.com"))
 Maintainer: Nick Golding <nick.golding.research@gmail.com>
