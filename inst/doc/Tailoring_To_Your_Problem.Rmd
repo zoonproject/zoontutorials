@@ -22,15 +22,13 @@ knitr::opts_chunk$set(message = FALSE,
 
 **Should this have a different title? This seems rather nondescriptive. Data modification? Data processing? Something data related anyway.**
 
-**Come back and rework parts of this after the No Model module is created? I.e. run a no process/model/output workflow so that you can use Occurrence/Covariate to perform data checks with summary()?**
-
 Species Distribution Models (SDMs) are built upon species occurrence records collected from field surveys or collated observation records. Rarely, however, do we build an SDM on this raw data without undertaking some sort of data processing. These processes can include the cleaning up of the raw data, standardising of covariates, transforming data, and creating interactions between measured variables. Within `zoon` these processes are achieved using `process` modules in your `workflow()`.
 
 # Data Cleaning
 
 Species distribution datasets are, to varying degrees, reliant on manually-compiled data from observations. Even in situations where we are fitting a model to entirely remotely-sensed data such as bioclimatic variables, our species occurrence records are usually pen-and-paper recordings from the field that have been manually transcribed into an excel file. Even with modern technology where the need for physical record taking can be replaced with data entry into hand-held computing devices in the field, this process still relies on manual data entry and this can lead to mistakes in the data entry procedure.
 
-Inaccurate data can lead us to draw false conclusions, and for conservation work this could mean squandering our limited resources for a species in locations where the species is not likely to occur. Some basic checks that it is wise to perform are using some of `zoon's` accessor functions in conjunction with the `summary()` function from base R to perform visual checks on your raw data. This will provide some numerical summaries of your data which can be used to check for inaccurate data. Maybe the maximum value in your elevation variable is 1000m, but you know that the highest peak in your study region is only 500m? During the data entry process someone may have added an extra 0 to a 100m measurement by mistake. Maybe your vegetation classification is showing as having ten levels despite it being an eight-category scale? Chances are a spelling mistake as benign as 'forest' instead of 'Forest' is present.
+Inaccurate data can lead us to draw false conclusions, and for conservation work this could mean squandering our limited resources for a species in locations where the species is not likely to occur. Some basic checks that it is wise to perform are using some of `zoon`'s accessor functions in conjunction with the `summary()` function from base R to perform visual checks on your raw data. This will provide some numerical summaries of your data which can be used to check for inaccurate data. Maybe the maximum value in your elevation variable is 1000m, but you know that the highest peak in your study region is only 500m? During the data entry process someone may have added an extra 0 to a 100m measurement by mistake. Maybe your vegetation classification is showing as having ten levels despite it being an eight-category scale? Chances are a spelling mistake as benign as 'forest' instead of 'Forest' is present.
 
 **add example using summary(Covariate(Logistic_Regression_workflow)) or something similar**
 
@@ -97,7 +95,8 @@ A pairwise interaction is the interaction between two variables in a model such 
 
 **how to put a formula into this?**
 
-$Y = b_0 + b_1*X_1 + b_2*X_2 + b_3(x_1*x_2)$
+$$Y &= b_0 + b_1*X_1 + b_2*X_2 + b_3(x_1*x_2) \\
+Y &= f(X)$$
 
 where b3 is the interaction term between the variables x1 and x2. This is achieved in `zoon` like this:
 
