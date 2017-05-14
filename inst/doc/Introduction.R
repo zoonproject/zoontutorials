@@ -16,8 +16,12 @@ library(zoon)
 zoon_workflow <- workflow(occurrence = SpOcc("Yucca brevifolia", extent = c(-119, -113, 34, 39)),
                           covariate = Bioclim(extent = c(-120, -112, 33, 40)),
                           process = Background(100),
-                          model = RandomForest,
-                          output = PrintMap)
+                          model = MaxEnt,
+                          output = InteractiveMap)
+
+## ----echo=FALSE, fig.align='center', fig.height=7, fig.width=7-----------
+# force the htmlwidget to render in the vignette
+Output(zoon_workflow)
 
 ## ----eval=TRUE, message=FALSE, warning=FALSE, cache=TRUE-----------------
 head(Occurrence(zoon_workflow))
@@ -30,25 +34,43 @@ zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
                                 occurrence = CarolinaWrenPO,
                                 covariate = CarolinaWrenRasters)
 
+## ----echo=FALSE, fig.align='center', fig.height=7, fig.width=7-----------
+# force the htmlwidget to render in the vignette
+Output(zoon_workflow)
+
+## ----eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE----
+zoon_data <- workflow(occurrence = CarolinaWrenPO,
+                      covariate = CarolinaWrenRasters,
+                      process = Background(100),
+                      model = MaxEnt,
+                      output = PrintMap)
+
+online_repositories <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                process = Background(100),
+                                model = MaxEnt,
+                                output = PrintMap)
+
 ## ----eval=TRUE, cache=TRUE-----------------------------------------------
 Covariate(zoon_workflow)   # Before standardisation
 
-## ----eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE----
-zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
-                                process = Chain(Background(n=100), StandardiseCov))
-
-
-## ----eval=TRUE, cache=TRUE-----------------------------------------------
-Covariate(zoon_workflow)
-
 ## ----eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE----
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
-                                process = Chain(StandardiseCov, Background(n = 100)))
+                                process = Chain(StandardiseCov, Background(n = 1000)))
+
+## ----echo=FALSE, fig.align='center', fig.height=7, fig.width=7-----------
+# force the htmlwidget to render in the vignette
+Output(zoon_workflow)
 
 ## ----eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE----
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
                                 model = LogisticRegression)
 
+
+## ----echo=FALSE, fig.align='center', fig.height=7, fig.width=7-----------
+# force the htmlwidget to render in the vignette
+Output(zoon_workflow)
 
 ## ----eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE----
 
