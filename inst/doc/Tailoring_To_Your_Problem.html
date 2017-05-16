@@ -4,7 +4,7 @@
 
 <head>
 
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 
@@ -83,12 +83,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 
 <p><strong>Should this have a different title? This seems rather nondescriptive. Data modification? Data processing? Something data related anyway.</strong></p>
-<p><strong>Come back and rework parts of this after the No Model module is created? I.e. run a no process/model/output workflow so that you can use Occurrence/Covariate to perform data checks with summary()?</strong></p>
 <p>Species Distribution Models (SDMs) are built upon species occurrence records collected from field surveys or collated observation records. Rarely, however, do we build an SDM on this raw data without undertaking some sort of data processing. These processes can include the cleaning up of the raw data, standardising of covariates, transforming data, and creating interactions between measured variables. Within <code>zoon</code> these processes are achieved using <code>process</code> modules in your <code>workflow()</code>.</p>
 <div id="data-cleaning" class="section level1">
 <h1>Data Cleaning</h1>
 <p>Species distribution datasets are, to varying degrees, reliant on manually-compiled data from observations. Even in situations where we are fitting a model to entirely remotely-sensed data such as bioclimatic variables, our species occurrence records are usually pen-and-paper recordings from the field that have been manually transcribed into an excel file. Even with modern technology where the need for physical record taking can be replaced with data entry into hand-held computing devices in the field, this process still relies on manual data entry and this can lead to mistakes in the data entry procedure.</p>
-<p>Inaccurate data can lead us to draw false conclusions, and for conservation work this could mean squandering our limited resources for a species in locations where the species is not likely to occur. Some basic checks that it is wise to perform are using some of <code>zoon's</code> accessor functions in conjunction with the <code>summary()</code> function from base R to perform visual checks on your raw data. This will provide some numerical summaries of your data which can be used to check for inaccurate data. Maybe the maximum value in your elevation variable is 1000m, but you know that the highest peak in your study region is only 500m? During the data entry process someone may have added an extra 0 to a 100m measurement by mistake. Maybe your vegetation classification is showing as having ten levels despite it being an eight-category scale? Chances are a spelling mistake as benign as ‘forest’ instead of ‘Forest’ is present.</p>
+<p>Inaccurate data can lead us to draw false conclusions, and for conservation work this could mean squandering our limited resources for a species in locations where the species is not likely to occur. Some basic checks that it is wise to perform are using some of <code>zoon</code>‘s accessor functions in conjunction with the <code>summary()</code> function from base R to perform visual checks on your raw data. This will provide some numerical summaries of your data which can be used to check for inaccurate data. Maybe the maximum value in your elevation variable is 1000m, but you know that the highest peak in your study region is only 500m? During the data entry process someone may have added an extra 0 to a 100m measurement by mistake. Maybe your vegetation classification is showing as having ten levels despite it being an eight-category scale? Chances are a spelling mistake as benign as ’forest’ instead of ‘Forest’ is present.</p>
 <p><strong>add example using summary(Covariate(Logistic_Regression_workflow)) or something similar</strong></p>
 <p>One of the <code>zoon</code> modules, <code>Clean</code>, removes impossible, incomplete, or unlikely species occurrence points in the dataset based on the listed longitude and latitude values. Impossible latitude/longitude points are removed because the location doesn’t exist, incomplete occurrence records are missing either a longitude or latitude value (or both) are removed as they cannot be plotted or used, and unlikely data points are those like 0,0 as you are unlikely to be surveying hundreds of kilometers offshore in the Gulf of Guinea but it is possibly an artifact of data entry if used as default values and the correct values aren’t entered in their place. Within <code>Clean</code> these are referred to by number as impossible (1), incomplete (2), and unlikely (3), and this module is used as follows:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">Clean</span>(<span class="dt">which =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>))</code></pre></div>
@@ -98,18 +97,18 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>** insert paragraph on what transformation is/why you should/when you should **</p>
 <p>This is achieved in <code>zoon</code> using the <code>Transform</code> module. To use this module we need to define the transformation, nominate the variable to be transformed, and whether to replace the original variable or create a new one. We define the transformation in a similar manner to defining a function in base R. This takes the format of setting the <code>trans</code> argument in this module to the format of <code>function(x) {our transformation}</code>. We select the variables we want to apply this transformation to by supplying a character vector to the <code>which_cov</code> argument, and choose to replace the original variable or not by setting the <code>replace</code> argument to <code>TRUE</code> or <code>FALSE</code>.</p>
 <p>Let’s run through a couple of examples. If we want to square a variable called VarA and make it an additional variable in our dataset we would use this:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">Transform</span>(<span class="dt">trans =</span> <span class="cf">function</span>(x) {x<span class="op">^</span><span class="dv">2</span>},
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">Transform</span>(<span class="dt">trans =</span> function(x) {x^<span class="dv">2</span>},
                     <span class="dt">which_cov =</span> <span class="st">&quot;VarA&quot;</span>,
                     <span class="dt">replace =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <p>If we want to perform a log transformation to the variables VarA, VarB, and VarC, and replace the original variables in the dataset we would use this:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">Transform</span>(<span class="dt">trans =</span> <span class="cf">function</span>(x) {<span class="kw">log</span>(x)},
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">Transform</span>(<span class="dt">trans =</span> function(x) {<span class="kw">log</span>(x)},
                     <span class="dt">which_cov =</span> <span class="kw">c</span>(<span class="st">&quot;VarA&quot;</span>, <span class="st">&quot;VarB&quot;</span>, <span class="st">&quot;VarC&quot;</span>),
                     <span class="dt">replace =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p>If we want to get fancy and provide different transformations to different variables we can achieve this using the <code>Chain()</code> function in <code>zoon</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">Chain</span>(<span class="kw">Transform</span>(<span class="dt">trans =</span> <span class="cf">function</span>(x) {x<span class="op">^</span><span class="dv">2</span>},
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">Chain</span>(<span class="kw">Transform</span>(<span class="dt">trans =</span> function(x) {x^<span class="dv">2</span>},
                           <span class="dt">which_cov =</span> <span class="kw">c</span>(<span class="st">&quot;VarA&quot;</span>, <span class="st">&quot;VarB&quot;</span>),
                           <span class="dt">replace =</span> <span class="ot">FALSE</span>),
-                <span class="kw">Transform</span>(<span class="dt">trans =</span> <span class="cf">function</span>(x) {<span class="kw">log</span>(x)},
+                <span class="kw">Transform</span>(<span class="dt">trans =</span> function(x) {<span class="kw">log</span>(x)},
                           <span class="dt">which_cov =</span> <span class="kw">c</span>(<span class="st">&quot;VarC&quot;</span>, <span class="st">&quot;VarD&quot;</span>)))</code></pre></div>
 </div>
 <div id="standardising-variables" class="section level1">
@@ -129,7 +128,8 @@ process =<span class="st"> </span><span class="kw">StandardiseCov</span>(<span c
 <p>The <code>addInteraction</code> module in <code>zoon</code> lets us define the interactions between variables in our model. There are multiple ways to implement this module: adding all pairwise interactions, defining set interactions between a select group of variables, and specifying polynomial terms.</p>
 <p>A pairwise interaction is the interaction between two variables in a model such that:</p>
 <p><strong>how to put a formula into this?</strong></p>
-<p><span class="math inline">\(Y = b_0 + b_1*X_1 + b_2*X_2 + b_3(x_1*x_2)\)</span></p>
+<p><span class="math display">\[Y &amp;= b_0 + b_1*X_1 + b_2*X_2 + b_3(x_1*x_2) \\
+Y &amp;= f(X)\]</span></p>
 <p>where b3 is the interaction term between the variables x1 and x2. This is achieved in <code>zoon</code> like this:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">process =<span class="st"> </span><span class="kw">addInteraction</span>(<span class="dt">which.covs =</span> <span class="st">'pairs'</span>)</code></pre></div>
 <p>Rather than a blanket application of interaction terms across our model, we might decide that it is more ecologically reasonable to define interactions only between a select group of variables. For example, we might not expect to see an interaction between average rainfall and distance to roads, but to see one between elevation and percentage forest cover. There are multiple ways to achieve this so lets go through them one at a time:</p>
@@ -164,7 +164,7 @@ process =<span class="st"> </span><span class="kw">addInteractions</span>(<span 
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>
