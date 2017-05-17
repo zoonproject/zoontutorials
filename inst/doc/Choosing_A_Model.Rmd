@@ -35,14 +35,16 @@ Throughout this tutorial we will fit several example SDMs to highlight each mode
 
 
 # Models
-
 ## Regression-based Models
 
 Regression analysis is a statistical method for estimating the relationships among variables, and the models found in this category are likely to be familiar to those with a statistical background. These models focus on the relationship between a dependent variable (like the presence of a species) and one or more independent variables (like our environmental predictor variables). The two regression-based SDMs covered here are logistic regression and generalised additive models.
 
 ### Logistic Regression
 
-Logistic regression is a type of Generalised Linear Model (GLM) that can be fit to presence-background and presence-absence datasets. It uses the logit link function to estimate probability of a binary response variable (presence represented as "1" and absence as "0," for example) based on its relationship with one or more independent predictor variables. **insert example formula?**. The regression coefficients are estimated using maximum likelihood estimation. This method chooses parameter values that maximise the likelihood of observing the data given the parameters. 
+Logistic regression is a type of Generalised Linear Model (GLM) that can be fit to presence-background and presence-absence datasets. It uses the logit link function to estimate probability of a binary response variable (presence represented as "1" and absence as "0," for example) based on its relationship with one or more independent predictor variables (see formulas below). The regression coefficients are estimated using maximum likelihood estimation. This method chooses parameter values that maximise the likelihood of observing the data given the parameters. 
+
+$$p_i = Pr(Occurrence)\\
+logit(p_i) = Intercept + b_1*Covariate1 + b_2*Covariate2 + b_3*Covariate3\\$$
 
 The `LogisticRegression` model fits a logistic regression model to your data using the `glm` package in R. There are no additional arguments to define for this model, so to fit it requires only selecting it as your model module within your `workflow`.
 
@@ -56,7 +58,10 @@ Logistic_Regression_workflow <- workflow(occurrence = CarolinaWrenPO,
 
 ### Generalised Additive Model
 
-Generalised Additive Models (GAMs) can be thought of as an extension to the GLM framework, and can be fit to presence-background and presence-absence datasets. In contrast to GLMs, in which the coefficient for each covariate is estimated, in GAMs the linear predictor is the sum of smoothing functions fit to each measured variable. **(Add definition of smoothing functions?)**. If smoothing functions are used without restriction then maximum likelihood estimation of the model will result in a complex, overfit estimation of the smoothing functions. To avoid this GAMs are fit using penalised likelihood maximisation which adds a penalty for each additional smoothing function, thus penalising 'wiggliness'.
+Generalised Additive Models (GAMs) can be thought of as an extension to the GLM framework, and can be fit to presence-background and presence-absence datasets. In contrast to GLMs, in which the coefficient for each covariate is estimated, in GAMs the linear predictor is the sum of smoothing functions fit to each measured variable. If smoothing functions are used without restriction then maximum likelihood estimation of the model will result in a complex, overfit estimation of the smoothing functions. To avoid this GAMs are fit using penalised likelihood maximisation which adds a penalty for each additional smoothing function, thus penalising 'wiggliness'.
+
+$$p_i = Pr(Occurrence)\\
+logit(p_i) = Intercept + f_1(Covariate1) + f_2(Covariate2) + f_(Covariate3)\\$$
 
 The `mgcv` module fits a GAM using generalised cross-validation via the `mgcv` package. To fit this model you need to define the dimension of the basis used to fit the smooth term, *k*, and select which penalised smoothing basis, *bs*, to use. You can find more details on selecting these parameters using `?mgcv::choose.k` and `?mgcv::smooth.terms`. Here we fit the model using the default settings in our `workflow`.
 
@@ -74,9 +79,9 @@ Machine learning is a subfield of computer science where models are built to lea
 
 ### MaxEnt
 
-MaxEnt is the most widely used SDM algorithm in practice today **(Elith reference)**. This model compares the probability density of covariates across the landscape, *f(z)*, with the probability density of covariates across locations within the landscape in which the species is present, *f1(z)*, where *z* is the environmental covariates. The estimated ratio of *f1(z)*/*f(z)* provides insight on which covariates are important and establishes the relative suitability of one site over another. MaxEnt estimates *f1(z)* such that it is consistent with the occurrence data, but there are many possible distributions so it chooses the one closest to *f(z)*. Minimising this distance is sensible as without occurrence data there is no reason to expect a species to prefer a particular environmental conditions over another. This distance from *f(z)* is taken to be the relative entropy of *f1(z)* with respect to *f(z)*. Minimising this relative entropy is equivalent to maximising the entropy (hence, MaxEnt) of the ratio *f1(z)*/*f(z)*. This model can be described as maximising entropy in geographic space, or minimising entropy in environmental space.
+MaxEnt is one of the most widely used SDM algorithm in practice today [(Elith *et al*, 2008)](http://onlinelibrary.wiley.com/doi/10.1111/j.1472-4642.2010.00725.x/abstract). This model compares the probability density of covariates across the landscape, *f(z)*, with the probability density of covariates across locations within the landscape in which the species is present, *f1(z)*, where *z* is the environmental covariates. The estimated ratio of *f1(z)*/*f(z)* provides insight on which covariates are important and establishes the relative suitability of one site over another. MaxEnt estimates *f1(z)* such that it is consistent with the occurrence data, but there are many possible distributions so it chooses the one closest to *f(z)*. Minimising this distance is sensible as without occurrence data there is no reason to expect a species to prefer a particular environmental conditions over another. This distance from *f(z)* is taken to be the relative entropy of *f1(z)* with respect to *f(z)*. Minimising this relative entropy is equivalent to maximising the entropy (hence, MaxEnt) of the ratio *f1(z)*/*f(z)*. This model can be described as maximising entropy in geographic space, or minimising entropy in environmental space.
 
-During the model fitting procedure MaxEnt needs to estimate coefficient values such that they meet the above constraints, yet not fit them too closely and result in an overfit model that has limited generalisation ability. This is achieved using regularisation, which can be thought of as shrinking the coefficients towards zero by penalising them to balance model fit and complexity. Thus, MaxEnt can be seen as fitting a penalised maximum likelihood model.
+During the model fitting procedure MaxEnt needs to estimate coefficient values such that they meet the above constraints, yet not fit them too closely and result in an overfit model that has limited generalisation ability. This is achieved using regularisation, which can be thought of as shrinking the coefficients towards zero by penalising them to balance model fit and complexity. Thus, MaxEnt can be seen as fitting a penalised maximum likelihood model. MaxEnt models are also the same as a Poisson point process model [(Renner & Warton, 2013)](http://onlinelibrary.wiley.com/doi/10.1111/j.1541-0420.2012.01824.x/abstract).
 
 This method works with presence-background data. The `MaxEnt` module uses the `maxent()` function in the `dismo` package, and requires a MaxEnt executable file saved in the correct location. The `zoon` helper function `GetMaxEnt()` is available to help with this installation. You select this model in your `workflow` as follows:
 
@@ -94,17 +99,19 @@ Boosted regression trees (BRTs) are a machine learning technique that produces a
 
 Tree-based models partition the predictor space into rectangles by using a set of rules to identify regions with the most homogenous responses to predictors (see below). A constant value is then fit to each region (most probable class for classification models, mean response for regression models). Growing a tree involves recursive binary splits, such that binary splits are applied to its own outputs until some set criterion is met (such as tree depth).
 
-**insert Elith paper image?**
+```{r echo = F, fig.cap="*Figure 1. A single decision tree (upper panel), with a response Y, two predictor variables, X1 and X2 and split points t1 , t2 , etc. The bottom panel shows its prediction surface (after Hastie et al. 2001). Image sourced from Elith *et al*, 2008*", fig.align = "centre"}
+knitr::include_graphics("../vignettes/Images/Decision_Tree_Elith.jpg")
+```
 
 The "boosting" technique is an iterative procedure that attempts to reduce the deviance of the model by fitting another tree to account for the residuals of the previous tree. The core idea is that is it easier to build and average multiple rules of thumb than to find a single, highly accurate prediction rule. There are different boosting algorithms that differ in how they quantify lack of fit, but they all use a forward, stage-wise procedure to gradually increase emphasis on observations modelled poorly by existing trees.
 
-The `GBM` module fits a generalised boosted regression model using the `gbm` package, and it can be fit to presence-background and presence-absence datasets. There are several tree parameters **(hyperparamters?)** that you need to set to "tune" the model.
+The `GBM` module fits a generalised boosted regression model using the `gbm` package, and it can be fit to presence-background and presence-absence datasets. There are several tuning parameters that you need to set to "tune" the model.
 
 *  Maximum number of trees: This is the equivalent to setting the number of iterations in the model. As a rule of thumb, more is better, but this just sets an upper limit and the optimal number will be selected by cross-validation.
 
-*  The maximum depth of variable interactions: This sets the number of nodes (or splits) in the decision trees. Interactions between variables is automatically modelled in BRTs due to the hierarchical structure of trees such that the response to an input variable is dependant on those higher up the tree. **(but as a tree can split multiple times in one variable 5 nodes does not necessarily mean 4 interactions?)**
+*  The maximum depth of variable interactions: This sets the number of nodes (or splits) in the decision trees. Interactions between variables is automatically modelled in BRTs due to the hierarchical structure of trees such that the response to an input variable is dependant on those higher up the tree. 
 
-*  The learning rate/shrinkage factor: This is the contribution of each tree to the final model average. The sum of fitted values in all trees is multiplied by the learning rate to produce the fitted values in the final model. **(how does this work with cross-validation choosing final number of trees? Does it adjust the lr? Why wouldn't this be set to default to 1/number of trees?)**
+*  The learning rate/shrinkage factor: This is the contribution of each tree to the final model average. The sum of fitted values in all trees is multiplied by the learning rate to produce the fitted values in the final model.
 
 This model can be fit using the following call in your `workflow`:
 
@@ -117,6 +124,8 @@ BRT_workflow <- workflow(occurrence = CarolinaWrenPO,
                                      shrinkage = 0.001),
                          output = PrintMap(points = FALSE))
 ```
+
+The `XGBoost` software for fitting BRTs is increasingly used in machine learning applications to really big datasets. You can use the `MachineLearn` module to fit BRT models with XGBoost by replacing the model module above with: `MachineLearn(method = 'xgbTree')`
 
 ### RandomForest
 

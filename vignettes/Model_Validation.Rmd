@@ -14,7 +14,7 @@ vignette: >
 
 ### Set up model validation
 
-Model validation is an important step in the model fitting process as it lets you determine if your model is an acceptable description of your data. Model validation can be as simple as including goodness-of-fit tests or analysing the residuals **can this be done for SDMs?** but the `zoon` package uses more complex methods that subset and/or resample the dataset. **[Expand on what model validation is/why it is important]** The `process` modules that set up model validation include:
+Model validation is an important step in the model fitting process as it lets you determine if your model is an acceptable description of your data. Model validation can be as simple as d goodness-of-fit tests but the `zoon` package uses more complex methods that subset and/or resample the dataset. **[Expand on what model validation is/why it is important]** The `process` modules that set up model validation include:
 
 *	`Crossvalidate`: Run k fold crossvalidation (default = 5). If you are using presence-absence, this will split presences and absences separately so folds have equally balanced data, otherwise it just samples. This samples the dataset without replacement into k 'folds' or sub-datasets to be used for training and testing the model. A model is fit to the k-1 folds of training data and evaluated against the fold of testing data (and repeated so each fold is used as the testing data once, and then the results are averaged). This is mainly used where the goal is to use the model for prediction as it tests if the model is overfit to the training data and thus unlikely to be suitable for prediction across another dataset (i.e. the test fold). 
 

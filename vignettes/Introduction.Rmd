@@ -61,29 +61,41 @@ A basic workflow for the Joshua tree from California could look like this:
 zoon_workflow <- workflow(occurrence = SpOcc("Yucca brevifolia", extent = c(-119, -113, 34, 39)),
                           covariate = Bioclim(extent = c(-120, -112, 33, 40)),
                           process = Background(100),
-                          model = RandomForest,
-                          output = PrintMap)
+                          model = MaxEnt,
+                          output = InteractiveMap)
 ```
 
-In this workflow, we have obtained occurrence records for *Yucca brevifolia* (Joshua Tree), loaded the Bioclim environmental covariates, selected 100 background occurrence data (more on this later), fit a RandomForest model, and printed a map. The map shows us how the probability of occurrence of *Yucca brevifolia* varies across south-eastern USA. Throughout this tutorial we will guide you step-by-step through each of the arguments in a workflow as we update this `zoon_workflow`. Be sure to explore the other tutorials...
+```{r echo=FALSE, fig.align='center', fig.height=7, fig.width=7}
+# force the htmlwidget to render in the vignette
+Output(zoon_workflow)
+```
+
+In this workflow, we have obtained occurrence records for *Yucca brevifolia* (Joshua Tree), loaded the Bioclim environmental covariates, selected 100 background occurrence data (more on this later), fit a RandomForest model, and printed a map. The map shows us how the probability of occurrence of *Yucca brevifolia* varies across south-eastern USA. There are multiple ways to visualise the output of a model and we will cover them in a later section.
+
+Throughout this tutorial we will guide you step-by-step through each of the arguments in a workflow as we update this `zoon_workflow`. Be sure to explore the other tutorials...
 
 `zoon` comes with several pre-existing modules for each argument, and we will go through a selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList()` command.
 
+<<<<<<< HEAD
 # The five `zoon` workflow steps
+=======
+# The five `zoon` workflow steps *edit*
+>>>>>>> f75462e2360b96da645039c57d578e54e3caf7ee
 ## Step 1. Occurrence
+
 Species distribution models are fitted with species occurrence data, the most common of which are: presence-only, presence-background, and presence-absence. Less commonly, species distribution models can be fitted with abundance data.
 
 * Presence-only data is usually sourced from museum or herbarium records, and is a list of all recorded sightings/captures of a species with its location.
 
-* Presence-background data is a type of presence-only data that combines presence records with randomly generated background points, also called 'pseudo-absences.' This is the more common of the two types.
+* Presence-background data is a type of presence-only data that combines presence records with randomly generated background points, also called 'pseudo-absences'. This is the more common of the two types.
 
 * Presence-absence data generally comes from structured field surveys where the presence *or* absence of the target species is recorded for a given site.
 
 Presence-only data is widely and freely accesible only and as a result is more commonly used than presence-absence data. As such, we write this tutorial for presence-only data and note any necessary alterations for presence-absence data.
 
-The first module required in a `workflow()` is `occurrence` and it is where we load our species occurrence data. There are three methods for loading data into your workflow depending where the data is sourced: we can use pre-existing `occurrence` modules in `zoon` like `Lorem_ipsum_UK`, download data from an online repository using `SpOcc`, or load in our own data from a local computer using `LocalOccurrenceData`.
+The first module required in a `workflow()` is `occurrence` and it is where we load our species occurrence data. There are three methods for loading data into our workflow depending on where the data is sourced: we can use pre-existing `occurrence` modules in `zoon` like `Lorem_ipsum_UK`, download data from an online repository using `SpOcc`, or load in our own data from a local computer using `LocalOccurrenceData`.
 
-`zoon` has several functions available to view the contents of each module in the workflow. For example, we can view our species occurrence data using the `Occurrence()` function (using the `head()` function to see only the first six lines):
+`zoon` has several functions available to view the contents of each module in the workflow. For example, we can view our species occurrence data using the `Occurrence()` accessor function (using the `head()` function to see only the first six lines):
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, cache=TRUE}
 head(Occurrence(zoon_workflow))
@@ -101,7 +113,6 @@ Covariates use the rasterStack data format to store data and the `Covariate()` f
 Covariate(zoon_workflow)
 ```
 
-
 Using what we've learned here, lets update `zoon_workflow` so that we can build an SDM for the Carolina Wren in the USA. CarolinaWrenPo is an occurrence module that comes pre-loaded with presence only data for the Carlonia wrne ifor north america. As presence-only data is the most commonly used data type for SDMs lets use the presence-only version of the dataset using `CarolinaWrenPO`, and we get the environmental data from `CarolinaWrenRasters`.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
@@ -110,38 +121,53 @@ zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
                                 covariate = CarolinaWrenRasters)
 ```
 
+```{r echo=FALSE, fig.align='center', fig.height=7, fig.width=7}
+# force the htmlwidget to render in the vignette
+Output(zoon_workflow)
+```
+
+While we have used some existing data modules in this tutorial, there are modules available that will obtain occurrence and environmental data for you from online repositories such as GBIF and Bioclim. Here we show you the difference between datasets for the Carolina Wren from the pre-loaded modules `CarolinaWrenPO` and `CarolinaWrenRasters` compared with datsets sourced from online repositories using the modules `SpOcc` and `Bioclim`. We already know the extent of the datsets from the pre-loaded modules (-138.71, -52.58, 18.15, 54.95) so we will use those values for the online repositories as well.
+
+```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
+zoon_data <- workflow(occurrence = CarolinaWrenPO,
+                      covariate = CarolinaWrenRasters,
+                      process = Background(100),
+                      model = MaxEnt,
+                      output = PrintMap)
+
+online_repositories <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                process = Background(100),
+                                model = MaxEnt,
+                                output = PrintMap)
+```
+
+**paragraph on difference between two. Wait on discussion with others first **
+
 ## Step 3. Process
 
 Now that we have loaded in our species and environmental data using the `occurrence` and `covariate` modules, the `process` modules will perform any pre-processing of our data required before fitting the model itself. This is where we can modify our raw data by removing poor data points using the `Clean` module or standardising our covariates using `StandardiseCov`, generate the background data points required for presence-only data analysis using `Background`, add interaction terms between our covariates using `addInteractions`, or set up model validation methods using modules like `CrossValidate`.
 
-Let's check out our environemntal data by using the function `Covariate()`. This function returns a summary of our raster data. In this case, we have six covariates stored in raster layers which are themsolves stored in a raster brick. Our covariates are the percentage of mixed (pcMix), decidous (pcDec), and coniferous (pcCon) forests as well as the percentage of grassland (pcGr). We have also included latitude and longitude so we can quanitfy the changes in the species distribution in geographic space.
+Let's check out our environmental data by using the function `Covariate()`. This function returns a summary of our raster data. In this case, we have six covariates stored in raster layers which are themselves stored in a raster brick. Our covariates are the percentage of mixed (pcMix), deciduous (pcDec), and coniferous (pcCon) forests as well as the percentage of grassland (pcGr). We have also included latitude and longitude so we can quantify the changes in the species distribution in geographic space.
 
 ```{r eval=TRUE, cache=TRUE}
 Covariate(zoon_workflow)   # Before standardisation
 ```
 
-Lets see how the mimimum/maximum values for our environmental layers change after we standardise our covariates. As we still need to generate background data to work with our presence-only dataset (more on this below), we can use the `Chain()` function to run multiple models in a single workflow argument.
-
-```{r eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
-zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
-                                process = Chain(Background(n=100), StandardiseCov))
-
-```
-
-```{r eval=TRUE, cache=TRUE}
-Covariate(zoon_workflow)
-```
-
-The standardised covariates have a smaller range and are centered around zero.
-
-In some instances we may not need a `process` module in your `workflow`, however, it is a mandatory argument and so the `NoProcess` module can be used as a 'blank' module.
-
-Since we are using presence-only data in our model we need to generate some background data, also known as pseudo-absences. Depending on the type of model (see next section), this data is used to either sample the range of environmental space in the landscape to compare it to where the species has been found, or as a non-presence class of data. We also want to standardise our covariates, so to use multiple modules in an argument we can use the `Chain()` function. Here we use `StandardiseCov` to standardise our covariates and  `Background` to generate 100 background points.
+Since we are using presence-only data in our model we need to generate some background data, also known as pseudo-absences. Depending on the type of model (see next section), this data is used to either sample the range of environmental space in the landscape to compare it to where the species has been found, or as a non-presence class of data. We also want to standardise our covariates, so to use multiple modules in an argument we can use the `Chain()` function. Here we use `StandardiseCov` to standardise our covariates and  `Background` to generate 1000 (increased from 100 in early examples) background points.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
-                                process = Chain(StandardiseCov, Background(n = 100)))
+                                process = Chain(StandardiseCov, Background(n = 1000)))
 ```
+
+```{r echo=FALSE, fig.align='center', fig.height=7, fig.width=7}
+# force the htmlwidget to render in the vignette
+Output(zoon_workflow)
+```
+
+In some instances we may not need a `process` module in your `workflow`, however, it is a mandatory argument and so the `NoProcess` module can be used as a 'blank' module.
 
 ## Step 4. Model
 
@@ -155,12 +181,15 @@ zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
 
 ```
 
+```{r echo=FALSE, fig.align='center', fig.height=7, fig.width=7}
+# force the htmlwidget to render in the vignette
+Output(zoon_workflow)
+```
 
 ## Step 5. Output
 Once we're happy with our included data and the model type we've chose. And we've included all relevant processes, it is finally time to check our results.
 
 Let's start by mapping our probability of occurrence predictions onto geographic space. We can use the `InteractiveMap` module to create a map showing the predicted species distribution and over-lying presence points.
-
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 
@@ -203,8 +232,7 @@ Dual_Model_Workflow <- workflow(occurrence = CarolinaWrenPO,
                                 output = PrintMap(points = FALSE))
 ```
 
-There are some obvious differences in the predicted distribution maps of these two models. There are no differences between the inputs or outputs for each model because we used a single workflow. That means each model used the same data, but the predicted distribution of the species is different between the models. What causes the difference? Check out our more detailed guide on SDM algorithm selection here **(insert plug for future guides)**
-
+There are some obvious differences in the predicted distribution maps of these two models. There are no differences between the inputs or outputs for each model because we used a single workflow. That means each model used the same data, but the predicted distribution of the species is different between the models. What causes the difference? Check out our more detailed guide on SDM algorithm selection here ["Choosing A Model" vignette](Choosing_A_Model.html)
 
 # Conclusion
 We've used the zoon package to successfully run and interpret an easily reproducible and sharable species distribtion model. *sentence advocating for how this was a better process than not this* We loaded our occurrence and covariate data for our species of interest, pre-processed that data as required, ran our model and produced some outputs. The interpretation of those outputs has increased our knowledge of the Carolina wren: we've learned the Carolina wren is most likely to occur in southeast USA. We've also learned that the wren does not particuarly mind the relative cover of forest types, having similar probability of occuring in each.
