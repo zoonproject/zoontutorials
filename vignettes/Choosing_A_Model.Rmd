@@ -31,7 +31,7 @@ With the abundance of species distribution modelling (SDM) algorithms to pick fr
 
 So, which model should you choose to fit to your dataset? In this best practice guide we can into detail about the common SDM model types available in `zoon`. For each model we will cover which data types it is compatible with, explain the underlying statistical approach, and show you how to fit the model in `zoon`.
 
-Throughout this tutorial we will fit several example SDMs to highlight each model, and to keep comparisons straight forward we will fit them all to the same Carolina Wren dataset, standardise our covariates, and generate 1000 points of background data.
+Throughout this tutorial we will fit several example SDMs to highlight each model, and to keep comparisons straight forward we will fit them all to the same Carolina Wren dataset (from online repositories), standardise our covariates, and generate 1000 points of background data.
 
 
 # Models
@@ -49,8 +49,9 @@ logit(p_i) = Intercept + b_1*Covariate1 + b_2*Covariate2 + b_3*Covariate3\\$$
 The `LogisticRegression` model fits a logistic regression model to your data using the `glm` package in R. There are no additional arguments to define for this model, so to fit it requires only selecting it as your model module within your `workflow`.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7}
-Logistic_Regression_workflow <- workflow(occurrence = CarolinaWrenPO,
-                                         covariate = CarolinaWrenRasters,
+Logistic_Regression_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                         covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
                                          process = Chain(StandardiseCov, Background(1000)),
                                          model = LogisticRegression,
                                          output = PrintMap(points = FALSE))
@@ -66,8 +67,9 @@ logit(p_i) = Intercept + f_1(Covariate1) + f_2(Covariate2) + f_(Covariate3)\\$$
 The `mgcv` module fits a GAM using generalised cross-validation via the `mgcv` package. To fit this model you need to define the dimension of the basis used to fit the smooth term, *k*, and select which penalised smoothing basis, *bs*, to use. You can find more details on selecting these parameters using `?mgcv::choose.k` and `?mgcv::smooth.terms`. Here we fit the model using the default settings in our `workflow`.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7}
-GAM_workflow <- workflow(occurrence = CarolinaWrenPO,
-                         covariate = CarolinaWrenRasters,
+GAM_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                         covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
                          process = Chain(StandardiseCov, Background(1000)),
                          model = mgcv(k = -1, bs = "tp"),
                          output = PrintMap(points = FALSE))
@@ -86,11 +88,12 @@ During the model fitting procedure MaxEnt needs to estimate coefficient values s
 This method works with presence-background data. The `MaxEnt` module uses the `maxent()` function in the `dismo` package, and requires a MaxEnt executable file saved in the correct location. The `zoon` helper function `GetMaxEnt()` is available to help with this installation. You select this model in your `workflow` as follows:
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7}
-MaxEnt_workflow <- workflow(occurrence = CarolinaWrenPO,
-                         covariate = CarolinaWrenRasters,
-                         process = Chain(StandardiseCov, Background(1000)),
-                         model = MaxEnt,
-                         output = PrintMap(points = FALSE))
+MaxEnt_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                            covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
+                            process = Chain(StandardiseCov, Background(1000)),
+                            model = MaxEnt,
+                            output = PrintMap(points = FALSE))
 ```
 
 ### Boosted Regression Trees
@@ -116,8 +119,9 @@ The `GBM` module fits a generalised boosted regression model using the `gbm` pac
 This model can be fit using the following call in your `workflow`:
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7}
-BRT_workflow <- workflow(occurrence = CarolinaWrenPO,
-                         covariate = CarolinaWrenRasters,
+BRT_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                         covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
                          process = Chain(StandardiseCov, Background(1000)),
                          model = GBM(max.trees = 1000,
                                      interaction.depth = 5,
@@ -134,11 +138,12 @@ Similar to the BRTs in the `GBM` module, random forests are a machine learning t
 The `RandomForest` module can be fit to presence-background or presence-absence data using the following call in your `workflow`:
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7}
-RandomForest_workflow <- workflow(occurrence = CarolinaWrenPO,
-                         covariate = CarolinaWrenRasters,
-                         process = Chain(StandardiseCov, Background(1000)),
-                         model = RandomForest,
-                         output = PrintMap(points = FALSE))
+RandomForest_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                  covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                  process = Chain(StandardiseCov, Background(1000)),
+                                  model = RandomForest,
+                                  output = PrintMap(points = FALSE))
 ```
 
 # Comparing the Models
@@ -157,6 +162,6 @@ grid.arrange(spplot(Output(Logistic_Regression_workflow), col.regions=cls, cuts 
              spplot(Output(RandomForest_workflow), col.regions=cls, cuts = length(cls)-1, main = "Random Forest"))
 ```
 
-At first glance there are some big differences in the predicted occurrence maps of the Carolina Wren between SDM algorithms. All of the models except logistic regression exhibit a distinct divide between predicted occurrence/non-occurrence in the East-West direction whereas logistic regression has a more gradual decline, there are drastically different levels of patchiness in predicted occurrence, and different rates of decline in predicted occurrence in the extreme northern-limits of the range. So what drives these differences when the models are fit to the same data?
+At first glance there are some big differences in the predicted occurrence maps of the Carolina Wren between SDM algorithms. The regression methods have smoother transitions in the probability of occurrence than the machine learning ones. The Logistic Regression, MaxEnt and Boosted Regression Tree models predict large amounts of area with high probability of occurrence outside of the range of the observed presences, yet the Generalised Additive Model and Random Forest model are mostly restrained to the range of the observed data. Some models predict occurrence probabilities only as high as 0.7, yet others predic values as high as 1.0. So what drives these differences when the models are fit to the same data?
 
 To be continued...
