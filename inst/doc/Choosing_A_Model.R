@@ -11,32 +11,36 @@ library(zoon)
 library(gridExtra)
 
 ## ----eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7----
-Logistic_Regression_workflow <- workflow(occurrence = CarolinaWrenPO,
-                                         covariate = CarolinaWrenRasters,
+Logistic_Regression_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                         covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
                                          process = Chain(StandardiseCov, Background(1000)),
                                          model = LogisticRegression,
                                          output = PrintMap(points = FALSE))
 
 ## ----eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7----
-GAM_workflow <- workflow(occurrence = CarolinaWrenPO,
-                         covariate = CarolinaWrenRasters,
+GAM_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                         covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
                          process = Chain(StandardiseCov, Background(1000)),
                          model = mgcv(k = -1, bs = "tp"),
                          output = PrintMap(points = FALSE))
 
 ## ----eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7----
-MaxEnt_workflow <- workflow(occurrence = CarolinaWrenPO,
-                         covariate = CarolinaWrenRasters,
-                         process = Chain(StandardiseCov, Background(1000)),
-                         model = MaxEnt,
-                         output = PrintMap(points = FALSE))
+MaxEnt_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                            covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
+                            process = Chain(StandardiseCov, Background(1000)),
+                            model = MaxEnt,
+                            output = PrintMap(points = FALSE))
 
 ## ----echo = F, fig.cap="*Figure 1. A single decision tree (upper panel), with a response Y, two predictor variables, X1 and X2 and split points t1 , t2 , etc. The bottom panel shows its prediction surface (after Hastie et al. 2001). Image sourced from Elith *et al*, 2008*", fig.align = "centre"----
 knitr::include_graphics("../vignettes/Images/Decision_Tree_Elith.jpg")
 
 ## ----eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7----
-BRT_workflow <- workflow(occurrence = CarolinaWrenPO,
-                         covariate = CarolinaWrenRasters,
+BRT_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                         covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
                          process = Chain(StandardiseCov, Background(1000)),
                          model = GBM(max.trees = 1000,
                                      interaction.depth = 5,
@@ -44,11 +48,12 @@ BRT_workflow <- workflow(occurrence = CarolinaWrenPO,
                          output = PrintMap(points = FALSE))
 
 ## ----eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7----
-RandomForest_workflow <- workflow(occurrence = CarolinaWrenPO,
-                         covariate = CarolinaWrenRasters,
-                         process = Chain(StandardiseCov, Background(1000)),
-                         model = RandomForest,
-                         output = PrintMap(points = FALSE))
+RandomForest_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                  covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                  process = Chain(StandardiseCov, Background(1000)),
+                                  model = RandomForest,
+                                  output = PrintMap(points = FALSE))
 
 ## ----eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE-----------------
 cls <- colorRampPalette(c('#e0f3db', '#a8ddb5', '#4eb3d3', '#08589e'))(10)  # PrintMap colour palette

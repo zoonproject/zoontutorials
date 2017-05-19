@@ -13,8 +13,8 @@ knitr::include_graphics("../vignettes/Images/SDM_theory.png")
 library(zoon)
 
 ## ----message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7----
-zoon_workflow <- workflow(occurrence = SpOcc("Yucca brevifolia", extent = c(-119, -113, 34, 39)),
-                          covariate = Bioclim(extent = c(-120, -112, 33, 40)),
+zoon_workflow <- workflow(occurrence = CarolinaWrenPO,
+                          covariate = CarolinaWrenRasters,
                           process = Background(100),
                           model = MaxEnt,
                           output = InteractiveMap)
@@ -31,26 +31,13 @@ Covariate(zoon_workflow)
 
 ## ----eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE----
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
-                                occurrence = CarolinaWrenPO,
-                                covariate = CarolinaWrenRasters)
+                                occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)))
 
 ## ----echo=FALSE, fig.align='center', fig.height=7, fig.width=7-----------
 # force the htmlwidget to render in the vignette
 Output(zoon_workflow)
-
-## ----eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE----
-zoon_data <- workflow(occurrence = CarolinaWrenPO,
-                      covariate = CarolinaWrenRasters,
-                      process = Background(100),
-                      model = MaxEnt,
-                      output = PrintMap)
-
-online_repositories <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
-                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
-                                covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
-                                process = Background(100),
-                                model = MaxEnt,
-                                output = PrintMap)
 
 ## ----eval=TRUE, cache=TRUE-----------------------------------------------
 Covariate(zoon_workflow)   # Before standardisation
@@ -88,8 +75,9 @@ zoon_workflow <- ChangeWorkflow(zoon_workflow,
                                 output = ResponsePlot())
 
 ## ----eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE----
-Dual_Model_Workflow <- workflow(occurrence = CarolinaWrenPO,
-                                covariate = CarolinaWrenRasters,
+Dual_Model_Workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
                                 process = Background(1000),
                                 model = list(LogisticRegression, MaxEnt),
                                 output = PrintMap(points = FALSE))

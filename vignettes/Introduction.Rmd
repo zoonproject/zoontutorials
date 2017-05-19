@@ -55,11 +55,11 @@ But first, let's fit a quick and simple SDM with `zoon` as a means of introducti
 library(zoon)
 ```
 
-A basic workflow for the Joshua tree from California could look like this:
+A basic workflow for the Carolina Wren in the contiguous USA could look like this:
 
 ```{r message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
-zoon_workflow <- workflow(occurrence = SpOcc("Yucca brevifolia", extent = c(-119, -113, 34, 39)),
-                          covariate = Bioclim(extent = c(-120, -112, 33, 40)),
+zoon_workflow <- workflow(occurrence = CarolinaWrenPO,
+                          covariate = CarolinaWrenRasters,
                           process = Background(100),
                           model = MaxEnt,
                           output = InteractiveMap)
@@ -70,7 +70,7 @@ zoon_workflow <- workflow(occurrence = SpOcc("Yucca brevifolia", extent = c(-119
 Output(zoon_workflow)
 ```
 
-In this workflow, we have obtained occurrence records for *Yucca brevifolia* (Joshua Tree), loaded the Bioclim environmental covariates, selected 100 background occurrence data (more on this later), fit a RandomForest model, and printed a map. The map shows us how the probability of occurrence of *Yucca brevifolia* varies across south-eastern USA. There are multiple ways to visualise the output of a model and we will cover them in a later section.
+In this workflow, we have obtained occurrence records for the Carolina Wren from a `zoon` module, loaded environmental covariates from another `zoon` module, selected 100 background points (more on this later), fit a MaxEnt model, and generated our results as an interactive map. There are multiple ways to visualise the output of a model and we will cover them in a later section.
 
 Throughout this tutorial we will guide you step-by-step through each of the arguments in a workflow as we update this `zoon_workflow`. Be sure to explore the other tutorials...
 
@@ -109,12 +109,13 @@ Covariates use the rasterStack data format to store data and the `Covariate()` f
 Covariate(zoon_workflow)
 ```
 
-Using what we've learned here, lets update `zoon_workflow` so that we can build an SDM for the Carolina Wren in the USA. CarolinaWrenPo is an occurrence module that comes pre-loaded with presence only data for the Carlonia wrne ifor north america. As presence-only data is the most commonly used data type for SDMs lets use the presence-only version of the dataset using `CarolinaWrenPO`, and we get the environmental data from `CarolinaWrenRasters`.
+Using what we've learned here, lets update `zoon_workflow` so that we can build an SDM for the Carolina Wren in the USA using data from online repositories rather than a `zoon` data module. We keep all other aspects of the work the same.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
-                                occurrence = CarolinaWrenPO,
-                                covariate = CarolinaWrenRasters)
+                                occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)))
 ```
 
 ```{r echo=FALSE, fig.align='center', fig.height=7, fig.width=7}
@@ -122,30 +123,11 @@ zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
 Output(zoon_workflow)
 ```
 
-While we have used some existing data modules in this tutorial, there are modules available that will obtain occurrence and environmental data for you from online repositories such as GBIF and Bioclim. Here we show you the difference between datasets for the Carolina Wren from the pre-loaded modules `CarolinaWrenPO` and `CarolinaWrenRasters` compared with datsets sourced from online repositories using the modules `SpOcc` and `Bioclim`. We already know the extent of the datsets from the pre-loaded modules (-138.71, -52.58, 18.15, 54.95) so we will use those values for the online repositories as well.
-
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
-zoon_data <- workflow(occurrence = CarolinaWrenPO,
-                      covariate = CarolinaWrenRasters,
-                      process = Background(100),
-                      model = MaxEnt,
-                      output = PrintMap)
-
-online_repositories <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
-                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
-                                covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
-                                process = Background(100),
-                                model = MaxEnt,
-                                output = PrintMap)
-```
-
-**paragraph on difference between two. Wait on discussion with others first **
-
 ## Step 3. Process
 
 Now that we have loaded in our species and environmental data using the `occurrence` and `covariate` modules, the `process` modules will perform any pre-processing of our data required before fitting the model itself. This is where we can modify our raw data by removing poor data points using the `Clean` module or standardising our covariates using `StandardiseCov`, generate the background data points required for presence-only data analysis using `Background`, add interaction terms between our covariates using `addInteractions`, or set up model validation methods using modules like `CrossValidate`.
 
-Let's check out our environmental data by using the function `Covariate()`. This function returns a summary of our raster data. In this case, we have six covariates stored in raster layers which are themselves stored in a raster brick. Our covariates are the percentage of mixed (pcMix), deciduous (pcDec), and coniferous (pcCon) forests as well as the percentage of grassland (pcGr). We have also included latitude and longitude so we can quantify the changes in the species distribution in geographic space.
+Let's check out our environmental data by using the function `Covariate()`. This function returns a summary of our raster data. In this case, we have five covariates stored in raster layers which are themselves stored in a raster brick. Our covariates are the Bioclim variables `bio1`, `bio2`, `bio3`, `bio4`, and `bio5`.
 
 ```{r eval=TRUE, cache=TRUE}
 Covariate(zoon_workflow)   # Before standardisation
@@ -167,7 +149,7 @@ In some instances we may not need a `process` module in your `workflow`, however
 
 ## Step 4. Model
 
-A fundamental aspect of the `workflow` is the `model` module. This is where we choose which type of SDM you want to fit to our data. There are multiple different SDM methods to choose from **(add Elith paper reference)** and each have their mertis. A few more common examples include the `LogisticRegression`, `mgcv`, `MaxEnt`, `RandomForest`, and `GBM` modules. For more detail on these methods you can refer to the ["Choosing A Model" vignette](Choosing_A_Model.html).
+A fundamental aspect of the `workflow` is the `model` module. This is where we choose which type of SDM you want to fit to our data. There are multiple different SDM methods to choose from and each have their mertis [(Elith *et al*, 2006)](http://onlinelibrary.wiley.com/doi/10.1111/j.2006.0906-7590.04596.x/abstract). A few more common examples include the `LogisticRegression`, `mgcv`, `MaxEnt`, `RandomForest`, and `GBM` modules. For more detail on these methods you can refer to the ["Choosing A Model" vignette](Choosing_A_Model.html).
 
 Now, let's update our `workflow` with another common model type, logistic regression. We do this by using the aptly named `LogisticRegression` module.
 
@@ -201,9 +183,9 @@ Output(zoon_workflow)
 
 The `InteractiveMap` module produces a map of occurrence probability that we can interact with. The map shows a scale from light green to purple and overlays our raw data on top of the map so we can see how our data align with model predictions. We can click on our raw data to get information about it.
 
-The `InteractiveMap` shows us, accoridng to the data we included, the Carolina wren is most likely to occur in the southeast of the country (higher probability of occurrence; purple) and is less likely to exist in the northwest of the country (lower probability of occurrence; yellow). These quantitative predictions fit with a qualitative analysis of our data; most of our presence records (white dots) are in the southeast of the map.
+The `InteractiveMap` shows us, according to the data we included, the Carolina Wren is most likely to occur in the southeast of the country (higher probability of occurrence: purple) and is less likely to exist in the northwest of the country (lower probability of occurrence: yellow). These quantitative predictions fit with a qualitative analysis of our data; most of our presence records (white dots) are in the southeast of the map.
 
-Now we've seen how Carolina wren occurrence varies over geographic space, let's look more closely at what is driving that variation. That is, how does probability of occurrence vary along the environmental gradients we included in our model. For this, we can use the `ResponsePlot` module to make graphs of the predicted relationships between probabilty of occurrence and our environmental covariate.
+Now we've seen how Carolina Wren occurrence varies over geographic space, let's look more closely at what is driving that variation. That is, how does probability of occurrence vary along the environmental gradients we included in our model. For this, we can use the `ResponsePlot` module to make graphs of the predicted relationships between probabilty of occurrence and our environmental covariate.
 
 Without input arguments, `ResponsePlot` plots a graph for each covariate included in our model. We can also specify, which covariate we want to plot.
 
@@ -214,11 +196,12 @@ zoon_workflow <- ChangeWorkflow(zoon_workflow,
 ```
 
 # Putting it all together
-Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. As MaxEnt is arguably one of the most popular SDM methodologies, lets fit a MaxEnt model in addition to the LogisticRegression module. This is achieved using the `List()` function. We will fit these models to the Carolina Wren presence-background data set, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
+Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. As MaxEnt is arguably one of the most popular SDM methodologies, lets fit a MaxEnt model in addition to the LogisticRegression module. This is achieved using the `List()` function. We will fit these models to the Carolina Wren data obtained from GBIF and the Bioclim environmental variables, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
-Dual_Model_Workflow <- workflow(occurrence = CarolinaWrenPO,
-                                covariate = CarolinaWrenRasters,
+Dual_Model_Workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
                                 process = Background(1000),
                                 model = list(LogisticRegression, MaxEnt),
                                 output = PrintMap(points = FALSE))
