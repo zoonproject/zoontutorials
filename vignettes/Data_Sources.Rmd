@@ -11,6 +11,15 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+# set up knitr options
+knitr::opts_chunk$set(message = FALSE,
+               warning = FALSE,
+               fig.align = 'center',
+               dev = c('png'),
+               cache = TRUE)
+```
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(zoon)
 ```
@@ -119,22 +128,22 @@ covariate = NCEP(extent = c(-5, 5, 50, 60),     # Coordinates of the extent of t
 
 # Example
 
-Now that we've seen the different ways of obtaining data in `zoon`, lets see an example. Here we obtain presence-only data for the Grizzly Bear, *Ursus arctod* in North America from GBIF, and bioclimatic variables from Wordclim.
+Now that we've seen the different ways of obtaining data in `zoon`, lets see an example. Here we obtain presence-only data for the Grizzly Bear, *Ursus arctos* in North America from GBIF, and bioclimatic variables from Wordclim.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE}
-CW_Online_Data <- workflow(occurrence = SpOcc(species = "Ursus arctos",
+Ursus_arctos_online <- workflow(occurrence = SpOcc(species = "Ursus arctos",
                                               extent = c(-175, -65, 20, 75),
                                               databases = "gbif",
                                               type = "presence"),
-                           covariate = Bioclim(extent = c(-175, -65, 20, 75),
+                                covariate = Bioclim(extent = c(-175, -65, 20, 75),
                                                resolution = 10,
                                                layers = 1:19),
-                           process = Chain(StandardiseCov, Background(1000)),
-                           model = MaxEnt,
-                           output = InteractiveOccurrenceMap)
+                                process = Chain(StandardiseCov, Background(1000)),
+                                model = MaxEnt,
+                                output = InteractiveOccurrenceMap)
 ```
 
 ```{r echo=FALSE, fig.align='center', fig.height=7, fig.width=7}
 # force the htmlwidget to render in the vignette
-Output(CW_Online_Data)
+Output(Ursus_arctos_online)
 ```
