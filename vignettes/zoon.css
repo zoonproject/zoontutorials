@@ -1,0 +1,13 @@
+pre{
+  border-radius: 2;
+}
+pre.r{
+  border-radius: 2;
+}
+hr {
+  height:10px;
+  border-top:4px solid #158cba;
+}
+code {
+  background-color: #f5eef6;
+}

@@ -1,10 +1,13 @@
 ---
 title: "Introduction to SDMs"
-author: "zoontutorials team"
-date: "6 February 2017"
 output:
-  rmarkdown::html_vignette:
+  html_document:
+    css: zoon.css
     toc: yes
+    toc_float:
+      collapsed: false
+      toc_depth: 4
+    theme: lumen
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Introduction to SDMs}
@@ -20,10 +23,13 @@ knitr::opts_chunk$set(message = FALSE,
                cache = TRUE)
 ```
 
-# Why do we fit species distribution models?
+<hr>
+
+## Why do we fit species distribution models?
+
 In ecology, we often want to understand where species are distributed in the environment and why. Sometimes we ask these questions to gain more knowledge about a species, yet other times we simply need to know where it is to better manage it.
 
-# What is a species distribution model?
+## What is a species distribution model?
 Where we find species in geographic species is the result of three factors: the abiotic environment, the biotic environment, and the species' movement. Together, these three factors determine the species' ecological niche. For example, a species may be constrained by the climate required for individuals to survive, the local vegetation types it depends on, and its abillity to traverse different landscapes. The intersection of the abiotic and biotic environmental conditions constitutes the *fundamental niche*, or where the species could physiologically occur given what we know of its biology and ecology. However, experience tells us that species are not always located where we expect them to be. Their *realised niche* is where they actually exist within the bounds of the environmental space where they could potentially exist.
 
 Species distribution models estimate a species' realised niche. They do this by estimating the probabilty of occurrence of species along environmental gradients. They do this by estimating the correlation between environmental covariates and species occurrence data. For example, using SDMs, we can estiamte the probability a species of bird will use forest habitat with high tree cover compared to open habitat with low tree cover. We can then take these statisical relationships and project them onto geographic space, which allows us to visualise on a map how the probability of species occurrence varies in geographic space.
@@ -34,7 +40,9 @@ We have visualised this theory in Figure 1 below. This dataset uses presence dat
 knitr::include_graphics("../vignettes/Images/SDM_theory.png")
 ```
 
-# How do I fit a species distribution model with `zoon`?
+<hr>
+
+## How do I fit a species distribution model with `zoon`?
 `zoon` is concerned with correlative SDMs, as described above, which are the most widely used SDM. This tutorial will focus on distribution models that estimate probability of occurrence, however, we could also use species abundance data to estimate how abundance varies along environemntal gradients.
 
 We implement a species distribution model with five steps: *make more zoon perspective*
@@ -76,8 +84,10 @@ Throughout this tutorial we will guide you step-by-step through each of the argu
 
 `zoon` comes with several pre-existing modules for each argument, and we will go through a selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList()` command.
 
-# The five `zoon` workflow steps *edit*
-## Step 1. Occurrence
+<hr>
+
+## The five `zoon` workflow steps *edit*
+### Step 1. Occurrence
 
 Species distribution models are fitted with species occurrence data, the most common of which are: presence-only, presence-background, and presence-absence. Less commonly, species distribution models can be fitted with abundance data.
 
@@ -99,7 +109,7 @@ head(Occurrence(zoon_workflow))
 
 The first two columns provide the geographic location of the observation (as longitude and latitude), the third column is the observation value (1 = presence, 0 = absence), the fourth column is the type of observation, and the last column identifies the "fold" (folds are covered later in the section of `Process` modules, but a default model can be considered to always have one fold).
 
-## Step 2. Covariates
+### Step 2. Covariates
 
 The second module required in a `workflow` is for environmental data. As with `occurrence` modules, there are lots of different modules to choose from. There are `zoon` modules that contain data, such as `CarolinaWrenRasters`. There are modules that source data from online sources such as `Bioclim`. And we can also load our own data from a local computer using `LocalRaster`.
 
@@ -123,7 +133,7 @@ zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
 Output(zoon_workflow)
 ```
 
-## Step 3. Process
+### Step 3. Process
 
 Now that we have loaded in our species and environmental data using the `occurrence` and `covariate` modules, the `process` modules will perform any pre-processing of our data required before fitting the model itself. This is where we can modify our raw data by removing poor data points using the `Clean` module or standardising our covariates using `StandardiseCov`, generate the background data points required for presence-only data analysis using `Background`, add interaction terms between our covariates using `addInteractions`, or set up model validation methods using modules like `CrossValidate`.
 
@@ -147,7 +157,7 @@ Output(zoon_workflow)
 
 In some instances we may not need a `process` module in your `workflow`, however, it is a mandatory argument and so the `NoProcess` module can be used as a 'blank' module.
 
-## Step 4. Model
+### Step 4. Model
 
 A fundamental aspect of the `workflow` is the `model` module. This is where we choose which type of SDM you want to fit to our data. There are multiple different SDM methods to choose from and each have their mertis [(Elith *et al*, 2006)](http://onlinelibrary.wiley.com/doi/10.1111/j.2006.0906-7590.04596.x/abstract). A few more common examples include the `LogisticRegression`, `mgcv`, `MaxEnt`, `RandomForest`, and `GBM` modules. For more detail on these methods you can refer to the ["Choosing A Model" vignette](Choosing_A_Model.html).
 
@@ -164,7 +174,7 @@ zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
 Output(zoon_workflow)
 ```
 
-## Step 5. Output
+### Step 5. Output
 Once we're happy with our included data and the model type we've chose. And we've included all relevant processes, it is finally time to check our results.
 
 Let's start by mapping our probability of occurrence predictions onto geographic space. We can use the `InteractiveMap` module to create a map showing the predicted species distribution and over-lying presence points.
@@ -195,7 +205,7 @@ zoon_workflow <- ChangeWorkflow(zoon_workflow,
                                 output = ResponsePlot())
 ```
 
-# Putting it all together
+## Putting it all together
 Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. As MaxEnt is arguably one of the most popular SDM methodologies, lets fit a MaxEnt model in addition to the LogisticRegression module. This is achieved using the `List()` function. We will fit these models to the Carolina Wren data obtained from GBIF and the Bioclim environmental variables, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
@@ -209,6 +219,7 @@ Dual_Model_Workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
 
 There are some obvious differences in the predicted distribution maps of these two models. There are no differences between the inputs or outputs for each model because we used a single workflow. That means each model used the same data, but the predicted distribution of the species is different between the models. What causes the difference? Check out our more detailed guide on SDM algorithm selection here ["Choosing A Model" vignette](Choosing_A_Model.html)
 
+<hr>
 
 ## Saving our work
 Our final analysis is stored in the the zoon workflow object `Dual_Model_Workflow`. This object contains all of the code needed to re-run the analysis, all of the data we used, and all of the results. So if we save this object we can always re-load it to access our results, get different outputs, or try different methods, just by using `ChangeWorkflow()`.
@@ -227,7 +238,10 @@ load('Dual_Model_Workflow.RData')
 
 Because the workflow object conatains the whole analysis, we can also share it with collaborators, they just need to install zoon and load the workflow object and they can access and modify the analysis too. We could also use the `ZoonFigshare()` function to upload the workflow to `figshare.com` and make it available for anyone to access.
 
+<hr>
+
 ## Conclusion
 We've used the zoon package to successfully run and interpret a species distribution model, in a fully reproducible way . We loaded our occurrence and covariate data for our species of interest, pre-processed that data as required, ran our model and produced some outputs. The interpretation of those outputs has increased our knowledge of the Carolina wren: we've learned the Carolina wren is most likely to occur in southeast USA. We've also learned that the wren does not particuarly mind the relative cover of forest types, having similar probability of occuring in each.
 
+<hr>
 
