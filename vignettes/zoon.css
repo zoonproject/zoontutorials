@@ -1,8 +1,13 @@
 pre{
-  border-radius: 2;
+  background-color: transparent;
+  border: 1px solid #696969;
+  border-radius: 0;
+  color: #696969;
 }
 pre.r{
-  border-radius: 2;
+  background-color: #ecf5f9;
+  border: none;
+  border-radius: 0;
 }
 hr {
   height:10px;
