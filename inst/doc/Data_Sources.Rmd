@@ -1,26 +1,43 @@
 ---
 title: "Data Sources"
-author: "zoontutorials team"
-date: "7 March 2017"
 output:
-  rmarkdown::html_vignette:
+  html_document:
+    css: zoon.css
     toc: yes
+    toc_float:
+      collapsed: false
+      toc_depth: 4
+    theme: lumen
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Data Sources}
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+# set up knitr options
+knitr::opts_chunk$set(message = FALSE,
+               warning = FALSE,
+               fig.align = 'center',
+               dev = c('png'),
+               cache = TRUE)
+```
+
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(zoon)
 ```
-# Introduction
+
+<hr>
+
+## Introduction
 
 Before we even choose a model algorithm for our species distribution model (SDM), we need to have data to fit it to. For an SDM we need two types of data: species observation records (presence-only, presence-absence, or abundance) and environmental data (such as bioclimatic variables or vegetation maps, in the form of rasters). In some instances we might be using data we recorded ourselves, other times we might want to use remotely sensed data, or even a combination of the two. There are multiple sources of data available, and `zoon` gives you the ability to access many of them.
 
 With `zoon` you are able to use your own data, data sourced from online repositories, and some modules in `zoon` that provide some occurrence and environmental data for you to use. This tutorial will guide you through the data sources available within a `zoon` `workflow()`.
 
-# `zoon` Modules
+<hr>
+
+## `zoon` Modules
 
 `zoon` comes with several pre-existing dataset modules that we can use. Using the `GetModuleList()` command we can see all of the `Occurrence` modules under the `$occurrence` sub-heading, and this includes the dataset modules. We can also view the `Covariate` modules under the `$covariate` sub-heading.
 
@@ -47,7 +64,9 @@ Output(Carolina_Wren_Workflow)
 
 While these are perfectly usable datasets, they are just useful examples and not something we would fit an SDM to for the sake of the results. These are most useful for experimenting with `zoon` modules (want to explore the differences in model algorithms? Run them on these example dataset modules and compare the outputs), or as test datasets when building new modules of your own.
 
-# Our Own Data
+<hr>
+
+## Our Own Data
 
 SDMs are commonly fit to datasets we have collected ourselves, and `zoon` has modules to help us load them. The two modules of interest here are `LocalOccurrenceData` for our observation records and `LocalRaster` for our raster-based data.
 
@@ -76,7 +95,9 @@ covariate = LocalRaster(rasters = c("myRaster1",     # Filepath to a raster
 covariate = LocalRaster(rasters = "myRasterStack")   # A RasterStack object already loaded
 ```
 
-# Online Repositories
+<hr>
+
+## Online Repositories
 
 Sometimes we may need or want to source our `occurrence` and/or `covariate` data from online sources. The modules of interest here are `SpOcc`, `Bioclim`, `Bioclim-future`, and `NCEP`.
 
@@ -117,24 +138,28 @@ covariate = NCEP(extent = c(-5, 5, 50, 60),     # Coordinates of the extent of t
                  status.bar = FALSE)            # Show a status bar of download progress?
 ```
 
-# Example
+<hr>
 
-Now that we've seen the different ways of obtaining data in `zoon`, lets see an example. Here we obtain presence-only data for the Grizzly Bear, *Ursus arctod* in North America from GBIF, and bioclimatic variables from Wordclim.
+## Example
+
+Now that we've seen the different ways of obtaining data in `zoon`, lets see an example. Here we obtain presence-only data for the Grizzly Bear, *Ursus arctos* in North America from GBIF, and bioclimatic variables from Wordclim.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE}
-CW_Online_Data <- workflow(occurrence = SpOcc(species = "Ursus arctos",
+Ursus_arctos_online <- workflow(occurrence = SpOcc(species = "Ursus arctos",
                                               extent = c(-175, -65, 20, 75),
                                               databases = "gbif",
                                               type = "presence"),
-                           covariate = Bioclim(extent = c(-175, -65, 20, 75),
+                                covariate = Bioclim(extent = c(-175, -65, 20, 75),
                                                resolution = 10,
                                                layers = 1:19),
-                           process = Chain(StandardiseCov, Background(1000)),
-                           model = MaxEnt,
-                           output = InteractiveOccurrenceMap)
+                                process = Chain(StandardiseCov, Background(1000)),
+                                model = MaxEnt,
+                                output = InteractiveOccurrenceMap)
 ```
 
 ```{r echo=FALSE, fig.align='center', fig.height=7, fig.width=7}
 # force the htmlwidget to render in the vignette
-Output(CW_Online_Data)
+Output(Ursus_arctos_online)
 ```
+
+<hr>

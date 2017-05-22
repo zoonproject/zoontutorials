@@ -1,10 +1,13 @@
 ---
 title: "Tailoring To Your Problem"
-author: "zoontutorials team"
-date: "7 March 2017"
 output:
-  rmarkdown::html_vignette:
+  html_document:
+    css: zoon.css
     toc: yes
+    toc_float:
+      collapsed: false
+      toc_depth: 4
+    theme: lumen
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Tailoring To Your Problem}
@@ -20,11 +23,15 @@ knitr::opts_chunk$set(message = FALSE,
                cache = TRUE)
 ```
 
+<hr>
+
 **Should this have a different title? This seems rather nondescriptive. Data modification? Data processing? Something data related anyway.**
 
 Species Distribution Models (SDMs) are built upon species occurrence records collected from field surveys or collated observation records. Rarely, however, do we build an SDM on this raw data without undertaking some sort of data processing. These processes can include the cleaning up of the raw data, standardising of covariates, transforming data, and creating interactions between measured variables. Within `zoon` these processes are achieved using `process` modules in your `workflow()`.
 
-# Data Cleaning
+<hr>
+
+## Data Cleaning
 
 Species distribution datasets are, to varying degrees, reliant on manually-compiled data from observations. Even in situations where we are fitting a model to entirely remotely-sensed data such as bioclimatic variables, our species occurrence records are usually pen-and-paper recordings from the field that have been manually transcribed into an excel file. Even with modern technology where the need for physical record taking can be replaced with data entry into hand-held computing devices in the field, this process still relies on manual data entry and this can lead to mistakes in the data entry procedure.
 
@@ -38,7 +45,9 @@ One of the `zoon` modules, `Clean`, removes impossible, incomplete, or unlikely 
 process = Clean(which = c(1,2,3))
 ```
 
-# Data Transformation
+<hr>
+
+## Data Transformation
 
 ** insert paragraph on what transformation is/why you should/when you should **
 
@@ -70,7 +79,9 @@ process = Chain(Transform(trans = function(x) {x^2},
                           which_cov = c("VarC", "VarD")))
 ```
 
-# Standardising Variables
+<hr>
+
+## Standardising Variables
 
 A common transformation, so common in fact that it is standard practice for most analyses nowadays and not really thought of in the same vein as transformation anymore, is the standarisation of variables. While it can improve the efficiency of model fitting algorithms, the main benefit of this transformation allows us to directly compare the influence of different variables on species distributions by placing them on the same scale. For example, the regression coefficient for the distance of a site to roads might be +3.0 when measured in kilometres, but +0.003 if measured in meters, and the effect of average temperature in celsius could be -10. How would we compare the effect of these variables?
 
@@ -85,7 +96,9 @@ process = StandardiseCov(Gelman = TRUE,
                          exclude = c("VarB", "VarC"))
 ```
 
-# Interactions
+<hr>
+
+## Interactions
 
 Interactions between variables can have important implications for the interpretation of statistical models. **Expand when back in front of textbooks (Something about interpretation of response curves? Doesn't effect maps)**. 
 
@@ -124,7 +137,9 @@ process = addInteraction(which.covs = list(c("A","B"), c("A","C")))   # adds int
 process = addInteraction(which.covs = c(A,B,C))   # adds all two-way (e.g. A & B) interactions and a three-way interaction between A, B & C
 ```
 
-# Polynomial Terms
+<hr>
+
+## Polynomial Terms
 
 Sometimes the relationship between our response variable and predictor variable is not adequately represented using a standard linear relationship. For example, the probability of species occurrence might increase with elevation, but beyond a certain point it starts to decrease again. Polynomial terms are used to capture these relationships.
 

@@ -1,15 +1,19 @@
 ---
 title: "Exploring Your Data"
-author: "zoontutorials team"
-date: "4 April 2017"
 output:
-  rmarkdown::html_vignette:
+  html_document:
+    css: zoon.css
     toc: yes
+    toc_float:
+      collapsed: false
+      toc_depth: 4
+    theme: lumen
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Exploring Your Data}
   %\VignetteEncoding{UTF-8}
 ---
+<hr>
 
 ## Data Exploration
 Data exploration is a key first step before you begin to think about what kind of model module you will use. 
@@ -53,7 +57,9 @@ E Interactions (is the quality of the data good enough to
 F Zero inflation Y
 G Are categorical covariates balanced?
 
-# OUTLIERS?
+<hr>
+
+## OUTLIERS?
 ```{r}
 par(mfrow = c(4, 1), mar = c(3, 4, 1, 1))
 dotchart(cov$pcCon, main= "Percent Coniferous")
