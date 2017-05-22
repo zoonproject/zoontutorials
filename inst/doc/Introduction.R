@@ -6,74 +6,6 @@ knitr::opts_chunk$set(message = FALSE,
                dev = c('png'),
                cache = TRUE)
 
-## ----echo = F, out.width= 700, fig.cap="*Figure 1. Species Distribution Model Theory. Presence-background points plotted on geographic space, on environmental space, and probability of occurrence predictions plotted on environmental and geographic space.*", fig.align = "left"----
-knitr::include_graphics("../vignettes/Images/SDM_theory.png")
-
-## ----message=FALSE, warning=FALSE, cache=TRUE----------------------------
-library(zoon)
-
-## ----message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7----
-zoon_workflow <- workflow(occurrence = CarolinaWrenPO,
-                          covariate = CarolinaWrenRasters,
-                          process = Background(100),
-                          model = MaxEnt,
-                          output = InteractiveMap)
-
-## ----echo=FALSE, fig.align='center', fig.height=7, fig.width=7-----------
-# force the htmlwidget to render in the vignette
-Output(zoon_workflow)
-
-## ----eval=TRUE, message=FALSE, warning=FALSE, cache=TRUE-----------------
-head(Occurrence(zoon_workflow))
-
-## ----eval=TRUE, message=FALSE, warning=FALSE, cache=TRUE-----------------
-Covariate(zoon_workflow)
-
-## ----eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE----
-zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
-                                occurrence = SpOcc("Thryothorus ludovicianus", 
-                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
-                                covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)))
-
-## ----echo=FALSE, fig.align='center', fig.height=7, fig.width=7-----------
-# force the htmlwidget to render in the vignette
-Output(zoon_workflow)
-
-## ----eval=TRUE, cache=TRUE-----------------------------------------------
-Covariate(zoon_workflow)   # Before standardisation
-
-## ----eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE----
-zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
-                                process = Chain(StandardiseCov, Background(n = 1000)))
-
-## ----echo=FALSE, fig.align='center', fig.height=7, fig.width=7-----------
-# force the htmlwidget to render in the vignette
-Output(zoon_workflow)
-
-## ----eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE----
-zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
-                                model = LogisticRegression)
-
-
-## ----echo=FALSE, fig.align='center', fig.height=7, fig.width=7-----------
-# force the htmlwidget to render in the vignette
-Output(zoon_workflow)
-
-## ----eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE----
-
-zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
-                                output = InteractiveMap)
-
-
-## ----echo=FALSE, fig.align='center', fig.height=7, fig.width=7-----------
-# force the htmlwidget to render in the vignette
-Output(zoon_workflow)
-
-## ----eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE----
-
-zoon_workflow <- ChangeWorkflow(zoon_workflow,
-                                output = ResponsePlot())
-
 ## ----eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE----
 Dual_Model_Workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
                                                    extent = c(-138.71, -52.58, 18.15, 54.95)),
@@ -81,4 +13,11 @@ Dual_Model_Workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
                                 process = Background(1000),
                                 model = list(LogisticRegression, MaxEnt),
                                 output = PrintMap(points = FALSE))
+
+## ----eval = FALSE--------------------------------------------------------
+#  save(Dual_Model_Workflow,
+#       file = 'Dual_Model_Workflow.RData')
+
+## ----eval = FALSE--------------------------------------------------------
+#  load('Dual_Model_Workflow.RData')
 
