@@ -209,7 +209,25 @@ Dual_Model_Workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
 
 There are some obvious differences in the predicted distribution maps of these two models. There are no differences between the inputs or outputs for each model because we used a single workflow. That means each model used the same data, but the predicted distribution of the species is different between the models. What causes the difference? Check out our more detailed guide on SDM algorithm selection here ["Choosing A Model" vignette](Choosing_A_Model.html)
 
-# Conclusion
-We've used the zoon package to successfully run and interpret an easily reproducible and sharable species distribtion model. *sentence advocating for how this was a better process than not this* We loaded our occurrence and covariate data for our species of interest, pre-processed that data as required, ran our model and produced some outputs. The interpretation of those outputs has increased our knowledge of the Carolina wren: we've learned the Carolina wren is most likely to occur in southeast USA. We've also learned that the wren does not particuarly mind the relative cover of forest types, having similar probability of occuring in each.
+
+## Saving our work
+Our final analysis is stored in the the zoon workflow object `Dual_Model_Workflow`. This object contains all of the code needed to re-run the analysis, all of the data we used, and all of the results. So if we save this object we can always re-load it to access our results, get different outputs, or try different methods, just by using `ChangeWorkflow()`.
+
+We can save `Dual_Model_Workflow` as a single .RData object with R's `save()`:
+
+```{r eval = FALSE}
+save(Dual_Model_Workflow,
+     file = 'Dual_Model_Workflow.RData')
+```
+
+and reload it with `load()`
+```{r eval = FALSE}
+load('Dual_Model_Workflow.RData')
+```
+
+Because the workflow object conatains the whole analysis, we can also share it with collaborators, they just need to install zoon and load the workflow object and they can access and modify the analysis too. We could also use the `ZoonFigshare()` function to upload the workflow to `figshare.com` and make it available for anyone to access.
+
+## Conclusion
+We've used the zoon package to successfully run and interpret a species distribution model, in a fully reproducible way . We loaded our occurrence and covariate data for our species of interest, pre-processed that data as required, ran our model and produced some outputs. The interpretation of those outputs has increased our knowledge of the Carolina wren: we've learned the Carolina wren is most likely to occur in southeast USA. We've also learned that the wren does not particuarly mind the relative cover of forest types, having similar probability of occuring in each.
 
 
