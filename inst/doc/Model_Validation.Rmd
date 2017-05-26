@@ -1,18 +1,22 @@
 ---
 title: "Model Validation"
-author: "zoontutorials team"
-date: "7 March 2017"
 output:
-  rmarkdown::html_vignette:
+  html_document:
+    css: zoon.css
     toc: yes
+    toc_float:
+      collapsed: false
+      toc_depth: 4
+    theme: lumen
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Model Validation}
   %\VignetteEncoding{UTF-8}
 ---
 
+<hr>
 
-### Set up model validation
+## Set up model validation
 
 Model validation is an important step in the model fitting process as it lets you determine if your model is an acceptable description of your data. Model validation can be as simple as including goodness-of-fit tests or analysing the residuals **can this be done for SDMs?** but the `zoon` package uses more complex methods that subset and/or resample the dataset. **[Expand on what model validation is/why it is important]** The `process` modules that set up model validation include:
 

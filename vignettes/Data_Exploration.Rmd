@@ -1,10 +1,13 @@
 ---
 title: "Exploring Your Data"
-author: "zoontutorials team"
-date: "4 April 2017"
 output:
-  rmarkdown::html_vignette:
+  html_document:
+    css: zoon.css
     toc: yes
+    toc_float:
+      collapsed: false
+      toc_depth: 4
+    theme: lumen
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Exploring Your Data}
