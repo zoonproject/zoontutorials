@@ -8,6 +8,8 @@ output:
       collapsed: false
       toc_depth: 4
     theme: lumen
+bibliography: bibliography.bib
+csl: apa.csl
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Introduction to SDMs}
@@ -23,24 +25,41 @@ knitr::opts_chunk$set(message = FALSE,
                cache = TRUE)
 ```
 
-<hr>
+## Why do we fit Species Distribution Models (SDMs)?
 
-## Why do we fit species distribution models?
+In ecology, we often want to understand where species are distributed in the environment and why. There are three predominant aims ecologists may have when undertaking a SDM: ecological inference, mapping extent, and prediction. 
 
-In ecology, we often want to understand where species are distributed in the environment and why. Sometimes we ask these questions to gain more knowledge about a species, yet other times we simply need to know where it is to better manage it.
+### Ecological inference
+
+
+### Extent mapping
+
+```{r echo = F, out.width= '400px', fig.align = "center", fig.cap="*Figure 2. Species Distribution Modelling for mapping: predicted distribution of zoonotic Ebola virus (from @pigott14) .*"}
+knitr::include_graphics("../vignettes/Images/Figure_2_mapping.png")
+```
+
+
+### Prediction
+
+```{r echo = F, out.width= '650px', fig.align = "center", fig.cap="*Figure 3. Species Distribution Modelling for future prediction: cane toad current and projected future extent (maps courtesy of @elith10; photo from @fraser-smith) .*"}
+knitr::include_graphics("../vignettes/Images/Figure_3_prediction.png")
+```
+
+
+Sometimes we ask these questions to gain more knowledge about a species, yet other times we simply need to know where it is to better manage it. 
+
+
 
 ## What is a species distribution model?
-Where we find species in geographic species is the result of three factors: the abiotic environment, the biotic environment, and the species' movement. Together, these three factors determine the species' ecological niche. For example, a species may be constrained by the climate required for individuals to survive, the local vegetation types it depends on, and its abillity to traverse different landscapes. The intersection of the abiotic and biotic environmental conditions constitutes the *fundamental niche*, or where the species could physiologically occur given what we know of its biology and ecology. However, experience tells us that species are not always located where we expect them to be. Their *realised niche* is where they actually exist within the bounds of the environmental space where they could potentially exist.
+Where we find species in geographic species is the result of three factors: the abiotic environment, the biotic environment, and the species' movement [@soberon05]. Together, these three factors determine the species' ecological niche. For example, a species may be constrained by the climate required for individuals to survive, the local vegetation types it depends on, and its abillity to traverse different landscapes. The intersection of the abiotic and biotic environmental conditions constitutes the *fundamental niche*, or where the species could physiologically occur given what we know of its biology and ecology. However, experience tells us that species are not always located where we expect them to be. Their *realised niche* is where they actually exist within the bounds of the environmental space where they could potentially exist.
 
 Species distribution models estimate a species' realised niche. They do this by estimating the probabilty of occurrence of species along environmental gradients. They do this by estimating the correlation between environmental covariates and species occurrence data. For example, using SDMs, we can estiamte the probability a species of bird will use forest habitat with high tree cover compared to open habitat with low tree cover. We can then take these statisical relationships and project them onto geographic space, which allows us to visualise on a map how the probability of species occurrence varies in geographic space.
 
-We have visualised this theory in Figure 1 below. This dataset uses presence data of the Carolina Wren as well as a suite of environmental predictors such as cover of different forest types. In the top left corner we have mapped onto geographic space the records of species occurrence (black dots) as well as the background points we will use in our model. In the top right we see these same points plotted in environmental space against two covariates. We can see that the presence points are clustered at higher percents of deciduous forest and lower percents of mixed forest. The model uses this presence background data to construct predictions of species occurrence in environmental space, as seen in the bottom right plot. In the final plot, bottom left, we see these probability predictions mapped back onto geographic space in a way that allows us to understand where and by what drivers the species is likely to occur. There are many types of species distribution models and the field is rapidly expanding. *expand...many different way and decision to be made along the way*
+We have visualised this theory in Figure 4 below. This dataset uses presence data of the Carolina Wren as well as a suite of environmental predictors such as cover of different forest types. In the top left corner we have mapped onto geographic space the records of species occurrence (black dots) as well as the background points we will use in our model. In the top right we see these same points plotted in environmental space against two covariates. We can see that the presence points are clustered at higher percents of deciduous forest and lower percents of mixed forest. The model uses this presence background data to construct predictions of species occurrence in environmental space, as seen in the bottom right plot. In the final plot, bottom left, we see these probability predictions mapped back onto geographic space in a way that allows us to understand where and by what drivers the species is likely to occur. There are many types of species distribution models and the field is rapidly expanding. *expand...many different way and decision to be made along the way*
 
-```{r echo = FALSE, out.width= 700, fig.cap="*Figure 1. Species Distribution Model Theory. Presence-background points plotted on geographic space, on environmental space, and probability of occurrence predictions plotted on environmental and geographic space.*", fig.align = "left"}
-knitr::include_graphics("../vignettes/Images/SDM_theory.png")
+```{r echo = F, out.width= '650px', fig.align = "center", fig.cap="*Figure 4. Species Distribution Model Theory. Presence-background points plotted on geographic space and on environmental space (top panel; P = presence, B = background), and probability of occurrence predictions plotted on environmental and geographic space (bottom panel; colour scale represents probability of occurrence).*"}
+knitr::include_graphics("../vignettes/Images/Figure_4_SDMtheory.png")
 ```
-
-<hr>
 
 ## How do I fit a species distribution model with `zoon`?
 `zoon` is concerned with correlative SDMs, as described above, which are the most widely used SDM. This tutorial will focus on distribution models that estimate probability of occurrence, however, we could also use species abundance data to estimate how abundance varies along environemntal gradients.
@@ -52,7 +71,7 @@ We implement a species distribution model with five steps: *make more zoon persp
 3.  Process: Often our data, both occurrence and environmental, will need some pre-processing before we fit our models.
 4.  Model: We then fit one or more statistical models to our data to estimate species probability of occurrence.
 5.  Output: Finally, after fitting our model, we produce model outputs, such as graphs and maps, to enable us to make ecological inference about the species.
-    
+
 The `zoon` workflow is structured around these five steps and designed to make building and fitting SDMs straight-foward and reproducible. The primary zoon function is `workflow()`, which we use to fit the SDM. The workflow function has five arguments, one for each step in the SDM fitting process. For each argument, we need only to select a 'module.' The modules we choose in each step determine what type of model we run with what data and what outputs we produce.
 
 This tutorial will guide you through the process of selecting a module for each argument of the `workflow()` function. Along the way, we'll introduce some key factors that you should consider when fitting and evaluating an SDM.
@@ -83,8 +102,6 @@ In this workflow, we have obtained occurrence records for the Carolina Wren from
 Throughout this tutorial we will guide you step-by-step through each of the arguments in a workflow as we update this `zoon_workflow`. Be sure to explore the other tutorials...
 
 `zoon` comes with several pre-existing modules for each argument, and we will go through a selection of these modules in more detail in this tutorial. You might like to explore some different combinations yourself, and you can find more information by running the `GetModuleList()` command.
-
-<hr>
 
 ## The five `zoon` workflow steps *edit*
 ### Step 1. Occurrence
@@ -123,7 +140,7 @@ Using what we've learned here, lets update `zoon_workflow` so that we can build 
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
 zoon_workflow <- ChangeWorkflow(workflow = zoon_workflow,
-                                occurrence = SpOcc("Thryothorus ludovicianus", 
+                                occurrence = SpOcc("Thryothorus ludovicianus",
                                                    extent = c(-138.71, -52.58, 18.15, 54.95)),
                                 covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)))
 ```
@@ -209,7 +226,7 @@ zoon_workflow <- ChangeWorkflow(zoon_workflow,
 Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. As MaxEnt is arguably one of the most popular SDM methodologies, lets fit a MaxEnt model in addition to the LogisticRegression module. This is achieved using the `List()` function. We will fit these models to the Carolina Wren data obtained from GBIF and the Bioclim environmental variables, generate 1000 background samples, and display our results in a map without our datapoints displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
 
 ```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
-Dual_Model_Workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+Dual_Model_Workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
                                                    extent = c(-138.71, -52.58, 18.15, 54.95)),
                                 covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
                                 process = Background(1000),
@@ -218,8 +235,6 @@ Dual_Model_Workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
 ```
 
 There are some obvious differences in the predicted distribution maps of these two models. There are no differences between the inputs or outputs for each model because we used a single workflow. That means each model used the same data, but the predicted distribution of the species is different between the models. What causes the difference? Check out our more detailed guide on SDM algorithm selection here ["Choosing A Model" vignette](Choosing_A_Model.html)
-
-<hr>
 
 ## Saving our work
 Our final analysis is stored in the the zoon workflow object `Dual_Model_Workflow`. This object contains all of the code needed to re-run the analysis, all of the data we used, and all of the results. So if we save this object we can always re-load it to access our results, get different outputs, or try different methods, just by using `ChangeWorkflow()`.
@@ -238,10 +253,8 @@ load('Dual_Model_Workflow.RData')
 
 Because the workflow object conatains the whole analysis, we can also share it with collaborators, they just need to install zoon and load the workflow object and they can access and modify the analysis too. We could also use the `ZoonFigshare()` function to upload the workflow to `figshare.com` and make it available for anyone to access.
 
-<hr>
 
 ## Conclusion
 We've used the zoon package to successfully run and interpret a species distribution model, in a fully reproducible way . We loaded our occurrence and covariate data for our species of interest, pre-processed that data as required, ran our model and produced some outputs. The interpretation of those outputs has increased our knowledge of the Carolina wren: we've learned the Carolina wren is most likely to occur in southeast USA. We've also learned that the wren does not particuarly mind the relative cover of forest types, having similar probability of occuring in each.
 
-<hr>
 
