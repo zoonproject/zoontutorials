@@ -86,38 +86,44 @@
 #   )
 #
 # # PrintMap colour palette
-# cls <- colorRampPalette(c('#e0f3db', '#a8ddb5', '#4eb3d3', '#08589e'))(10)
+# #cls <- colorRampPalette(c('#e0f3db', '#a8ddb5', '#4eb3d3', '#08589e'))(10)
 #
 # require(gridExtra)
+#
 # png('vignettes/Images/SDM_theory_pb.png',
 #     width     = 7,
 #     height    = 3,
 #     units     = "in",
 #     res       = 1200,
 #     pointsize = 4)
+#
 # # presence-background map
 # usa <- map_data('usa')
-# mycolour <- viridis(1000)[800]
+#
+# #mycolour <- viridis(1000)[800]
 #
 # pb_map <- ggplot(cov, aes(longitude, latitude)) +
 #   geom_polygon(data = usa, aes(x=long, y = lat, group = group), fill = grey(0.9), color = grey(0.9)) +
 #   geom_point(aes(colour = type), size = 0.3) +
-#   scale_colour_manual(values = c(mycolour, 'black')) +
+#   scale_colour_manual(values = c('#D2B48C', 'black')) +
 #   zoon_theme +
-#   theme(axis.title.y = element_text(angle = 180, vjust = 0.1)) +
+#   theme(axis.title.y = element_text(hjust = 0.9)) +
 #   xlim(-126, -66) +
 #   ylim(22, 52) +
-#   xlab('E') +
-#   ylab('N')
+#   xlab('Longitude') +
+#   ylab('Latitude')
+#
 # # presence-background on environmental space
 # pb_env <- ggplot(cov, aes(pcMix, pcDec)) +
 #   geom_point(aes(colour = type), size = 0.3) +
 #   zoon_theme +
 #   theme(axis.title.y = element_text(hjust = 0.9)) +
-#   scale_colour_manual(values = c(mycolour, 'black')) +
+#   scale_colour_manual(values = c('#D2B48C', 'black')) +
 #   xlab('Mixed Forest') +
 #   ylab('Deciduous')
+#
 # grid.arrange(pb_map, pb_env, ncol=2)
+#
 # dev.off()
 #
 # png('vignettes/Images/SDM_theory_pred.png',
@@ -126,6 +132,8 @@
 #     units     = "in",
 #     res       = 1200,
 #     pointsize = 4)
+#
+#
 # # probability of occurrence predictions in environmental space
 # pred_env <- ggplot(mp, aes(Var1, Var2, fill = value)) + geom_raster() +
 #   scale_fill_viridis(direction = -1) +
@@ -133,17 +141,20 @@
 #   theme(axis.title.y = element_text(hjust = 0.1)) +
 #   xlab('Mixed Forest') +
 #   ylab('Deciduous')
+#
 # # probability of occurrence predictions map
 # pred_map <- ggplot(out.df) +
 #   geom_raster(aes(x, y, fill = pcMix)) +
 #   zoon_theme +
-#   theme(axis.title.y = element_text(angle = 180, vjust = 0.1)) +
 #   scale_fill_viridis(direction = -1) +
+#   theme(axis.title.y = element_text(hjust = 0.1)) +
 #   xlim(-126, -66) +
 #   ylim(22, 52) +
-#   xlab('E') +
-#   ylab('N')
+#   xlab('Longitude') +
+#   ylab('Latitude')
+#
 # grid.arrange(pred_map, pred_env, ncol=2)
+#
 # dev.off()
 #
 # # legend plot
@@ -174,14 +185,14 @@
 # pred_legend <- ggplot(out.df) +
 #   geom_raster(aes(x, y, fill = pcMix)) +
 #   zoon_theme_legend +
-#   theme(axis.title.y = element_text(angle = 180, vjust = 0.1)) +
 #   scale_fill_viridis(name = "", direction = -1) +
+#   theme(axis.title.y = element_text(hjust = 0.9)) +
 #   xlim(-126, -66) +
 #   ylim(22, 52) +
-#   xlab('E') +
-#   ylab('N')
+#   xlab('Longitude') +
+#   ylab('Latitude')
 # pred_legend
 # dev.off()
-#
-#
-#
+
+
+
