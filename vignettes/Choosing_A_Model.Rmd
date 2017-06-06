@@ -2,6 +2,7 @@
 title: "Choosing A Model"
 output:
   html_document:
+    pandoc_args: ["--filter-pandoc-eqnos"]
     css: zoon.css
     toc: yes
     toc_float:
@@ -48,10 +49,10 @@ Regression analysis is a statistical method for estimating the relationships amo
 
 #### Logistic Regression
 
-Logistic regression is a type of Generalised Linear Model (GLM) that can be fit to presence-background and presence-absence datasets. It uses the logit link function to estimate probability of a binary response variable (presence represented as "1" and absence as "0," for example) based on its relationship with one or more independent predictor variables (see formulas below). The regression coefficients are estimated using maximum likelihood estimation. This method chooses parameter values that maximise the likelihood of observing the data given the parameters. 
+Logistic regression is a type of Generalised Linear Model (GLM) that can be fit to presence-background and presence-absence datasets. It uses the logit link function to estimate probability of a binary response variable (presence represented as "1" and absence as "0," for example) based on its relationship with one or more independent predictor variables (see formulas below). The regression coefficients are estimated using maximum likelihood estimation. This method chooses parameter values that maximise the likelihood of observing the data given the parameters. For example, see @eq:Logistic
 
 $$p_i = Pr(Occurrence)\\
-logit(p_i) = Intercept + b_1*Covariate1 + b_2*Covariate2 + b_3*Covariate3\\$$ {#eq:(1)}
+logit(p_i) = Intercept + b_1*Covariate1 + b_2*Covariate2 + b_3*Covariate3\\$$ {#eq:Logistic}
 
 The `LogisticRegression` model fits a logistic regression model to your data using the `glm` package in R. There are no additional arguments to define for this model, so to fit it requires only selecting it as your model module within your `workflow`.
 
