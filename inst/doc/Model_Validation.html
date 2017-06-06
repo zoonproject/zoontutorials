@@ -69,7 +69,7 @@ h6 {
 }
 </style>
 
-<link href="data:text/css;charset=utf-8,pre%7B%0Abackground%2Dcolor%3A%20transparent%3B%0Aborder%3A%201px%20solid%20%23696969%3B%0Aborder%2Dradius%3A%200%3B%0Acolor%3A%20%23696969%3B%0A%7D%0Apre%2Er%7B%0Abackground%2Dcolor%3A%20%23ecf5f9%3B%0Aborder%3A%20none%3B%0Aborder%2Dradius%3A%200%3B%0A%7D%0Ahr%20%7B%0Aheight%3A10px%3B%0Aborder%2Dtop%3A4px%20solid%20%23158cba%3B%0A%7D%0Acode%20%7B%0Abackground%2Dcolor%3A%20%23f5eef6%3B%0A%7D%0A" rel="stylesheet" type="text/css" />
+<link href="data:text/css;charset=utf-8,pre%7B%0Abackground%2Dcolor%3A%20transparent%3B%0Aborder%3A%201px%20solid%20%23696969%3B%0Aborder%2Dradius%3A%200%3B%0Acolor%3A%20%23696969%3B%0A%7D%0Apre%2Er%7B%0Abackground%2Dcolor%3A%20%23ecf5f9%3B%0Aborder%3A%20none%3B%0Aborder%2Dradius%3A%200%3B%0A%7D%0Ahr%20%7B%0Aheight%3A6px%3B%0Aborder%2Dtop%3A4px%20solid%20%23158cba%3B%0A%7D%0Acode%20%7B%0Abackground%2Dcolor%3A%20%23f5eef6%3B%0A%7D%0A" rel="stylesheet" type="text/css" />
 
 </head>
 
@@ -228,7 +228,7 @@ div.tocify {
 <hr>
 <div id="set-up-model-validation" class="section level2">
 <h2>Set up model validation</h2>
-<p>Model validation is an important step in the model fitting process as it lets you determine if your model is an acceptable description of your data. Model validation can be as simple as including goodness-of-fit tests or analysing the residuals <strong>can this be done for SDMs?</strong> but the <code>zoon</code> package uses more complex methods that subset and/or resample the dataset. <strong>[Expand on what model validation is/why it is important]</strong> The <code>process</code> modules that set up model validation include:</p>
+<p>Model validation is an important step in the model fitting process as it lets you determine if your model is an acceptable description of your data. Model validation can be as simple as d goodness-of-fit tests but the <code>zoon</code> package uses more complex methods that subset and/or resample the dataset. <strong>[Expand on what model validation is/why it is important]</strong> The <code>process</code> modules that set up model validation include:</p>
 <ul>
 <li><code>Crossvalidate</code>: Run k fold crossvalidation (default = 5). If you are using presence-absence, this will split presences and absences separately so folds have equally balanced data, otherwise it just samples. This samples the dataset without replacement into k ‘folds’ or sub-datasets to be used for training and testing the model. A model is fit to the k-1 folds of training data and evaluated against the fold of testing data (and repeated so each fold is used as the testing data once, and then the results are averaged). This is mainly used where the goal is to use the model for prediction as it tests if the model is overfit to the training data and thus unlikely to be suitable for prediction across another dataset (i.e. the test fold).</li>
 </ul>

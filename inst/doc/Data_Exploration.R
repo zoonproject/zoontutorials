@@ -1,3 +1,11 @@
+## ----eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE-----------------
+# set up knitr options
+knitr::opts_chunk$set(message = FALSE,
+               warning = FALSE,
+               fig.align = 'center',
+               dev = c('png'),
+               cache = TRUE)
+
 ## ----message = F, warning = F--------------------------------------------
 library(zoon)
 library(lattice)
@@ -6,55 +14,60 @@ library(lattice)
 Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
                                    covariate = CarolinaWrenRasters,
                                    process = Background(1000),
-                                   model = LogisticRegression,
+                                   model = NullModel,
                                    output = PrintMap)
 
 ## ------------------------------------------------------------------------
-cov <- Process(Carolina_Wren_Workflow)$df
-levels(cov) <- c('background', 'presence')
+occ.cov.df <- Process(Carolina_Wren_Workflow)$df
 str(cov)
 
 ## ------------------------------------------------------------------------
-table(cov$type)
+# once I have the process module that makes this binned, I will provide code examples. 
 
-## ------------------------------------------
-par(mfrow = c(4, 1), mar = c(3, 4, 1, 1))
-dotchart(cov$pcCon, main= "Percent Coniferous")
-dotchart(cov$pcDec, main= "Percent Deciduous")
-dotchart(cov$pcMix, main= "Percent Mixed Forest")
-dotchart(cov$pcGr, main= "Percent Grassland")
-dev.off()
+# also show the outliers module output. 
 
-## ------------------------------------------
-# RELATIONSHIPS?
- panel.cor <- function(x, y, digits = 2, cex.cor, ...)
-  {
-    usr <- par("usr"); on.exit(par(usr))
-    par(usr = c(0, 1, 0, 1))
-    # correlation coefficient
-    r <- cor(x, y)
-    txt <- format(c(r, 0.123456789), digits = digits)[1]
-    txt <- paste("r= ", txt, sep = "")
-    text(0.5, 0.6, txt)
-    
-    # p-value calculation
-    p <- cor.test(x, y)$p.value
-    txt2 <- format(c(p, 0.123456789), digits = digits)[1]
-    txt2 <- paste("p= ", txt2, sep = "")
-    if(p<0.01) txt2 <- paste("p= ", "<0.01", sep = "")
-    text(0.5, 0.4, txt2)
-  }
+## ----eval=FALSE----------------------------------------------------------
+#  process = Clean(which = c(1,2,3))
 
- pairs(cov[,c('pcCon', 'pcDec', 'pcMix', 'pcGr')], upper.panel = panel.cor)
+## ----eval=FALSE----------------------------------------------------------
+#  process = Transform(trans = function(x) {x^2},
+#                      which_cov = "VarA",
+#                      replace = FALSE)
 
-## ------------------------------------------
-# Covariate effects
-par(mfrow = c(1, 1), mar = c(5, 5, 2, 2), cex.lab = 1.5)
-boxplot(cov$pcCon ~ type,
-        varwidth = TRUE,
-        data = cov,
-        xlab     = "Data Type",
-        ylab     = "Percent Coniferous")
-abline(h = mean(cov$pcCon, na.rm = TRUE),
-       lty = 2)
+## ----eval=FALSE----------------------------------------------------------
+#  process = Transform(trans = function(x) {log(x)},
+#                      which_cov = c("VarA", "VarB", "VarC"),
+#                      replace = TRUE)
+
+## ----eval=FALSE----------------------------------------------------------
+#  process = Chain(Transform(trans = function(x) {x^2},
+#                            which_cov = c("VarA", "VarB"),
+#                            replace = FALSE),
+#                  Transform(trans = function(x) {log(x)},
+#                            which_cov = c("VarC", "VarD")))
+
+## ----eval=FALSE----------------------------------------------------------
+#  process = StandardiseCov(Gelman = FALSE, exclude = NULL) # default form: standardise all covariates normally
+#  
+#  process = StandardiseCov() # short form of the default fit
+#  
+#  process = StandardiseCov(Gelman = TRUE,
+#                           exclude = c("VarB", "VarC"))
+
+## ----eval=FALSE----------------------------------------------------------
+#  process = addInteraction(which.covs = 'pairs')
+
+## ----eval=FALSE----------------------------------------------------------
+#  process = addInteraction(which.covs = c("A","B"))   # adds an interaction between A & B
+
+## ----eval=FALSE----------------------------------------------------------
+#  process = addInteraction(which.covs = list(c("A","B"), c("A","C")))   # adds interactions between A & B and A & C, but not B & C
+
+## ----eval=FALSE----------------------------------------------------------
+#  process = addInteraction(which.covs = c(A,B,C))   # adds all two-way (e.g. A & B) interactions and a three-way interaction between A, B & C
+
+## ----eval=FALSE----------------------------------------------------------
+#  process = addInteractions(which.covs = c(A,A))   # leads to a quadratic polynomial
+#  
+#  process = addInteractions(which.covs = c(A,A,A))   # leads to a cubic, polynomial
 
