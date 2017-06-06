@@ -17,7 +17,7 @@ str(cov)
 ## ------------------------------------------------------------------------
 table(cov$type)
 
-## ------------------------------------------------------------------------
+## ------------------------------------------
 par(mfrow = c(4, 1), mar = c(3, 4, 1, 1))
 dotchart(cov$pcCon, main= "Percent Coniferous")
 dotchart(cov$pcDec, main= "Percent Deciduous")
@@ -25,7 +25,7 @@ dotchart(cov$pcMix, main= "Percent Mixed Forest")
 dotchart(cov$pcGr, main= "Percent Grassland")
 dev.off()
 
-## ------------------------------------------------------------------------
+## ------------------------------------------
 # RELATIONSHIPS?
  panel.cor <- function(x, y, digits = 2, cex.cor, ...)
   {
@@ -47,7 +47,7 @@ dev.off()
 
  pairs(cov[,c('pcCon', 'pcDec', 'pcMix', 'pcGr')], upper.panel = panel.cor)
 
-## ------------------------------------------------------------------------
+## ------------------------------------------
 # Covariate effects
 par(mfrow = c(1, 1), mar = c(5, 5, 2, 2), cex.lab = 1.5)
 boxplot(cov$pcCon ~ type,
