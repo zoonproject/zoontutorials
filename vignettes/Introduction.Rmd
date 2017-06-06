@@ -9,7 +9,7 @@ output:
       toc_depth: 4
     theme: lumen
 bibliography: bibliography.bib
-csl: apa.csl
+csl: Methods.csl
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Introduction to SDMs}
