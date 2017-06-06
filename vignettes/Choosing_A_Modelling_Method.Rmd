@@ -1,0 +1,186 @@
+---
+title: "Choosing A Modelling Method"
+output:
+  html_document:
+    css: zoon.css
+    toc: yes
+    toc_float:
+      collapsed: false
+      toc_depth: 5
+    theme: lumen
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Choosing A Modelling Method}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r knitr_options, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+# set up knitr options
+knitr::opts_chunk$set(message = FALSE,
+               warning = FALSE,
+               fig.align = 'center',
+               dev = c('png'),
+               cache = TRUE)
+```
+
+```{r Library, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+library(zoon)
+library(gridExtra)
+```
+
+<hr>
+
+## Introduction
+
+In order to fit a species distribution model (SDM), we must select a modelling method to relate our response data (e.g., presence-background points) and our covariates (e.g., mean annual temperature). This best practice guide is concerned with how to select an appropriate modelling method.
+
+With the abundance of SDM methods to pick from, it can be difficult to know which to choose. Primarily, the modelling method we choose depends on the type of data we want to analyse and the question we want to ask. Methods for species distribution modelling fall into three broad categories: 'profile,' 'regression,' or 'machine learning.' In addition to these main types, there are ensemble models that combine analyses from multiple different modelling methods into a single result. `zoon` does not yet have any profile methods and so we will confine our discussion to regression and machine learning-based methods. There's no obvious distinction between these two categroies, however the literature refers to the models under these headings and so we keep to convention here. 
+
+In this best practice guide we go into detail about some common modelling methods currently available in `zoon`. For each method we will cover which data types it is compatible with, explain the underlying statistical approach, and demonstrate how to fit the model in `zoon`. To keep comparisons straightforward, we will fit them all to the same Carolina wren dataset. 
+
+<hr>
+
+## Regression-based methods
+
+Regression analyses estimate the statistical relationship between a dependent variable (e.g., presence of a species) and one or more independent variables (e.g., environmental covariates). The two regression-based SDMs included in `zoon`, logistic regression and generalised additive models, are covered in detail here.
+
+### Logistic regression
+
+Logistic regression is a type of generalised linear model (GLM). GLMs allow us to predict linear models to non-normally distributed response data via so-called 'link functions.' Both linear models (e.g. $y = c + mc$) and GLMs estimate a linear relationship between covariates (*x* in $y = c + mc$) and a response variable (*y* in $y = c + mc$). Traditional linear models, however, rely on normally-distributed response variables. In order to generalise the linear predictor to other types of response data, GLMs use so-called 'link functions.'
+
+Logistic regression, in particular, uses the 'logit' link function to estimate the probability of a binary response variable (presence represented as "1" and absence as "0") based on its relationship with predictor covariates. In the same way that we estimate the slope of a linear relationship (e.g. *m* in $y = c + mx$), logistic regression estimates one regression coefficient (*b* in equation XX below) for each covariate using maximum likelihood estimation. As in a linear model (e.g. *c* in $y = c + mx$), we will also estimate an intercept term. 
+
+$$p_i = Pr(Occurrence)\\
+logit(p_i) = Intercept + \beta_1Covariate_1 + \beta_2Covariate_2 + \beta_3Covariate_3\\$$
+
+The right-hand side of this equation is known as the linear predictor. The left-hand side is the link function of the response variable. 
+
+In `zoon`, we can fit a `LogisticRegression` model by choosing it as the model module in our `zoon` `workflow`. `LogisticRegression` uses the `glm` package.
+
+```{r Logistic_Regression, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7}
+Logistic_Regression_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                         covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                         process = Chain(StandardiseCov, Background(1000)),
+                                         model = LogisticRegression,
+                                         output = PrintMap(points = FALSE))
+```
+
+### Generalised additive model
+
+Generalised additive models (GAMs) are similar to logistic regression but allow a bit more flexibility. Like logistic regression, GAMs can fit binary data such as presence-background or presence-absence datasets, but they can also fit abudance datasets. The main difference is that GAMs do not estimate regression coefficients. Instead, the 'linear predictor' is the sum of a set of 'smoothing functions' (see equation XX below). Smoothing functions are used for non-linear covariates...  By using smoothing functions instead of regression coefficients, we can fit complex, non-linear relationships between our dependent and independent covariates.
+
+If we use smoothing functions without any restrictions, however, it is possible to 'overfit' our data, creating a linear predictor that is too complex. To avoid this, GAMs use 'penalised likelihood maximisation,' which penalises the model for each additional smoothing function (or 'wiggliness).
+
+$$p_i = Pr(Occurrence)\\
+logit(p_i) = Intercept + f_1(Covariate_1) + f_2(Covariate_2) + f_3(Covariate_3)\\$$
+
+In `zoon`, the `mgcv` model module fits a GAM using the `mgcv` package. To fit a GAM we need to define a couple of parameters that determine how wiggly and complex we will allow the linear predictor to be. Specifically, we need to define the degrees of freedom, *k*, and select a penalised smoothing basis, *bs*. You can find more details on selecting these parameters using `?mgcv::choose.k` and `?mgcv::smooth.terms`. 
+
+Let's just start by fitting a GAM using the default settings in our `workflow`.
+
+```{r GAM, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7}
+GAM_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                         covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
+                         process = Chain(StandardiseCov, Background(1000)),
+                         model = mgcv(k = -1, bs = "tp"),
+                         output = PrintMap(points = FALSE))
+```
+
+## Machine learning methods
+
+Machine learning is a field of computer science where modelling methods learn from and make predictions on data. 
+
+### MaxEnt/MaxNet
+
+MaxEnt is one of the most widely used SDM modelling methods [@elith11]. MaxEnt is used only for presence-background data. Unlike the regression-based analyses discussed above, MaxEnt does not use maxmimum likelihood estimation. Instead, as its name suggests, it uses maximum entropy estimation.
+
+Maximum entropy estimation compares the probability density of environmental covariates across the landscape at a random selection of backgorund points ($f(z)$) with the probability density of covariates across the landscape where the species is present ($f_1(z)$). The estimated ratio $f_1(z)/f(z)$ provides insight on which covariates are important and establishes the relative suitability of one site over another. 
+
+[ MaxEnt estimates $f_1(z)$ such that it is consistent with the occurrence data, but there are many possible distributions so it chooses the one closest to $f(z)$.] ((I find this sentence hard to understand.)) Minimising this difference is sensible, as without absence data we have no information to guide our expectation of a species' preference for one particular environment over another. The distance from $f(z)$ represents the relative entropy of $f_1(z)$ with respect to $f(z)$. Minimising the relative entropy is equivalent to maximising the entropy (hence, MaxEnt) of the ratio $f_1(z)/f(z)$. This model can be described as maximising entropy in geographic space, or minimising entropy in environmental space.
+
+During the model fitting procedure MaxEnt needs to estimate coefficient values such that they meet the above constraints, yet to not fit them too closely and result in an overfitted model with limited generalisability. This is achieved using regularisation, which can be thought of as shrinking the coefficients towards zero by penalising them to balance model fit and complexity. Thus, MaxEnt can be seen as fitting a penalised maximum likelihood model. This method works with presence-background data. 
+
+The `MaxEnt` module uses the `maxent()` function in the `dismo` package, and requires a MaxEnt executable file saved in the correct location. The `zoon` helper function `GetMaxEnt()` is available to help with this installation. Due to common difficulties in downloading MaxEnt, in this example we will use MaxNet as a subsitute. You select this model in your `workflow` as follows:
+
+```{r MaxNet, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7}
+MaxNet_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                            covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
+                            process = Chain(StandardiseCov, Background(1000)),
+                            model = MaxNet,
+                            output = PrintMap(points = FALSE))
+```
+
+### Boosted regression trees
+
+Boosted regression trees (BRTs) are a machine learning technique that produces a prediction model in the form of an ensemble of weak prediction models (i.e. decision trees). BRTs are known by various names (including gradient boosting machine, or GBM), but BRTs is the name most commonly used in the SDM context. This differs from the standard regression approach of fitting a single best model (using some information criterion) by using the 'boosting' technique to combine relatively large numbers of simple trees adaptively, optimising predictive performance. 
+
+Tree-based models partition the predictor space into rectangles by using a set of rules to identify regions with the most homogenous responses to predictors (see below). A constant value is then fit to each region (most probable class for classification models, mean response for regression models). Growing a tree involves recursive binary splits, such that binary splits are applied to its own outputs until some set criterion is met (such as tree depth).
+
+```{r Decision_Tree_Image, echo = FALSE, fig.cap="*Figure 1. A single decision tree (upper panel), with a response Y, two predictor variables, X1 and X2 and split points t1 , t2 , etc. The bottom panel shows its prediction surface (after Hastie et al. 2001). Image sourced from Elith *et al*, 2008*", fig.align = "centre"}
+knitr::include_graphics("../vignettes/Images/Decision_Tree_Elith.jpg")
+```
+
+The 'boosting' technique is an iterative procedure that attempts to reduce the deviance of the model by fitting another tree to account for the residuals of the previous tree. The core idea is that is it easier to build and average multiple rules of thumb than to find a single, highly accurate prediction rule. There are different boosting methods that differ in how they quantify lack of fit, but they all use a forward, stage-wise procedure to gradually increase emphasis on observations modelled poorly by existing trees.
+
+The `GBM` module fits a generalised boosted regression model using the `gbm` package, and it can be fit to both presence-background and presence-absence datasets. There are several tuning parameters that you need to set.
+
++  Maximum number of trees: This is equivalent to setting the number of iterations in the model. As a rule of thumb, more is better, but this just sets an upper limit and the optimal number will be selected by cross-validation (XXXX see other BPG here?)
+
++  The maximum depth of variable interactions: This sets the number of nodes (or splits) in the decision trees. Interactions between variables is automatically modelled in BRTs due to the hierarchical structure of trees such that the response to an input variable is dependant on those higher up the tree. 
+
++  The learning rate/shrinkage factor: This is the contribution of each tree to the final model average. The sum of fitted values in all trees is multiplied by the learning rate to produce the fitted values in the final model.
+
+This model can be fit using the following call in your `workflow`:
+
+```{r BRT, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7}
+BRT_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                         covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
+                         process = Chain(StandardiseCov, Background(1000)),
+                         model = GBM(max.trees = 1000,
+                                     interaction.depth = 5,
+                                     shrinkage = 0.001),
+                         output = PrintMap(points = FALSE))
+```
+
+The `XGBoost` software for fitting BRTs is increasingly used in machine learning applications to very large datasets. You can use the `MachineLearn` module to fit BRT models with XGBoost by replacing the model module above with: `MachineLearn(method = 'xgbTree')`.
+
+### RandomForest
+
+Similar to the BRTs in the `GBM` module, random forests are a machine learning technique that make use of an ensemble of weak prediction models (i.e. decision trees). Where BRTs build each subsequent tree in order to explain the most poorly modelled observations of previous trees, each tree in a random forest model is fit independently of each other to a boot-strapped sample of the data. The final predicted output is the mean prediction of all of the trees, which corrects for the tendency of decision trees to over-fit their data.
+
+The `RandomForest` module can be fit to presence-background or presence-absence data using the following call in your `workflow`:
+
+```{r RandomForest, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7}
+RandomForest_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
+                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                  covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
+                                  process = Chain(StandardiseCov, Background(1000)),
+                                  model = RandomForest,
+                                  output = PrintMap(points = FALSE))
+```
+
+<hr>
+
+## Comparing the modelling methods
+
+The most common SDM modelling methods have been highlighted above, but how do they compare? First, lets plot their outputs next to each other.
+
+```{r Colour_Palette, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+cls <- colorRampPalette(c('#e0f3db', '#a8ddb5', '#4eb3d3', '#08589e'))(10)  # PrintMap colour palette
+```
+
+```{r Comparison, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=10, fig.width=7}
+grid.arrange(spplot(Output(Logistic_Regression_workflow), col.regions=cls, cuts = length(cls)-1, main = "Logistic Regression"),
+             spplot(Output(GAM_workflow), col.regions=cls, cuts = length(cls)-1, main = "Generalised Additive Model"),
+             spplot(Output(MaxNet_workflow), col.regions=cls, cuts = length(cls)-1, main = "MaxNet"),
+             spplot(Output(BRT_workflow), col.regions=cls, cuts = length(cls)-1, main = "Boosted Regression Tree"),
+             spplot(Output(RandomForest_workflow), col.regions=cls, cuts = length(cls)-1, main = "Random Forest"))
+```
+
+At first glance there are some big differences in the predicted occurrence maps of the Carolina wren between SDM methods. The regression methods have smoother transitions in the probability of occurrence than the machine learning ones. The logistic regression, MaxNet, and boosted regression tree models predict large amounts of area with high probability of occurrence outside of the range of the observed presences, yet the generalised additive model and random forest model are mostly restrained to the range of the observed data. Some models predict occurrence probabilities only as high as 0.7, yet others predict values as high as 1.0. So what drives these differences when the models are fit to the same data?
+
+To be continued...
