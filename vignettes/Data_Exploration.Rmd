@@ -15,9 +15,10 @@ vignette: >
 ---
 
 # Data exploration and wrangling
+
 Species Distribution Models (SDMs) are built upon species occurrence records collected from field surveys or collated observation records. Rarely, however, do we build an SDM on this raw data without undertaking some sort of data exploration and processing. Data exploration is a key first step before analysing our data, because it allows us to identify any errors and select and format appropriate covariates. Data processing can include the cleaning up of the raw data, standardising of covariates, transforming data, and creating interactions between measured variables. Much of these decisions will be determined by our model of choice, and by the assumptions underlying that model. With that in mind, there are some general guidelines we can suggest below. Within `zoon`, these visualisations are achieved with `output` modules, and data processes are achieved using `process` modules in your `workflow()`. 
 
-```{r eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+```{r knitr_options, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
 # set up knitr options
 knitr::opts_chunk$set(message = FALSE,
                warning = FALSE,
@@ -26,15 +27,16 @@ knitr::opts_chunk$set(message = FALSE,
                cache = TRUE)
 ```
 
-```{r message = F, warning = F}
+```{r Library, message = F, warning = F}
 library(zoon)
 library(lattice)
 ```
 
 ## Data Structure
+
 In order to explore our data, we first need to equip ourselves with the tools to do so. In `zoon`, you need to first have a basic workflow set up in order to examine your components in greater detail. We will implement a basic zoon workflow with `process = Background(1000)`, `model = NullModel`, and `ouptput = PrintMap`, to start with, and our data exploration may guide selection of other, potentially more appropriate module options. In this vignette we will use the Carolina Wren dataset for illustration. 
 
-```{r model, warning = FALSE, message=FALSE}
+```{r Workflow, model, warning = FALSE, message=FALSE}
 Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
                                    covariate = CarolinaWrenRasters,
                                    process = Background(1000),
@@ -42,7 +44,7 @@ Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
                                    output = InteractiveOccurrenceMap)
 ```
 
-```{r echo=FALSE, fig.align='center', fig.height=7, fig.width=7}
+```{r HTML_Output_1, echo=FALSE, fig.align='center', fig.height=7, fig.width=7}
 # force the htmlwidget to render in the vignette
 Output(Carolina_Wren_Workflow)
 ```
@@ -51,11 +53,13 @@ With our basic workflow loaded, we can examine our occurrence and covariate data
 
 ```{r}
 occ.cov.df <- Process(Carolina_Wren_Workflow)$df
-str(cov)
+str(occ.cov.df)
 ```
+
 This allows us to check some initial conditions of our data, including its form. In this case, we can see that data type is stored as a factor, and the continuous variables are stored as numeric variables. This is correct. 
 
 ## Outliers and data cleaning
+
 Species distribution datasets are, to varying degrees, reliant on manually-compiled data from observations. Even in situations where we are fitting a model to entirely remotely-sensed data such as bioclimatic variables, our species occurrence records are usually pen-and-paper recordings from the field that have been manually transcribed into an excel file. Even with modern technology where the need for physical record taking can be replaced with data entry into hand-held computing devices in the field, this process still relies on manual data entry and this can lead to mistakes in the data entry procedure.
 
 Inaccurate data can lead us to draw false conclusions, and for conservation work this could mean squandering our limited resources for a species in locations where the species is not likely to occur. `zoon's` accessor functions in conjunction with base R `summary()` functions are a good way for us to check the raw data. For example, maybe the maximum value in your elevation variable is 1000 m, but you know that the highest peak in your study region is only 500 m. During the data entry process someone may have added an extra 0 to a 100 m measurement by mistake. Maybe your vegetation classification is showing as having ten levels despite it being an eight-category scale. Chances are a spelling mistake as benign as 'forest' instead of 'Forest' is present. 
@@ -70,7 +74,7 @@ We can check for outliers in our occurrence and covariate data, for example, wit
 
 If you've identified errors in your data, or want to run a check to be safe, one of the `zoon` modules, `Clean`, removes impossible, incomplete, or unlikely species occurrence points in the dataset based on the listed longitude and latitude values. Impossible latitude/longitude points are removed because the location doesn't exist, incomplete occurrence records are missing either a longitude or latitude value (or both) are removed as they cannot be plotted or used, and unlikely data points are those like 0,0 as you are unlikely to be surveying hundreds of kilometers offshore in the Gulf of Guinea but it is possibly an artifact of data entry if used as default values and the correct values aren't entered in their place. Within `Clean` these are referred to by number as impossible (1), incomplete (2), and unlikely (3), and this module is used as follows:
 
-```{r eval=FALSE}
+```{r Clean, eval=FALSE}
 process = Clean(which = c(1,2,3))
 ```
 
@@ -85,11 +89,15 @@ process = Clean(which = c(1,2,3))
 
 ## Data Report
 
-A tidy summary of many of the previous data exploration methods is provided with the `GenerateDataReport` `Output` module. This is based on the `GenerateReport()` function in the `DataExplorer` `R` package, but tailored specifically for SDM analysis.
+A tidy summary of many of the previous data exploration methods is provided with the `GenerateCovariateReport` `Output` module. This is based on the `GenerateReport()` function in the `DataExplorer` `R` package, but tailored specifically for SDM analysis.
 
-This module generates a data profiling report for our training data (the data set that our model is fit to) and/or our raster data (that our model uses to predict the distribution of our study species). These reports will show our data's structure, the percentage of missing data, the distribution of our covariates (histograms for continuous data, bar charts for discrete), and show the results of a correlation analysis.
+This module generates a data profiling report for our training data (the data set that our model is fit to) and/or our raster data (that our model uses to predict the distribution of our study species). These reports will show our data's structure, the percentage of missing data, the distribution of our covariates (histograms for continuous data, bar charts for discrete), and show the results of a correlation analysis. We need to tell the module which report(s) to generate by setting the `type` argument to one of "D" (Data Report only), "R" (Raster report only), or "DR" (Data and Raster Report).
 
-Using the `GenerateDataReport` module we can, at a glance, identify potential issues with our dataset including:
+```{r DataReport, eval=FALSE}
+output = GenerateCovariateReport(type = "DR")
+```
+
+Using the `GenerateCovariateReport` module we can, at a glance, identify potential issues with our dataset including:
 
 +  NA values are to be expected in our raster data (unless they are oblong in shape) as they are commonly masked to cover only a particular region (e.g. the border of a country or a national park) but are stored as a matrix and thus padded with NA values in cells of no interest, but we would not expect NA values in our training data. Finding NA values in the training data could indicate that some data points have incorrect latitude/longitude values and are being mapped to locations outide the extent of our study, or that the data point sits on the border of the study region and "misses" the raster due to its resolution (i.e. a diagonal line is instead a series of alternating horizontal and vertical lines) and should be adjusted slightly.
 +  Our training data does not adequately represent the full range of our covariate data in the study region. For example, we have an elevation covariate ranging from 0-100m, but our samples are all from the 0-50m range. This means that our predictions will have to extrapolate outside the sample range, and we then have to assume that the estimated relationship between species occurrence and the covariate holds under these conditions.
@@ -105,7 +113,7 @@ Performing transformations of our data is achieved in `zoon` using the `Transfor
 
 For example, if we want to log transform a variable called "VarA" and make it an additional variable in our dataset we would use this:
 
-```{r eval=FALSE}
+```{r Transform_1, eval=FALSE}
 process = Transform(trans = function(x) {log(x)},
                     which_cov = "VarA",
                     replace = FALSE)
@@ -113,7 +121,7 @@ process = Transform(trans = function(x) {log(x)},
 
 This time, to show just how complex we can go, lets perform a series of nonsense transformations to different variables:
 
-```{r eval=FALSE}
+```{r Transform_2, eval=FALSE}
 process = Chain(Transform(trans = function(x) {x + 101},
                           which_cov = c("VarA", "VarB"),
                           replace = FALSE),
@@ -133,7 +141,7 @@ We do this with the `StandardiseCov` module in `zoon` to standardise covariates 
 
 Some examples of how to use the module are below. The first is the default fit of the module which performs normal standardisation of variables to all variables. The second alculates the Gelamn variant of standardisation on all variables except "VarB" and "VarC".
 
-```{r eval=FALSE}
+```{r StandardiseCov, eval=FALSE}
 process = StandardiseCov(Gelman = FALSE, exclude = NULL) # default form
 
 process = StandardiseCov(Gelman = TRUE,
@@ -152,7 +160,7 @@ where b3 is the interaction term between the variables X1 and X2.
 
 To implement all possible pairwise interactions in the model we write up the module like this:
 
-```{r eval=FALSE}
+```{r Interaction_AllPairs, eval=FALSE}
 process = addInteraction(which.covs = 'pairs')
 ```
 
@@ -160,19 +168,19 @@ Rather than a blanket application of interaction terms across our model, we migh
 
 +  To define the pairwise interaction between any two variables as a character vector:
 
-```{r eval=FALSE}
+```{r Interaction_Pair, eval=FALSE}
 process = addInteraction(which.covs = c("A","B"))   # adds an interaction between A & B
 ```
 
 +  To define multiple pairwise interactions, but not *all* pairwise interactions, we make use of `R`'s `list()` function. We provide a list of interaction terms as character vectors like so:
 
-```{r eval=FALSE}
+```{r Interaction_MultPairs, eval=FALSE}
 process = addInteraction(which.covs = list(c("A","B"), c("A","C")))   # adds interactions between A & B and A & C, but not B & C
 ```
 
 +  To define higher order interactions between more than two variables we just need to extend the length of our character vectors. This will define the highest order interaction term between all of the selected variables as well as all combinations of lower-order interaction terms.
 
-```{r eval=FALSE}
+```{r Interaction_Three-way, eval=FALSE}
 process = addInteraction(which.covs = c(A,B,C))   # adds all two-way (e.g. A & B) interactions and a three-way interaction between A, B & C
 ```
 
@@ -182,7 +190,7 @@ Sometimes the relationship between our response variable and predictor variable 
 
 Now, it may not be intuitive to think of polynomial terms as interactions, but the structure of defining interactions in the manner of the `addInteraction` module also suits defining polynomial terms. Rather than using characters vectors of multiple variables like defining interactions, we define a character vector of repeated instances of the same variable name of a length equal to the order of polynomial term we want to define. For example:
 
-```{r eval=FALSE}
+```{r Polynomial, eval=FALSE}
 process = addInteractions(which.covs = c(A,A))   # leads to a quadratic polynomial
 
 process = addInteractions(which.covs = c(A,A,A))   # leads to a cubic, polynomial
