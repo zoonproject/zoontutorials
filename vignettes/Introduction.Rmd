@@ -25,24 +25,24 @@ knitr::opts_chunk$set(message = FALSE,
                cache = TRUE)
 ```
 
-## Why do we fit Species Distribution Models (SDMs)?
+## Why do we fit species distribution models?
 
-In ecology, we often want to understand where species are distributed in the environment and why. There are three predominant aims ecologists may have when undertaking a SDM: ecological inference, predicting current extent, and predicting future distribution. 
+In ecology, we often want to understand where species are distributed in the environment and why. There are three predominant aims ecologists may have when undertaking a species distribution model (SDM): ecological inference, predicting current extent, and predicting future distribution. 
 
-SDMs predict species occurrence using environmental covariates, and while these relationships are correlative rather than mechanistic, they can still inform underlying ecological relationships. Environmental response curves, for example, can help us visualise how individual environmental parameters relate to probability of occurrence. It is up to the ecologist to interpret these results in a meaningful way, including to assess whether the pattern is rather an indicator that there is a more relevant variable that has not been included in the model. In Figure 1a, we see an example of ecological inference from an SDM of blue whale occurrence. This plot examines how sea surface height (SSH) predicts abundance of the blue whale *Balaenoptera musculus* in both California and Eastern tropical Pacific populations [@redfern17].
+SDMs predict species occurrence using environmental covariates, and while these relationships are correlative rather than mechanistic, they can still inform underlying ecological relationships. Environmental response curves, for example, can help us visualise how individual environmental parameters relate to probability of occurrence. It is up to the ecologist to interpret these results in a meaningful way, including to assess whether the pattern is instead an indicator of a more relevant variable that has not been included in the model. In Figure 1a, we see an example of ecological inference from an SDM of the blue whale. This plot examines how sea surface height (SSH) predicts abundance of the blue whale, *Balaenoptera musculus*, in both California and Eastern tropical Pacific populations [@redfern17].
 
 SDMs can also be used to visualise or map the extent of species' occurrence in geographic space both in current conditions and into the future, taking into account environmental changes such as climate change. Mapping current distribution can be useful for managers seeking to understand the extent of species' occurrence, for example, for planning responses to public health emergencies or conserving habitat. Species occurrence records are single points in space, so mapping allows us to extend our understanding by predicting the wider habitat from these points. In Figure 1b, we see an example from an SDM of the Ebola virus. This map illustrated the occurrence of the virus at that time [@pigott14]. 
 
-As our understanding and predictive capacity of climate change improves, we are increasingly able to predict future occurrence of species using these new climate scenarios as environmental variables. In Figure 1c, we see an example of this future distribution predictive modeling of the invasive cane toad, *Bufo marinus*, in Australia [@elith10]. The black line delineates the current distribution, and the grey area represent prediction of future occurrence. 
+As our understanding and predictive capacity of climate change improves, we are increasingly able to predict future occurrence of species using these new climate scenarios as environmental variables. In Figure 1c, we see an example of this future distribution predictive modeling of the invasive cane toad, *Bufo marinus*, in Australia [@elith10]. The black line delineates the current distribution, and the grey area represents prediction of future occurrence. 
 
-```{r Figure_3, echo = FALSE, out.width= '650px', fig.align = "center", fig.cap="*Figure 1. Species Distribution Modelling aims: ecological inference (a; figure from (@redfern17), photo from (@cetus)), predicting current species' distributions (b; figure from (@pigott14)), or mapping future distributions (c; figure from (@elith10), photo from (@fraser-smith)).*"}
+```{r echo = F, out.width= '650px', fig.align = "center", fig.cap="*Figure 1. Species Distribution Modelling aims: ecological inference (a; figure from @redfern17, photo from @cetus), predicting current species' distributions (b; figure from @pigott14), or mapping future distributions (c; figure from @elith10, photo from @fraser-smith).*"}
 knitr::include_graphics("../vignettes/Images/Figure_1_litSDM.png")
 ```
 
 ## What is a species distribution model?
 Where we find species in geographic species is typically considered the result of three main factors: the abiotic environment, the biotic environment, and the species' movement capabillity [@soberon05]. Together, these three factors determine the species' *ecological niche*. The intersection of the abiotic and biotic environmental conditions constitutes the *fundamental niche*, or where the species could physiologically occur given what we know of its biology and ecology. However, experience tells us that species are not always located where we expect them to be. Their *realised niche* is where they actually exist within the bounds of the environmental space where they could potentially exist. For example, a species may be constrained by the climate required for individuals to survive, the local vegetation types it depends on, or its abillity to traverse different landscapes. 
 
-Species distribution models estimate a species' realised niche. They do this by estimating the probabilty of occurrence of species along environmental gradients using correlation between environmental covariates and species occurrence data. Using SDMs, we can estimate the probability a species of bird will use forest habitat with high tree cover compared to open habitat with low tree cover. We can then take these statisical relationships and project them onto geographic space, which allows us to visualise how the probability of species occurrence varies in space.
+Species distribution models estimate a species' realised niche. They do this by estimating the probabilty of occurrence of species along environmental gradients using correlation between environmental covariates and species occurrence data. Using SDMs, we can estimate the probability that a species of bird will use forest habitat with high tree cover compared to open habitat with low tree cover. We can then take these statisical relationships and project them onto geographic space, which allows us to visualise how the probability of species occurrence varies in space.
 
 We have visualised this theory in Figure 2 below. This dataset uses presence data of the Carolina Wren as well as a suite of environmental predictors such as cover of different forest types. In the top left corner we have mapped onto geographic space the records of species occurrence (black dots) as well as the background points we will use in our model. In the top right we see these same points plotted in environmental space against two covariates. We can see that the presence points are clustered at higher percents of deciduous forest and lower percents of mixed forest. The model uses this presence background data to construct predictions of species occurrence in environmental space, as seen in the bottom right plot. In the final plot, bottom left, we see these probability predictions mapped back onto geographic space in a way that allows us to understand where and by what drivers the species is likely to occur. There are many types of species distribution models and the field is rapidly expanding. *expand...many different way and decision to be made along the way*
 
@@ -78,8 +78,8 @@ A basic workflow for the Carolina Wren in the contiguous USA could look like thi
 zoon_workflow <- workflow(occurrence = CarolinaWrenPO,
                           covariate = CarolinaWrenRasters,
                           process = Background(100),
-                          model = MaxEnt,
-                          output = InteractiveMap)
+                          model = MaxNet,
+                          output = PrintMap)
 ```
 
 ```{r HTML_output_1, echo=FALSE, fig.align='center', fig.height=7, fig.width=7}
@@ -87,7 +87,7 @@ zoon_workflow <- workflow(occurrence = CarolinaWrenPO,
 Output(zoon_workflow)
 ```
 
-In this workflow, we have obtained occurrence records for the Carolina Wren from a `zoon` module, loaded environmental covariates from another `zoon` module, selected 100 background points (more on this later), fit a MaxEnt model, and generated our results as an interactive map. 
+In this workflow, we have obtained occurrence records for the Carolina Wren from a `zoon` module, loaded environmental covariates from another `zoon` module, selected 100 background points (more on this later), fit a MaxNet model, and generated our results as an interactive map. 
 
 Through this tutorial we will guide you step-by-step through each of the arguments in a workflow as we update this `zoon_workflow`. You might like to explore some different combinations of modules yourself, and you can find more information by running the `GetModuleList()` command. Be sure to explore the other tutorials as well that go through these steps in greater detail.
 
@@ -167,7 +167,7 @@ In some instances we may not need a `process` module in our `workflow`, however,
 
 ### Step 4. Model
 
-A fundamental aspect of the `workflow` is the `model` module. This is where we choose which type of SDM you want to fit to our data. There are multiple different SDM methods to choose from and each have their merits [@elith06]. A few more common examples include the `LogisticRegression`, `mgcv`, `MaxEnt`, `RandomForest`, and `GBM` modules. For more detail on these methods you can refer to the ["Choosing A Model" vignette](Choosing_A_Model.html).
+A fundamental aspect of the `workflow` is the `model` module. This is where we choose which type of SDM you want to fit to our data. There are multiple different SDM methods to choose from and each have their merits [@elith06]. A few more common examples include the `LogisticRegression`, `mgcv`, `MaxNet`, `RandomForest`, and `GBM` modules. For more detail on these methods you can refer to the ["Choosing A Model" vignette](Choosing_A_Model.html).
 
 Now, let's update our `workflow` with another common model type, logistic regression. We do this by using the aptly named `LogisticRegression` module.
 
@@ -222,15 +222,14 @@ zoon_workflow <- ChangeWorkflow(zoon_workflow,
 ```
 
 ## Putting it all together
-
-Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. As MaxEnt is arguably one of the most popular SDM methodologies, lets fit a MaxEnt model in addition to the logistic regression. This is achieved using the `List()` function. We will fit these models to the Carolina Wren data obtained from GBIF and the Bioclim environmental variables, generate 1000 background samples, and display our results in a map without our raw data displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
+Now that we have seen how to use each argument in the `workflow()` function it is time to put all of the pieces together and fit our own SDM within `zoon`. MaxEnt is arguably one of the most popular SDM methodologies, however it can sometimes be difficult to install, so in this example we will use MaxNet in addition to the logistic regression. This is achieved using the `List()` function. We will fit these models to the Carolina Wren data obtained from GBIF and the Bioclim environmental variables, generate 1000 background samples, and display our results in a map without our raw data displayed. We have covered each of the necesssary modules previously, and here we will run them together to form a complete `workflow()`.
 
 ```{r Dual_Model_Workflow, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
 Dual_Model_Workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
                                                    extent = c(-138.71, -52.58, 18.15, 54.95)),
                                 covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
                                 process = Background(1000),
-                                model = list(LogisticRegression, MaxEnt),
+                                model = list(LogisticRegression, MaxNet),
                                 output = PrintMap(points = FALSE))
 ```
 
