@@ -9,7 +9,7 @@ output:
       toc_depth: 4
     theme: lumen
 bibliography: bibliography.bib
-csl: apa.csl
+csl: Methods.csl
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Introduction to SDMs}
@@ -35,7 +35,7 @@ SDMs can also be used to visualise or map the extent of species' occurrence in g
 
 As our understanding and predictive capacity of climate change improves, we are increasingly able to predict future occurrence of species using these new climate scenarios as environmental variables. In Figure 1c, we see an example of this future distribution predictive modeling of the invasive cane toad, *Bufo marinus*, in Australia [@elith10]. The black line delineates the current distribution, and the grey area represents prediction of future occurrence. 
 
-```{r echo = F, out.width= '650px', fig.align = "center", fig.cap="*Figure 1. Species Distribution Modelling aims: ecological inference (a; figure from @redfern17, photo from @cetus), predicting current species' distributions (b; figure from @pigott14), or mapping future distributions (c; figure from @elith10, photo from @fraser-smith).*"}
+```{r echo = F, out.width= '100%', fig.align = "center", fig.cap="*Figure 1. Species Distribution Modelling aims: ecological inference (a; figure from @redfern17, photo from @cetus), predicting current species' distributions (b; figure from @pigott14), or mapping future distributions (c; figure from @elith10, photo from @fraser-smith).*"}
 knitr::include_graphics("../vignettes/Images/Figure_1_litSDM.png")
 ```
 
@@ -205,8 +205,6 @@ The `InteractiveMap` module produces a map of occurrence probability that we can
 The `InteractiveMap` shows us that, according to the data we included, the Carolina Wren is most likely to occur in the southeast of the United States (higher probability of occurrence: purple) and is less likely to exist in the northwest of the country (lower probability of occurrence: yellow). These quantitative predictions fit with a qualitative analysis of our data; most of our presence records (white dots) are in the southeast of the map.
 
 Now we've seen how Carolina Wren occurrence varies over geographic space, let's look more closely at what is driving that variation. That is, how does probability of occurrence vary along the environmental gradients we included in our model. For this, we can use the `ResponsePlot` module to make graphs of the predicted relationships between probabilty of occurrence and our environmental covariates.
-
-
 
 Without input arguments, `ResponsePlot` plots a graph for each covariate included in our model. We can also specify, which covariate we want to plot.
 

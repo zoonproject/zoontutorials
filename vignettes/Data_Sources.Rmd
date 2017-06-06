@@ -52,12 +52,12 @@ modules$covariate
 
 For example, we could choose to fit a model to the Carolina wren data using the `CarolinaWrenPO` or `CarolinaWrenPA` occurrence modules (presence-only and presence-absence, respectively) with the `CarolinaWrenRasters` covariate module. 
 
-```{r Workflow, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
-                                   covariate = CarolinaWrenRasters,
-                                   process = NoProcess,
-                                   model = NullModel,
-                                   output = PrintMap)
+```{r Workflow, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+Carolina_Wren_workflow <- workflow(occurrence = CarolinaWrenPO,
+                          covariate = CarolinaWrenRasters,
+                          process = Background(100),
+                          model = NullModel,
+                          output = PrintMap)
 ```
 
 ```{r HTML_Output_1, echo=FALSE, fig.align='center', fig.height=7, fig.width=7}
