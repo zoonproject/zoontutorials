@@ -53,11 +53,11 @@ modules$covariate
 For example, we could choose to fit a model to the Carolina wren data using the `CarolinaWrenPO` or `CarolinaWrenPA` occurrence modules (presence-only and presence-absence, respectively) with the `CarolinaWrenRasters` covariate module. 
 
 ```{r Workflow, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-#Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
-#                                   covariate = CarolinaWrenRasters,
-#                                   process = StandardiseCov,
-#                                   model = MaxNet,
-#                                   output = PrintMap)
+Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
+                                   covariate = CarolinaWrenRasters,
+                                   process = NoProcess,
+                                   model = NullModel,
+                                   output = PrintMap)
 ```
 
 ```{r HTML_Output_1, echo=FALSE, fig.align='center', fig.height=7, fig.width=7}
@@ -71,7 +71,7 @@ Output(Carolina_Wren_Workflow)
 
 SDMs are commonly fit to datasets we have collected ourselves, and `zoon` has modules to help us load them. The two modules of interest here are `LocalOccurrenceData` for our observation records and `LocalRaster` for our raster-based data.
 
-To ensure that all datasets loaded in to a `zoon` `workflow` are compatible with the `model` modules, the `LocalOccurrenceData` module requires our data to be eith .csv/.xlsx/.tab or /.xlsx files with a strict structure. The first and second columns are the `longitude` and `latitude` values (in that order), and the third column is the `value` of the observation (0 for absence, 1 for presence, and an integer for abundance data). If your coordinate system is not latitude/longitude then you can supply an optional fourth column called `CRS` that contains the PROJ.4 code for your coordinate system (e.g. `+init=epsg:27700` for easting/northing data for the UK). If no `CRS` column is supplied then latitude/longitude is assumed. 
+To ensure that all datasets loaded in to a `zoon` `workflow` are compatible with the `model` modules, the `LocalOccurrenceData` module requires our data to be either .csv/.xlsx/.tab or /.xlsx files with a strict structure. The first and second columns are the `longitude` and `latitude` values (in that order), and the third column is the `value` of the observation (0 for absence, 1 for presence, and an integer for abundance data). If your coordinate system is not latitude/longitude then you can supply an optional fourth column called `CRS` that contains the PROJ.4 code for your coordinate system (e.g. `+init=epsg:27700` for easting/northing data for the UK). If no `CRS` column is supplied then latitude/longitude is assumed. 
 
 To use the `LocalOccurrenceData` module you call `occurrence` in your `workflow` like this:
 
@@ -120,7 +120,7 @@ covariate = Bioclim(extent = c(-180, 180, -90, 90), # Coordinates for the extent
                     layers = 1:5)                   # Variables we want (between 1-19)
 ```
 
-We can also obtain these bioclimatic variables for predictions of future climate using the `Bioclim_future` module. We can find more information about different scenarios used to predict future climates here and here. [Representative Concentration Pathways](https://en.wikipedia.org/wiki/Representative_Concentration_Pathways) and [General Circulation Models](https://en.wikipedia.org/wiki/General_circulation_model). We can call this `module` like this:
+We can also obtain these bioclimatic variables for predictions of future climate using the `Bioclim_future` module. We can find more information about different scenarios used to predict future climates [here](https://en.wikipedia.org/wiki/Representative_Concentration_Pathways) and [here](https://en.wikipedia.org/wiki/General_circulation_model). We can call this `module` like this:
 
 ```{r Bioclim_future, eval=FALSE}
 covariate = Bioclim_future(extent = c(-10, 10, 45, 65),  # Coordinates of the extent of the region
