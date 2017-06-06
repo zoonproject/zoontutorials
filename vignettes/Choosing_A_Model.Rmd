@@ -2,7 +2,6 @@
 title: "Choosing A Model"
 output:
   html_document:
-    pandoc_args: ["--filter-pandoc-eqnos"]
     css: zoon.css
     toc: yes
     toc_float:
@@ -56,7 +55,7 @@ Logistic regression is a type of Generalised Linear Model (GLM). Where a (non-ge
 Logistic regression uses the logit link function to estimate the probability of a binary response variable (presence represented as "1" and absence as "0") based on its relationship with one or more independent predictor covariates (see equation XX below). In the same way as we estimate the gradient of a linear relationship (e.g., y = mx +c), logistic regression estimates one regression coefficient (b) for each covariate using maximum likelihood estimation. And let's not forget the intercept.
 
 $$p_i = Pr(Occurrence)\\
-logit(p_i) = Intercept + b_1*Covariate1 + b_2*Covariate2 + b_3*Covariate3\\$$ {#eq:Logistic}
+logit(p_i) = Intercept + b_1*Covariate1 + b_2*Covariate2 + b_3*Covariate3\\$$
 
 The right hand side of this equation is known as the linear predictor.
 
