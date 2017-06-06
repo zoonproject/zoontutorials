@@ -204,10 +204,15 @@ The `InteractiveMap` shows us that, according to the data we included, the Carol
 
 Now we've seen how Carolina Wren occurrence varies over geographic space, let's look more closely at what is driving that variation. That is, how does probability of occurrence vary along the environmental gradients we included in our model. For this, we can use the `ResponsePlot` module to make graphs of the predicted relationships between probabilty of occurrence and our environmental covariates.
 
-Without input arguments, `ResponsePlot` plots a graph for each covariate included in our model. We can also specify which covariates we want to plot.
 
-```{r eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
+Without input arguments, `ResponsePlot` plots a graph for each covariate included in our model. We can also specify, which covariate we want to plot.
+```{r echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.height=5, fig.width=7, cache=TRUE}
+zoon_workflow <- ChangeWorkflow(zoon_workflow,
+                                output = ResponsePlot())
+```
 
+```{r echo=FALSE, eval=TRUE, cache = TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=5, fig.width=7, cache=TRUE}
+par(mfrow=c(2,3))
 zoon_workflow <- ChangeWorkflow(zoon_workflow,
                                 output = ResponsePlot())
 ```
