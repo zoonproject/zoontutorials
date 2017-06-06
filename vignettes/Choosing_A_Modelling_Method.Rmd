@@ -6,8 +6,10 @@ output:
     toc: yes
     toc_float:
       collapsed: false
-      toc_depth: 5
+      toc_depth: 4
     theme: lumen
+bibliography: bibliography.bib
+csl: Methods.csl    
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Choosing A Modelling Method}
@@ -36,7 +38,7 @@ In order to fit a species distribution model (SDM), we must select a modelling m
 
 With the abundance of SDM methods to pick from, it can be difficult to know which to choose. Primarily, the modelling method we choose depends on the type of data we want to analyse and the question we want to ask. Methods for species distribution modelling fall into three broad categories: 'profile,' 'regression,' or 'machine learning.' In addition to these main types, there are ensemble models that combine analyses from multiple different modelling methods into a single result. `zoon` does not yet have any profile methods and so we will confine our discussion to regression and machine learning-based methods. There's no obvious distinction between these two categroies, however the literature refers to the models under these headings and so we keep to convention here. 
 
-In this best practice guide we go into detail about some common modelling methods currently available in `zoon`. For each method we will cover which data types it is compatible with, explain the underlying statistical approach, and demonstrate how to fit the model in `zoon`. To keep comparisons straightforward, we will fit them all to the same Carolina wren dataset. 
+In this tutorial we go into detail about some common modelling methods currently available in `zoon`. For each method we will cover which data types it is compatible with, explain the underlying statistical approach, and demonstrate how to fit the model in `zoon`. To keep comparisons straightforward, we will fit them all to the same Carolina wren dataset. 
 
 <hr>
 
