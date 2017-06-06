@@ -16,24 +16,85 @@ vignette: >
 
 <hr>
 
-## Set up model validation
+## Is my model any good?
 
-Model validation is an important step in the model fitting process as it lets you determine if your model is an acceptable description of your data. Model validation can be as simple as d goodness-of-fit tests but the `zoon` package uses more complex methods that subset and/or resample the dataset. **[Expand on what model validation is/why it is important]** The `process` modules that set up model validation include:
+Not all species distribution models are created equal. The ease of fitting species distribution models means that sometimes we use them willy-nilly without questioning the results, how accurate they are, and whether the mdoel is 'fit for purpose'. We need first to know if your model is a reaonsable representtion of reality. What is reasonable is still being debated and there's no hard line in the sand, so far.
 
-*	`Crossvalidate`: Run k fold crossvalidation (default = 5). If you are using presence-absence, this will split presences and absences separately so folds have equally balanced data, otherwise it just samples. This samples the dataset without replacement into k 'folds' or sub-datasets to be used for training and testing the model. A model is fit to the k-1 folds of training data and evaluated against the fold of testing data (and repeated so each fold is used as the testing data once, and then the results are averaged). This is mainly used where the goal is to use the model for prediction as it tests if the model is overfit to the training data and thus unlikely to be suitable for prediction across another dataset (i.e. the test fold). 
+Bearing in mind that all models are just that: models. They won't perfectly represent truth but they may still be useful. It's important to consider if our model is good *enough* for it's purpose, rather than if it is *good* in absolute terms. This means we're not validatin ght emoel as representative of truth, per se, by vaidating it as *fit for purpose*. Model evaluation is the process of checking our model outputs to determine if they are a close enough representation of reality for the purpose you're using it for.
 
-```{r eval=FALSE}
-process = Crossvalidate(k = 5)   # 5-fold cross-validation
-```
+In this best practice guide, we will talk about the different ways of evaluating a model (or set of models), when we might choose one methods over an another, and lastly, how to implememnt these model evaluation methods in `zoon`. We'll use one example throughout to demonstrate the concepts and how to use `zoon` for simple and reporducible model evaluation
 
-*	`Bootstrap`: This module generates random bootstraps of the data. **expand** It defaults to the number of points in the dataset
+Need to choose between models
 
-```{r eval=FALSE}
-process = Bootstrap   # Bootstrap a number of points equal to the number of points in the dataset
-```
+## What is model evaluation?
 
-*	`BackgroundAndCrossvalid`: This module generates up to 100 background records at random in the raster cells and splits all data in k folds for cross validation (default = 5).
+There's many different ways to do model evalation and which way we choose will depend on the data we have available, 
 
-```{r eval=FALSE}
-process = BackgroundAndCrossvalid(k = 5)   # generate up to 100 background points, and the split all data into 5 folds for cross validation
-```
+
+What method of model evaluation you choose depends on what you ant to use th emodel for. If you ony want to accuratley map the here and now, you won't neccessaruly mind about over-fitting. Howveer, if you need to predict to a new time or place, or you want to identify generalisable patterns, you need your model to fin dthe pattern among the noise - that is, you need the model not to be overfit, but still be a good descriptoin of the truth.
+
+If you're using your model to predict to a new time or place, you'll need to assess if your model can do that.
+
+If you're only trying to get an accurate picture of here and now, you need to know whether your model has fit your data accuratley.
+
+If you only want to make ecological inference - to find general patterns in ecology - you'll still be concerned
+
+
+### The bare minimum
+
+Let's first run through what we at zoon believe is the bare minimum. Some of what follows we'll do just as part of interpretting our results, but it's good to be cogniscent that we're looking to question the model and it's accuracy, rather than accepting the printed map or response curve as gospel truth.
+
+Check maps match data (interactive map)
+
+One can go a little bit further in evaluating model fit by plotting species repsonse curves where available (response curves)
+
+For parametric models, check coefficients make sense (go the same way as data, giev back sensible results) (coefficient plot)
+
+### Internal evalution
+
+The next step up in the model evaluation game is internal evaluation. Internal evaluation checks if our model is a good description of the data we fit it with.
+
+#### Deviance and Variance
+
+R-squared (variance explained)
+
+Deviance
+
+#### Information criteria
+
+Information criteria build on deviance measures by penalising models for additional covariates. That is, they select for accurate and *parimsoneous*models.
+
+### Cross-validation
+
+Model cross-validation is the gold standard of model evalution in species distritbuion models. In the absence of a independently dataset, that is.
+
+There's many way to do cross-validation and again it depends on what aspect of model performance we want to check.
+
+Cross-validation works as follows - you iteratively split the data into a test and training dataset. The model is fit (or 'trained') with the traiing dataset and evaluated with the test dataset.
+
+#### K-fold
+
+#### Bootstrap
+
+#### Exrapolation in space
+
+Want to do if need to predict range shift or to a new location. Olden (ref) refer to this as the transferability of the model in space. And you do it by 
+
+Can your model predict extremes? Can it extrpolate.
+
+#### The controversial AUC
+
+#### Specificity
+
+#### Selectivity
+
+## How do I know if my model is over-fitted?
+
+...
+
+## Conclusion
+
+
+
+
+
