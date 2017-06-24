@@ -36,9 +36,9 @@ library(gridExtra)
 
 In order to fit a species distribution model (SDM), we must select a modelling method to relate our response data (e.g., presence-background points) and our covariates (e.g., mean annual temperature). This best practice guide is concerned with how to select an appropriate modelling method.
 
-With the abundance of SDM methods to pick from, it can be difficult to know which to choose. Primarily, the modelling method we choose depends on the type of data we want to analyse and the question we want to ask. Methods for species distribution modelling fall into three broad categories: 'profile,' 'regression,' or 'machine learning.' In addition to these main types, there are ensemble models that combine analyses from multiple different modelling methods into a single result. We will confine our discussion in this tutorial to regression and machine learning-based methods. There's no fundamental distinction between these two categroies, however the literature refers to the models under these headings and so we keep to convention here. 
+With the abundance of SDM methods to pick from, it can be difficult to know which to choose. Primarily, the modelling method we choose depends on the type of data we want to analyse and the question we want to ask. Methods for species distribution modelling fall into three broad categories: 'profile', 'regression', or 'machine learning'. In addition to these main types, there are ensemble models that combine analyses from multiple different modelling methods into a single result. We will confine our discussion in this tutorial to regression and machine learning-based methods. There's no fundamental distinction between these two categroies, however the literature refers to the models under these headings and so we keep to convention here. 
 
-In this tutorial we go into detail about some common modelling methods currently available as modules in `zoon`. For each method we will cover which data types they are compatible with, explain the underlying statistical approach, and demonstrate how to fit in `zoon`. To keep comparisons straightforward, we will fit them all to the same Carolina wren dataset. 
+In this tutorial we go into detail about some common modelling methods currently available as modules in `zoon`. For each method we will cover which data types they are compatible with, explain the underlying statistical approach, and demonstrate how to fit them in `zoon`. To keep comparisons straightforward, we fit them all to the same Carolina wren dataset. 
 
 <hr>
 
@@ -46,18 +46,15 @@ In this tutorial we go into detail about some common modelling methods currently
 
 Regression analyses estimate the statistical relationship between a dependent variable (e.g. presence of a species) and one or more independent variables (e.g. environmental covariates). The two regression-based SDMs currently available as `zoon` modules, logistic regression and generalised additive models, are covered in detail here.
 
-** move GLM discussion up here. 
-** give linear model an equation number. here. 
+Standard linear models (e.g. $y = c + mx$) assume a linear effect of covariates (*x* in equation XX). on response variable (*y* in equation XX). These models assume that the response variable varies linearly with the covariates, and relies on normally-distributed response variables. In contrast, generalised linear models (GLMs) allow the linear models to be related to the response variable via so-called 'link functions'. These link functions let us use non-normally distributed response variables by transforming them so they can be used within the standard linear model framework.
 
 ### Logistic regression
 
-Logistic regression is a type of generalised linear model (GLM). GLMs allow us to predict linear models to non-normally distributed response data via so-called 'link functions.' Both linear models (e.g. $y = c + mx$) and GLMs assume a linear effect of covariates (*x* in equation XX). on response variable (*y* in equation XX). Traditional linear models, however, assume that the response variable varies linearly with the covariates, but GLMs use a 'link function' to transform the response variable to it varies linearly. .... rely on normally-distributed response variables. In order to generalise the linear predictor to other types of response data, GLMs use so-called 'link functions.'
-
-Logistic regression, in particular, uses the 'logit' link function to estimate the probability of a binary response variable (presence represented as "1" and absence as "0") based on its relationship with predictor covariates. In the same way that we estimate the slope of a linear relationship (e.g. *m* in equation XX), logistic regression estimates one regression coefficient ($/beta$ in equation XXX below) for each covariate using maximum likelihood estimation. As in a linear model, we will also estimate an intercept term (e.g. *c* in equation XX). 
+Logistic regression is a type of generalised linear model (GLM). It uses the 'logit' link function to estimate the probability of a binary response variable (e.g. species presence/absence encoded as 1/0) based on its relationship with our predictor covariates. In the same way that we estimate the slope of a linear relationship (e.g. *m* in equation XX), logistic regression estimates one regression coefficient ($/beta$ in equation XXX below) for each covariate using maximum likelihood estimation. As in a standard linear model, we also estimate an intercept term (e.g. *c* in equation XX). 
 
 $$logit(Pr(Occurrence)) = Intercept + \beta_1Covariate_1 + \beta_2Covariate_2 + \beta_3Covariate_3\\$$
 
-The left-hand side is the link function of the response variable. The right-hand side of this equation is known as the linear predictor. 
+The left-hand side of the equation is the link function transformation of the response variable. The right-hand side of this equation is known as the linear predictor. 
 
 In `zoon`, we can fit a `LogisticRegression` model by choosing it as the model module in our `zoon` `workflow`. `LogisticRegression` uses the `glm` package.
 
