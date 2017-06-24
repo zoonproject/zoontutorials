@@ -55,20 +55,20 @@ Logistic regression is a type of generalised linear model (GLM). GLMs allow us t
 
 Logistic regression, in particular, uses the 'logit' link function to estimate the probability of a binary response variable (presence represented as "1" and absence as "0") based on its relationship with predictor covariates. In the same way that we estimate the slope of a linear relationship (e.g. *m* in equation XX), logistic regression estimates one regression coefficient ($/beta$ in equation XXX below) for each covariate using maximum likelihood estimation. As in a linear model, we will also estimate an intercept term (e.g. *c* in equation XX). 
 
-$$p_i = Pr(Occurrence)\\
-logit(p_i) = Intercept + \beta_1Covariate_1 + \beta_2Covariate_2 + \beta_3Covariate_3\\$$
+$$logit(Pr(Occurrence)) = Intercept + \beta_1Covariate_1 + \beta_2Covariate_2 + \beta_3Covariate_3\\$$
 
 The left-hand side is the link function of the response variable. The right-hand side of this equation is known as the linear predictor. 
 
 In `zoon`, we can fit a `LogisticRegression` model by choosing it as the model module in our `zoon` `workflow`. `LogisticRegression` uses the `glm` package.
 
 ```{r Logistic_Regression, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7}
-Logistic_Regression_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
-                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
-                                         covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
-                                         process = Chain(StandardiseCov, Background(1000)),
-                                         model = LogisticRegression,
-                                         output = PrintMap(points = FALSE))
+Logistic <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
+                                        extent = c(-138.71, -52.58, 18.15, 54.95)),
+                     covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
+                     process = Chain(StandardiseCov,
+                                     Background(1000)),
+                     model = LogisticRegression,
+                     output = PrintMap(points = FALSE))
 ```
 
 ### Generalised additive model
@@ -77,20 +77,21 @@ Generalised additive models (GAMs) are similar to GLMs but allow a bit more flex
 
 If we use smoothing functions without any restrictions, however, it is possible to 'overfit' our data, creating a linear predictor that is too complex. To avoid this, GAMs use 'penalised likelihood maximisation,' which penalises the model for each additional smoothing function (or 'wiggliness').
 
-$$p_i = Pr(Occurrence)\\
-logit(p_i) = Intercept + f_1(Covariate_1) + f_2(Covariate_2) + f_3(Covariate_3)\\$$
+$$logit(Pr(Occurrence)) = Intercept + f_1(Covariate_1) + f_2(Covariate_2) + f_3(Covariate_3)\\$$
 
 In `zoon`, the `mgcv` model module fits a GAM using the `mgcv` package. To fit a GAM we need to define a couple of parameters that determine how wiggly and complex we will allow the linear predictor to be. Specifically, we need to define the parameter *k*, which .... the maximum amount of flexibility degrees of freedom, and a penalised smoothing basis, *bs*. You can find more details on selecting these parameters using `?mgcv::choose.k` and `?mgcv::smooth.terms`. 
 
 Let's just start by fitting a GAM using the default settings in our `workflow`.
 
 ```{r GAM, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7}
-GAM_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
-                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
-                         covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
-                         process = Chain(StandardiseCov, Background(1000)),
-                         model = mgcv(k = -1, bs = "tp"),
-                         output = PrintMap(points = FALSE))
+GAM <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
+                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
+                process = Chain(StandardiseCov,
+                                Background(1000)),
+                model = mgcv(k = -1,
+                             bs = "tp"),
+                output = PrintMap(points = FALSE))
 ```
 
 ## Machine learning methods
@@ -110,12 +111,13 @@ During the model fitting procedure MaxEnt needs to estimate coefficient values s
 The `MaxEnt` module uses the `maxent()` function in the `dismo` package, and requires a MaxEnt executable file saved in the correct location. The `zoon` helper function `GetMaxEnt()` is available to help with this installation. Due to common difficulties in downloading MaxEnt, in this example we will use MaxNet as a subsitute. *** add sentence about MaxNet ***(refer to maxnet R package). You select this model in your `workflow` as follows:
 
 ```{r MaxNet, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7}
-MaxNet_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
-                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
-                            covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
-                            process = Chain(StandardiseCov, Background(1000)),
-                            model = MaxNet,
-                            output = PrintMap(points = FALSE))
+MaxNet <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
+                                      extent = c(-138.71, -52.58, 18.15, 54.95)),
+                   covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
+                   process = Chain(StandardiseCov,
+                                   Background(1000)),
+                   model = MaxNet,
+                   output = PrintMap(points = FALSE))
 ```
 
 ### Boosted regression trees
@@ -141,14 +143,14 @@ The `GBM` module fits a generalised boosted regression model using the `gbm` pac
 This model can be fit using the following call in your `workflow`:
 
 ```{r BRT, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7}
-BRT_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
-                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
-                         covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
-                         process = Chain(StandardiseCov, Background(1000)),
-                         model = GBM(max.trees = 1000,
-                                     interaction.depth = 5,
-                                     shrinkage = 0.001),
-                         output = PrintMap(points = FALSE))
+BRT <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
+                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
+                covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
+                process = Chain(StandardiseCov, Background(1000)),
+                model = GBM(max.trees = 1000,
+                            interaction.depth = 5,
+                            shrinkage = 0.001),
+                output = PrintMap(points = FALSE))
 ```
 
 The `XGBoost` software for fitting BRTs is increasingly used in machine learning applications to very large datasets. You can use the `MachineLearn` module to fit BRT models with XGBoost by replacing the model module above with: `MachineLearn(method = 'xgbTree')`.
@@ -160,12 +162,12 @@ Similar to the BRTs in the `GBM` module, random forests are a machine learning t
 The `RandomForest` module can be fit to presence-background or presence-absence data using the following call in your `workflow`:
 
 ```{r RandomForest, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7}
-RandomForest_workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", 
-                                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
-                                  covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
-                                  process = Chain(StandardiseCov, Background(1000)),
-                                  model = RandomForest,
-                                  output = PrintMap(points = FALSE))
+RandomForest <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
+                                            extent = c(-138.71, -52.58, 18.15, 54.95)),
+                         covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
+                         process = Chain(StandardiseCov, Background(1000)),
+                         model = RandomForest,
+                         output = PrintMap(points = FALSE))
 ```
 
 <hr>
@@ -179,11 +181,16 @@ cls <- colorRampPalette(c('#e0f3db', '#a8ddb5', '#4eb3d3', '#08589e'))(10)  # Pr
 ```
 
 ```{r Comparison, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=10, fig.width=7}
-grid.arrange(spplot(Output(Logistic_Regression_workflow), col.regions=cls, cuts = length(cls)-1, main = "Logistic Regression"),
-             spplot(Output(GAM_workflow), col.regions=cls, cuts = length(cls)-1, main = "Generalised Additive Model"),
-             spplot(Output(MaxNet_workflow), col.regions=cls, cuts = length(cls)-1, main = "MaxNet"),
-             spplot(Output(BRT_workflow), col.regions=cls, cuts = length(cls)-1, main = "Boosted Regression Tree"),
-             spplot(Output(RandomForest_workflow), col.regions=cls, cuts = length(cls)-1, main = "Random Forest"))
+grid.arrange(spplot(Output(Logistic), col.regions=cls,
+                    cuts = length(cls)-1, main = "Logistic Regression"),
+             spplot(Output(GAM), col.regions=cls,
+                    cuts = length(cls)-1, main = "Generalised Additive Model"),
+             spplot(Output(MaxNet), col.regions=cls,
+                    cuts = length(cls)-1, main = "MaxNet"),
+             spplot(Output(BRT), col.regions=cls,
+                    cuts = length(cls)-1, main = "Boosted Regression Tree"),
+             spplot(Output(RandomForest), col.regions=cls,
+                    cuts = length(cls)-1, main = "Random Forest"))
 ```
 
 At first glance there are some big differences in the predicted occurrence maps of the Carolina wren between SDM methods. The regression methods have smoother transitions in the probability of occurrence than the machine learning ones. The logistic regression, MaxNet, and boosted regression tree models predict large amounts of area with high probability of occurrence outside of the range of the observed presences, yet the generalised additive model and random forest model are mostly restrained to the range of the observed data. Some models predict occurrence probabilities only as high as 0.7, yet others predict values as high as 1.0. So what drives these differences when the models are fit to the same data?
