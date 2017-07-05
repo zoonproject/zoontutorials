@@ -35,7 +35,7 @@ knitr::opts_chunk$set(message = FALSE,
 
 Knowing where biota are in our world is important for a variety of reasons. We might want to know where an endangered species is most likely to occur so we can protect its habitat, or where a disease will break out so we can prevent it from doing so, or where a species of fish occurs so we can responsibly harvest our fisheries. We can answer all of these questions and more using species distribitions models (SDMs). 
 
-Species distribution models predict species distributions by correlating environmental covariates, such as temperature or rainfall, with observations of species occurence - presence, absence, or abundance. While these relationships are correlative, as opposed to mechanistic, they still help us identify potential ecological relationships between species and the environment. This enable us to make ecological inferences about our target species.
+Species distribution models predict species distributions by correlating environmental covariates, such as temperature or rainfall, with observations of species occurence - presence, absence, or abundance. While these relationships are correlative, as opposed to mechanistic, they still help us identify potential ecological relationships between species and the environment. This enable us to make ecological inferences.
 
 Environmental response curves, for example, illustrate how the probabilty of species occurrence varies in *environmental space*, that is, over environmental gradients. Figure 1a shows an example of a response curve for the blue whale, *Balaenoptera musculus*. This plot shows how blue whale abundance varies along a gradient of sea surface height (SSH) [@redfern17].
 
