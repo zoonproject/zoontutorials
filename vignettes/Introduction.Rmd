@@ -136,7 +136,7 @@ We can use the `Covariate()` accessor function to extract our covariates from th
 Covariate(workflow)
 ```
 
-Using what we've learned so far, let's fit a different SDM by altering our workflow. We'll build a SDM for the same species, the Carolina wren (*Thryothorus ludovicianus*), but instead of using pre-exisitng data, we'll download data from online repositories. To change the occurrence data, we need to change the `occurrence` module. Instead of `CarolinaWrenPO`, we'll download data from online repositories using `SpOcc`. To change our environmental covariates, we need to change the `covariate` module. The `Bioclim` module accesses bioclimatic environmental data.
+Using what we've learned so far, let's fit a different SDM by altering our workflow. We'll build a SDM for the same species, the Carolina wren (*Thryothorus ludovicianus*), but instead of using pre-exisitng data, we'll download data from online repositories. To change the occurrence data, we need to change the `occurrence` module. Instead of `CarolinaWrenPO`, we'll download data from online repositories using `SpOcc`. To change our environmental covariates, we need to change the `covariate` module. The `Bioclim` module accesses the Bioclim bioclimatic data.
 
 Both the `SpOcc` and `Bioclim` modules require us to specify a geographic extent - this is the boundary of the area we want to retrieve data from. We'll extract and use the extent from our previous model by saving it to an object called `ext`. This way, we can compare the two SDMs.
 
@@ -151,13 +151,13 @@ workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", extent = ext
                      output = PrintMap)
 ```
 
-This distribution map is different to our orginal. Given this new set of data, the wren is still most likely to be found in southeast USA. However, now there is a small patch of increased probabilty in the northeast. We have disagreement between two different models! An interesting turn of events.
+This distribution map is different to our orginal. Given this new set of data, the wren is still most likely to be found in southeast USA. However, now there is a small patch of increased probabilty in the northwest. We have disagreement between two different models! An interesting turn of events.
 
 Try running this workflow for another species!
 
 ### Step 3. Process
 
-Next it's time to consider any required data processing. We process our data by choosing modules for the `process` argument of `workflow()`. There's a whole suite of data processing we might want to do before fitting our model. For example, we could clean our data by removing poor data points using the `Clean` module. The process argument is also where we generate background data points for when we have a presence-only `occurrence` module. We can actually do both (or more) at once using the `Chain()` function! 
+Next it's time to consider any required data processing. We process our data by choosing modules for the `process` argument of `workflow()`. There's a whole suite of data processing we might want to do before fitting our model. For example, we could clean our data by removing poor data points using the `Clean` module. The `process` argument is also where we generate background data points for when we have a presence-only `occurrence` module. We can actually do both (or more) at once using the `Chain()` function! 
 
 ```{r process, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
 workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", extent = ext),
@@ -167,7 +167,7 @@ workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", extent = ext
                           output = PrintMap)
 ```
 
-All workflow arguments must be given a module but we don't always need to process our data. In those instances, we can use the `NoProcess` module.
+We don't always need to process our data, in those instances, we can use the `NoProcess` module.
 
 ### Step 4. Model
 
