@@ -8,3 +8,7 @@ vignettes/*.R
 vignettes/*.html
 vignettes/*_files
 vignettes/.build.timestamp
+vignettes/Bradypus.csv
+report.html
+R/knit_zoon.R
+Bradypus.csv

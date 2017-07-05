@@ -4,26 +4,27 @@ knitr::opts_chunk$set(message = FALSE,
                warning = FALSE,
                fig.align = 'center',
                dev = c('png'),
-               cache = TRUE)
+               cache = TRUE,
+               comment = NA)
 
 ## ----Library, echo=FALSE, message=FALSE, warning=FALSE-------------------
 library(zoon)
 
 ## ----Module_List, eval=TRUE----------------------------------------------
 modules <- GetModuleList()
-modules$occurrence            # subset for the sake of screen space
+modules$occurrence
 modules$covariate
 
-## ----Workflow, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE-------
-Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPA,
-                                   covariate = CarolinaWrenRasters,
-                                   process = StandardiseCov,
-                                   model = MaxEnt,
-                                   output = InteractiveOccurrenceMap)
+## ----Workflow, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7----
+Carolina_Wren <- workflow(occurrence = CarolinaWrenPO,
+                          covariate = CarolinaWrenRasters,
+                          process = Background(100),
+                          model = NullModel,
+                          output = InteractiveOccurrenceMap)
 
 ## ----HTML_Output_1, echo=FALSE, fig.align='center', fig.height=7, fig.width=7----
 # force the htmlwidget to render in the vignette
-Output(Carolina_Wren_Workflow)
+Output(Carolina_Wren)
 
 ## ----LocalOccurrence, eval=FALSE-----------------------------------------
 #  occurrence = LocalOccurrenceData(filename = "myData.csv",         # File path to your data file
@@ -39,6 +40,35 @@ Output(Carolina_Wren_Workflow)
 #                                      "myRaster2"))    # Filepath to a second raster
 #  
 #  covariate = LocalRaster(rasters = "myRasterStack")   # A RasterStack object already loaded
+
+## ----eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE------------------
+filename <- paste(system.file(package = "dismo"), '/ex/bradypus.csv', sep='') # filepath to .csv
+Bradypus <- read.csv(filename, header = TRUE) # read in .csv file
+Bradypus <- Bradypus[,2:3] # remove column of species name
+Bradypus <- cbind(Bradypus, rep(1, nrow(Bradypus))) # all records are presences, so add column of 1s
+colnames(Bradypus) <- c("longitude", "latitude", "value") # set necessary column names
+write.csv(Bradypus, "Bradypus.csv") # create a .csv file of the required format
+
+## ----eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE------------------
+files <- list.files(path = paste(system.file(package="dismo"),'/ex', sep=''),
+                    pattern='grd', full.names=TRUE ) # list all .grd files in `dismo`
+predictors <- stack(files) # create a raster-stack from these layers
+predictors <- dropLayer(x=predictors,i=9) # drop unwanted raster layer
+
+## ----eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE------------------
+Our_Data <- workflow(occurrence = LocalOccurrenceData(filename = "Bradypus.csv",
+                                                      occurrenceType = "presence",
+                                                      columns = c(long = "longitude",
+                                                                  lat = "latitude",
+                                                                  value = "value")),
+                     covariate = LocalRaster(predictors),
+                     process = Background(100),
+                     model = NullModel,
+                     output = InteractiveOccurrenceMap)
+
+## ----HTML_Output_2, echo=FALSE, fig.align='center', fig.height=7, fig.width=7----
+# force the htmlwidget to render in the vignette
+Output(Our_Data)
 
 ## ----SpOcc, eval=FALSE---------------------------------------------------
 #  occurrence = SpOcc(species = "SpeciesName",   # Species scientific name
@@ -62,22 +92,31 @@ Output(Carolina_Wren_Workflow)
 
 ## ----NCEP, eval=FALSE----------------------------------------------------
 #  covariate = NCEP(extent = c(-5, 5, 50, 60),     # Coordinates of the extent of the region
-#                   variables = "hgt",             # Character cevtor of variables of interest
+#                   variables = "hgt",             # Character vector of variables of interest
 #                   status.bar = FALSE)            # Show a status bar of download progress?
 
-## ----Ursus_arctos, eval=TRUE, message=FALSE, warning=FALSE---------------
-Ursus_arctos_online <- workflow(occurrence = SpOcc(species = "Ursus arctos",
-                                              extent = c(-175, -65, 20, 75),
-                                              databases = "gbif",
-                                              type = "presence"),
-                                covariate = Bioclim(extent = c(-175, -65, 20, 75),
-                                               resolution = 10,
-                                               layers = 1:19),
-                                process = Chain(StandardiseCov, Background(1000)),
-                                model = MaxEnt,
-                                output = InteractiveOccurrenceMap)
+## ----Online, eval=TRUE, message=FALSE, warning=FALSE---------------------
+Online <- workflow(occurrence = SpOcc(species = "Ursus arctos",
+                                      extent = c(-175, -65, 20, 75),
+                                      databases = "gbif",
+                                      type = "presence"),
+                   covariate = Bioclim(extent = c(-175, -65, 20, 75),
+                                       resolution = 10,
+                                       layers = 1:19),
+                   process = Background(1000),
+                   model = NullModel,
+                   output = InteractiveOccurrenceMap)
 
-## ----HTML_Output_2, echo=FALSE, fig.align='center', fig.height=7, fig.width=7----
+## ----HTML_Output_3, echo=FALSE, fig.align='center', fig.height=7, fig.width=7----
 # force the htmlwidget to render in the vignette
-Output(Ursus_arctos_online)
+Output(Online)
+
+## ----Combination_A, eval=TRUE, message=FALSE, warning=FALSE--------------
+CombinationA <- workflow(occurrence = list(CarolinaWrenPO,
+                                           SpOcc("Thryothorus ludovicianus",
+                                                 extent = c(-138.71, -52.58, 18.15, 54.95))),
+                         covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
+                         process = Background(100),
+                         model = LogisticRegression,
+                         output = PrintMap)
 
