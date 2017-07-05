@@ -171,9 +171,9 @@ We don't always need to process our data, in those instances, we can use the `No
 
 ### Step 4. Model
 
-The fourth argument of `workflow()` is `model`, and is where we choose our modelling method. There are many modelling methods to choose from and each have their merits [@elith06]. To help you choose which model module is right for your data, we've written a ["Choosing A Model" guide](Choosing_A_Model.html). # link needs changing
+The fourth argument of `workflow()` is `model`; this is where we choose our modelling method. There are many modelling methods to choose from and each have their merits [@elith06]. To help you choose which model module is right for your data, we've written a ['Choosing A Model' guide](Choosing_A_Model.html).
 
-For now, let's work with a common modelling method - logistic regression via the `LogisticRegression` module. We'll keep our data and process modules the same:
+For now, let's work with the common modelling method logistic regression using the module `LogisticRegression`. We'll keep our data and process modules the same:
 
 ```{r model, eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
 workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", extent = ext),
@@ -207,7 +207,7 @@ workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", extent = ext
 Output(workflow)
 ```
 
-The `InteractiveMap` module produces a map of occurrence probability we can interact with. The map has a scale from purple (low probability) to yellow (high probability). By zooming in and around, we can see more closely how our model predictions align with the data. We can click on our data to get information about it and we can select which data (presence, background, or both) we want to overlay. Have a go!
+The `InteractiveMap` module produces a map of occurrence probability we can interact with. The map has a scale from purple (low probability) to yellow (high probability). By zooming in and around, we can see more closely how our model predictions align with the data. We can also click on our data to get information about it and we can select which data (presence, background, or both) we want to overlay. Have a go!
 
 Now we've seen how Carolina wren occurrence varies over geographic space, let's look more closely at what is driving that variation. How does probability of occurrence vary along the environmental gradients we've included in our model? For this, we can use the `ResponsePlot` module to make graphs of the predicted relationships between probabilty of occurrence and our environmental covariates.
 
@@ -247,7 +247,7 @@ and reload it with `load()`:
 load('workflow.RData')
 ```
 
-Because the workflow object contains our whole analysis, we can also share it with collaborators: after they install `zoon` and load the workflow object, they can access and modify the analysis too.
+Because the workflow object contains our whole analysis, we can also share it with collaborators. After they install `zoon` and load the workflow object, they can access and modify the analysis too.
 
 <hr>
 
