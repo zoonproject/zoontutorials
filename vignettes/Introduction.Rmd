@@ -54,7 +54,7 @@ Correlative species distribution models estimate a species' realised niche. They
 
 A species distribution is typically considered the result of three factors: the abiotic environment, the biotic environment, and the species' dispersal ability [@soberon05]. The intersection of the abiotic and biotic environment constitutes the *fundamental niche*. This is where the species could *potentially* occur given what we know of its biology and ecology. However, most species do not occur everywhere they potentially could. Where a species *actually* occurs is termed the *realised niche*. For example, a realised niche could be constrained by the climate required for individuals to survive, the local vegetation types it depends on, and its abillity to traverse different landscapes. Species interactions are also considered to constrain the fundamental niche to the realised niche. For example, two closely related species may have mutally exclusive geophraphic distributions despite having similar physiological tolerances, habitat preferences, and dispersal ability.
 
-We have illustrated the SDM fitting process in a flowchart below (Figure 2). We correlated presence data for the Carolina wren in the United States with a suite of environmental covariates, such as the cover of different forest types. We've mapped species presence records onto geographic space (Figure 2a; black dots) and a random selection of background points (brown dots), which we used as pseudo-absences in our model. In Figure 2b, we've plotted these same data in environmental space against two covariates: percentage of deciduous and mixed forests. By correlating presence-background data with environmental covariates, we've predicted the Carolina wren's probability of occurrence in environmental space (Figure 2c). In the final plot (Figure 2d), we've mapped these probabilities back onto geographic space. The Carolina wren is most likely to occur in southeast USA (purple) and least likely to occur in the northwest (yellow). By modelling species distributions, we can begin to understand where a species is likely to occur and why.
+We have illustrated the SDM fitting process in a flowchart below (Figure 2). We correlated presence data for the Carolina wren in the United States with a suite of environmental covariates, such as the cover of different forest types. We've mapped species presence records onto geographic space (Figure 2a; black dots) and a random selection of background points (brown dots), which we used as pseudo-absences in our model. We've also plotted these same data in environmental space against two covariates (Figure 2b): percentage of deciduous and mixed forests. By correlating presence-background data with environmental covariates, we've predicted the Carolina wren's probability of occurrence in environmental space (Figure 2c). In the final plot (Figure 2d), we've mapped these probabilities back onto geographic space. The Carolina wren is most likely to occur in southeast USA (purple) and least likely to occur in the northwest (yellow). By modelling species distributions, we can begin to understand where species are likely to occur and why.
 
 ```{r Figure_4, echo = FALSE, out.width= '650px', fig.align = "center", fig.cap="*Figure 2. Species distribution modelling process. Presence-background points in geographic (a) and environmental space (b; P = presence, B = background), and predicted probability of occurrence in environmental (c) and geographic space (d; colour scale represents probability of occurrence).*"}
 knitr::include_graphics("../vignettes/Images/Figure_2_SDMtheory.png")
@@ -64,7 +64,7 @@ knitr::include_graphics("../vignettes/Images/Figure_2_SDMtheory.png")
 
 ## How can I fit an SDM?
 
-This introductory guide will demonstrate how to use the `zoon` R package to fit species distribution models. `zoon` is designed to make fitting SDMs simple and reproducible. `zoon` keeps things simple by splitting the SDM process into five easy steps:
+This introductory guide will demonstrate how to use the `zoon` R package to fit species distribution models. `zoon` is designed to make fitting SDMs simple and reproducible. `zoon` keeps things simple by splitting the SDM fitting process into five easy steps:
 
 1.  Occurence: Gather species occurrence data.
 2.  Covariates: Gather environmental covariates.
@@ -90,7 +90,7 @@ workflow <- workflow(occurrence = CarolinaWrenPO,
                      output = PrintMap)
 ```
 
-In this workflow, we've chosen one module for each of argument in `workflow()`. Using `zoon`, we've:
+In this workflow, we've chosen one module for each argument in `workflow()`. Using `zoon`, we've:
 
 1. Obtained presence-only records for the Carolina wren,
 2. Loaded the CarolinaWren rasters as environmental covariates,
@@ -98,9 +98,9 @@ In this workflow, we've chosen one module for each of argument in `workflow()`. 
 4. Fit a MaxNet model and,
 5. Generated a map as our output.
 
-The printed map illustrates the Carolina wren's distributions as predicted by our SDM. 
+The printed map illustrates the Carolina wren's distribution as predicted by our SDM. 
 
-We'll work with this workflow throughout this introductory guide. In order to tackle SDMs one step at a time, we'll update this workflow's arguments one-by-one.
+We'll work with this workflow throughout this introductory guide. In order to tackle SDMs one step at a time, we'll update the arguments one-by-one.
 
 <hr>
 
@@ -114,7 +114,7 @@ The `occurrence` argument is where we load our species occurrence data. The most
 
 +  Presence-background data are the same as presence-only data but they have an associated set of randomly generated 'background' points, also called 'pseudo-absences.'
 
-+  Presence-absence data generally come from structured field surveys, by novices and experts alike, where the presence *or* absence of the target species is recorded for a given location and survey method.
++  Presence-absence data generally come from structured field surveys, by novices and experts alike, where the presence *or* absence of species is recorded for a given location and survey method.
 
 There are three methods for loading data into our workflow. We can use existing `occurrence` modules in `zoon` like `SugarMaple`, we can download data from an online repository using `SpOcc`, or we can load our own data from a local computer using `LocalOccurrenceData`. Presence-only data are widely and freely accessible online and as a result are the most commonly used.
 
