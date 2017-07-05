@@ -72,4 +72,3 @@ Dual_Model_Workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
 
 ## ----eval = FALSE--------------------------------------------------------
 #  load('Dual_Model_Workflow.RData')
-
