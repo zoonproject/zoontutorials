@@ -1,54 +1,83 @@
 ---
-title: "Model Validation"
+title: "Model Evaluation"
 output:
   html_document:
     css: zoon.css
+    theme: lumen
     toc: yes
     toc_float:
-      collapsed: false
+      collapsed: no
       toc_depth: 4
-    theme: lumen
-vignette: >
+  pdf_document:
+    toc: yes
+vignette: |
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Model Validation}
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r knitr_options, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+# set up knitr options
+knitr::opts_chunk$set(message = FALSE,
+               warning = FALSE,
+               fig.align = 'center',
+               dev = c('png'),
+               cache = TRUE)
+```
+
 <hr>
 
-## Is my model any good?
+## Why
 
-Not all species distribution models are created equal. The ease of fitting species distribution models means that sometimes we use them willy-nilly without questioning the results, how accurate they are, and whether the mdoel is 'fit for purpose'. We need first to know if your model is a reaonsable representtion of reality. What is reasonable is still being debated and there's no hard line in the sand, so far.
+Species distribution models are used for all sorts of important decisions: choosing protected areas, prioritising conservation actions, informing development applications, even determining the conservation status of species. As such, we need to know how much faith we can put in our models. We need to know if they are up to the task we set for them? We do that by evaluating our models performance.
 
-Bearing in mind that all models are just that: models. They won't perfectly represent truth but they may still be useful. It's important to consider if our model is good *enough* for it's purpose, rather than if it is *good* in absolute terms. This means we're not validatin ght emoel as representative of truth, per se, by vaidating it as *fit for purpose*. Model evaluation is the process of checking our model outputs to determine if they are a close enough representation of reality for the purpose you're using it for.
+## What
+Model evaluation is the process of determining if our model is close enough to reality for our purpose. Models are smaller, simpler, hopefully useful versions of reality. Whether our imperfect model is useful is dependent on what we're going to use it for. For example, if we wish to predict the geographic expansion of a species under a changing climate, we need to know if our model dcan extrapolate in geographic space. But, if we wish only to accuratley map the current distribution of a species, we don't mind much at all if our model can extrapolate accurately. It is thus important to consider not how good our model is in absolute terms, but  rather if our model is *good enough* for it's purpose. Model evaluation, then, is the process of checking our model outputs to determine if they are a close enough representation of reality for the purpose you're using it for.
 
-In this best practice guide, we will talk about the different ways of evaluating a model (or set of models), when we might choose one methods over an another, and lastly, how to implememnt these model evaluation methods in `zoon`. We'll use one example throughout to demonstrate the concepts and how to use `zoon` for simple and reporducible model evaluation
+## Fit-for-purpose
+The purpose of our model will decide for us both how we evaluate our model and whether the goodness of fit, or lack thereof, determined by our evaluation is tolerable. Determinig if our model is 'good enough' is not a simple task and generally has to be justified on a case by case basis. Are we building a model to identify gradients species respond to and contribute to ecological knowledge? Or maybe we are running models on behalf of a governmental agency and thus require accurate models? We'll address some of these nuances throughout this guide. However, there is one facet of model fit worht discussing straight up - over-fitting.
 
-Need to choose between models
+Models are considered over-fitted when they go beyond identifying a pattern in data and instead fit a relationship to the noise in the data - to the stochastic variation. In species distribution models, sometimes we want to avoid over-fitting and sometimes we don't mind. Generally, if we only want to know about here and now as precisely as possible, over-fitting our models is of littel concern. For example, if there is a location where a species is found but that location is an outlier as far as the species is concerned, we still want to protect it. Thus, a model which estimates that location as a presence if useful. If we use a model that determines that site is an outlier, and therefore has a low probability of presence, we will miss it in our conservation prioritisations. Over-fitted models are difficult to identify and the jury is still out on precisley what makes a model over-fitted. 
 
-## What is model evaluation?
+Model evaluation then, even over-fitted models, is an exercise in justifying that our model is fit for the purpose for which we made it. It is not an exercise in validating that our models perfectly reflect reality. For example, a model that only explains 15% of the variance in the data but identifies an important environmental gradient is still a useful model for the purpose of generating ecological knowledge. It is probably not a model we should use to inform development applications but it is still a useful model.
 
-There's many different ways to do model evalation and which way we choose will depend on the data we have available, 
+### Calibration versus discrimination
 
+### We cannot validate a model by comparing it to another model
 
-What method of model evaluation you choose depends on what you ant to use th emodel for. If you ony want to accuratley map the here and now, you won't neccessaruly mind about over-fitting. Howveer, if you need to predict to a new time or place, or you want to identify generalisable patterns, you need your model to fin dthe pattern among the noise - that is, you need the model not to be overfit, but still be a good descriptoin of the truth.
+## How
 
-If you're using your model to predict to a new time or place, you'll need to assess if your model can do that.
+In this `zoon` guide, we will discuss the different methods of evaluating a model (or set of models), when we might choose one method of evaluation over another, and how to use `zoon` to implement these different evaluation methods. In this guide, we split model evaluation methods and metrics into three broad categories increasing in thoroughness: bare minimum, internal evaluation, and cross-validation.
 
-If you're only trying to get an accurate picture of here and now, you need to know whether your model has fit your data accuratley.
-
-If you only want to make ecological inference - to find general patterns in ecology - you'll still be concerned
-
+However, no matter which category of evaluation method and metric we choose, there are a few over-arhcing princples to keep in mind. Firstly, we want our results to *make sense* ecologically and reflect our raw data. Secondly, we would like the most parsimoneous model. Some old white man said 'the simplest answer is usualy the right answer'. Thus, if given the choice between two equally performing models, we would choose the least complicated model, the model with the fewest environmental covariates. Lastly, we want our model to be able to predict the data we fitted it with; we want it to be accurate and not biased. In this guide, we'll discuss the various model evaluation methods and metrics in line with these guiding principles.
 
 ### The bare minimum
 
-Let's first run through what we at zoon believe is the bare minimum. Some of what follows we'll do just as part of interpretting our results, but it's good to be cogniscent that we're looking to question the model and it's accuracy, rather than accepting the printed map or response curve as gospel truth.
+Let's first run through the Bare Minimum. The Bare Minimum is what we absolutely must do in order to be able to defend our choice of model. Remember a model consists of the response data, the environmental covariates, and the modelling method we choose. Some of the bare mimimum is just part and parcel of interpretting the results, but while we're interpretting our results, it's good to remember that we need to question the model not accept the printed map or response curve as gospel truth.
+
+The bare minimum can be split into two categories: checking the model results against our data and checking the model against our knowledge of the ecology we're modelling.
 
 Check maps match data (interactive map)
+
+```{r Library, message=FALSE, warning=FALSE}
+library(zoon)
+```
+
+```{r Workflow, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
+zoon_workflow <- workflow(occurrence = CarolinaWrenPA,
+                          covariate = CarolinaWrenRasters,
+                          process = NoProcess,
+                          model = LogisticRegression,
+                          output = InteractiveMap)
+```
+
 
 One can go a little bit further in evaluating model fit by plotting species repsonse curves where available (response curves)
 
 For parametric models, check coefficients make sense (go the same way as data, giev back sensible results) (coefficient plot)
+
+
+
 
 ### Internal evalution
 
@@ -66,7 +95,7 @@ Information criteria build on deviance measures by penalising models for additio
 
 ### Cross-validation
 
-Model cross-validation is the gold standard of model evalution in species distritbuion models. In the absence of a independently dataset, that is.
+Model cross-validation is the gold standard of model evalution in species distritbuion models. In the absence of a independent dataset, that is.
 
 There's many way to do cross-validation and again it depends on what aspect of model performance we want to check.
 
@@ -88,11 +117,7 @@ Can your model predict extremes? Can it extrpolate.
 
 #### Selectivity
 
-## How do I know if my model is over-fitted?
-
-...
-
-## Conclusion
+## Call to action, snappy sub-title
 
 
 
