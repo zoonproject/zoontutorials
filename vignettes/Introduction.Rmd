@@ -31,7 +31,7 @@ knitr::opts_chunk$set(message = FALSE,
 
 <hr>
 
-## Why?   # I appreciate the desire for a shorter heading, but this should be longer. Why what?
+## Why model species distributions?
 
 Knowing where biota are in our world is important for a variety of reasons. We might want to know where an endangered species is most likely to occur so we can protect its habitat, or where a disease will break out so we can prevent it from doing so, or where a species of fish occurs so we can responsibly harvest our fisheries. We can answer all of these questions and more using species distribitions models (SDMs). 
 
@@ -49,7 +49,7 @@ knitr::include_graphics("../vignettes/Images/Figure_1_litSDM.png")
 
 <hr>
 
-## What?   # Same thing, should be longer
+## What are SDMs?
 Correlative species distribution models estimate a species' realised niche. They estimate the probabilty of species occurrence along environmental gradients by correlating occurrence data with environmental covariates. Let's revisit the ecological theory underlying species distributions.
 
 A species distribution is typically considered the result of three factors: the abiotic environment, the biotic environment, and the species' dispersal ability [@soberon05]. The intersection of the abiotic and biotic environment constitutes the *fundamental niche*. This is where the species could *potentially* occur given what we know of its biology and ecology. However, most species do not occur everywhere they potentially could. Where a species *actually* occurs is termed the *realised niche*. For example, a realised niche could be constrained by the climate required for individuals to survive, the local vegetation types it depends on, and its abillity to traverse different landscapes. Species interactions are also considered to constrain the fundamental niche to the realised niche. For example, two closely related species may have mutally exclusive geophraphic distributions despite having similar physiological tolerances, habitat preferences, and dispersal ability.
@@ -62,7 +62,7 @@ knitr::include_graphics("../vignettes/Images/Figure_2_SDMtheory.png")
 
 <hr>
 
-## How?
+## How can I fit an SDM?
 
 This introductory guide will demonstrate how to use the `zoon` R package to fit species distribution models. `zoon` is designed to make fitting SDMs simple and reproducible. `zoon` keeps things simple by splitting the SDM process into five easy steps:
 
