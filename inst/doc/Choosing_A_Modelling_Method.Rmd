@@ -1,16 +1,16 @@
 ---
 title: "Choosing A Modelling Method"
+csl: Methods.csl
 output:
   html_document:
     css: zoon.css
+    theme: lumen
     toc: yes
     toc_float:
-      collapsed: false
+      collapsed: no
       toc_depth: 4
-    theme: lumen
 bibliography: bibliography.bib
-csl: Methods.csl    
-vignette: >
+vignette: |
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Choosing A Modelling Method}
   %\VignetteEncoding{UTF-8}
