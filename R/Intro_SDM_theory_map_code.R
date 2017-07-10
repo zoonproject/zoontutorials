@@ -61,7 +61,7 @@
 # image(p_mat,
 #       xlab = 'pcMix',
 #       ylab = 'pcDec',
-#       col = rev(viridis::viridis(1000)),
+#       col = viridis::viridis(1000),
 #       asp = 1,
 #       pty = 's')
 #
@@ -123,7 +123,6 @@
 #   ylab('Deciduous')
 #
 # grid.arrange(pb_map, pb_env, ncol=2)
-#
 # dev.off()
 #
 # png('vignettes/Images/SDM_theory_pred.png',
@@ -136,7 +135,7 @@
 #
 # # probability of occurrence predictions in environmental space
 # pred_env <- ggplot(mp, aes(Var1, Var2, fill = value)) + geom_raster() +
-#   scale_fill_viridis(direction = -1) +
+#   scale_fill_viridis(direction = 1) +
 #   zoon_theme +
 #   theme(axis.title.y = element_text(hjust = 0.1)) +
 #   xlab('Mixed Forest') +
@@ -146,7 +145,7 @@
 # pred_map <- ggplot(out.df) +
 #   geom_raster(aes(x, y, fill = pcMix)) +
 #   zoon_theme +
-#   scale_fill_viridis(direction = -1) +
+#   scale_fill_viridis(direction = 1) +
 #   theme(axis.title.y = element_text(hjust = 0.1)) +
 #   xlim(-126, -66) +
 #   ylim(22, 52) +
@@ -185,7 +184,7 @@
 # pred_legend <- ggplot(out.df) +
 #   geom_raster(aes(x, y, fill = pcMix)) +
 #   zoon_theme_legend +
-#   scale_fill_viridis(name = "", direction = -1) +
+#   scale_fill_viridis(name = "", direction = 1) +
 #   theme(axis.title.y = element_text(hjust = 0.9)) +
 #   xlim(-126, -66) +
 #   ylim(22, 52) +
@@ -193,6 +192,6 @@
 #   ylab('Latitude')
 # pred_legend
 # dev.off()
-
+#
 
 
