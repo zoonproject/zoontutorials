@@ -9,7 +9,7 @@ knitr::opts_chunk$set(message = FALSE,
 ## ----echo = F, out.width= '650px', fig.align = "center", fig.cap="*Figure 1. Species distribution modelling aims: ecological inference (a; figure from @redfern17, photo from @cetus), predicting current species distributions (b; figure from @pigott14), or future distributions (c; figure from @elith10, photo from @fraser-smith).*"----
 knitr::include_graphics("../vignettes/Images/Figure_1_litSDM.png")
 
-## ----Figure_4, echo = FALSE, out.width= '650px', fig.align = "center", fig.cap="*Figure 2. Species distribution modelling process. Presence-background points in geographic (a) and environmental space (b; P = presence, B = background), and predicted probability of occurrence in environmental (c) and geographic space (d; colour scale represents probability of occurrence).*"----
+## ----Figure_4, echo = FALSE, out.width= '550px', fig.align = "center", fig.cap="*Figure 2. Species distribution modelling process. Presence-background points in geographic (a) and environmental space (b; P = presence, B = background), and predicted probability of occurrence in environmental (c) and geographic space (d; colour scale represents probability of occurrence).*"----
 knitr::include_graphics("../vignettes/Images/Figure_2_SDMtheory.png")
 
 ## ----Library, message=FALSE, warning=FALSE-------------------------------
