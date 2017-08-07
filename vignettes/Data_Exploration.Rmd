@@ -27,38 +27,38 @@ knitr::opts_chunk$set(message = FALSE,
 
 # Introduction
 
-Species Distribution Models (SDMs) are built upon species occurrence records collected from field surveys or collated observation records. Rarely, however, do we build an SDM on this raw data without undertaking some sort of data processing. These processes can include cleaning up of raw data, standardising covariates, transforming data, and creating interactions between measured variables. Much of these decisions will be determined by the assumption underlying our model of choice. With that in mind, there are some general guidelines we can suggest below. Within `zoon`, these visualisations are achieved with `output` modules, and data processing is achieved using `process` modules in the `workflow()`.
+When we undertake a Species Distribution Model (SDM) we use both species occurrence data, records collected from field surveys or collated observations, as well as environmental predictor data. Before beginning to use covariate data to model occurrence over space, a crucial first step is to familiarise ourselves with the data and its limitations. It is important to do this before modelling the data, as data exploration can result in consequences for the choice of model applied as well as the accurracy of the inference taken from the model.  
 
-```{r Library, message = F, warning = F}
+There are some generally agreed upon guidelines for this data exploration and processing, but it is also highly subjective and open to interpretation. This guide suggests the following steps (Figure 1). 
+
+
+
+In this guide we present resources in both base R as well as using `zoon` `output` and `process` modules within the `workflow()`. We will start by setting up a basic `zoon` `workflow()` with the Carolina wren presence-only data and raster covariate datasets for illustration.  We will set `process = Background(1000)`, `model = NullModel`, and `output = PrintMap` - this map simply shows us our raw occurrence points (in red) and our background points (in black), no model has been applied. 
+
+```{r packages, message = FALSE, warning = FALSE}
 library(zoon)
-library(lattice)
 ```
 
-In order to explore our data, we first need to equip ourselves with the tools to do so. In `zoon`, we need to first have a basic workflow set up in order to examine our components in greater detail. We will implement a basic `zoon` `workflow()` with `process = Background(1000)`, `model = NullModel`, and `output = PrintMap`, to begin this exploration. Our data exploration may guide selection of other, potentially more appropriate, module options later down the line. In this vignette we will use the Carolina wren dataset for illustration. 
-
-```{r Workflow, model, warning = FALSE, message=FALSE}
+```{r workflow, message = FALSE, warning = FALSE}
 Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
                                    covariate = CarolinaWrenRasters,
                                    process = Background(1000),
                                    model = NullModel,
-                                   output = InteractiveOccurrenceMap)
+                                   output = PrintMap)
 ```
 
-```{r HTML_Output_1, echo=FALSE, fig.align='center', fig.height=7, fig.width=7}
-# force the htmlwidget to render in the vignette
-Output(Carolina_Wren_Workflow)
-```
+It is helpful to have a basic workflow loaded before we begin so that we can take advantage of zoon's accessor functions. We can call accessor function `Process` to generate a data frame object with extracted raster covariate values for each respective occurrence point. We can examine the first six rows of this data frame by using the base R function `head()`. This data frame strucutre will be very useful for our ongoing exploration of the data.
 
-With our basic workflow loaded, we can begin to examine our occurrence and covariate data in more detail by calling the accessor function `Process`, which will display the combined occurrence data with extracted values of the raster covariates. 
-
-```{r}
+``` {r}
 occ.cov.df <- Process(Carolina_Wren_Workflow)$df
 head(occ.cov.df)
 ```
 
+<hr>
+
 # Data exploration 
 
-When we first begin to examine our data, we will want to check for a few key properties, so that our coding and modelling work as expected. First, we want to check that our data contains the data we expect and that each variable is stored in the right format. Categorical variables should be stored as factors, however they may be listed, for example, in a numerical index (e.g. vegetation categories identified as 1-10 instead of 'VegClass1', 'VegClass2', etc) and therefore interpreted as numerical data. Similarly, if there are any typos in numerical data entries that introduce characters (e.g. '2 cm' instead of '2'), then a continuous variable will be classed as a factor. 
+First, we want to check that our data contains the data we expect and that each variable is stored in the right format. Categorical variables should be stored as factors, however they may be listed, for example, in a numerical index (e.g. vegetation categories identified as 1-10 instead of 'VegClass1', 'VegClass2', etc) and therefore interpreted as numerical data. Similarly, if there are any typos in numerical data entries that introduce characters (e.g. '2 cm' instead of '2'), then a continuous variable will be classed as a factor. 
 
 We can check both the data included as well as their format with the `str()` function, or check individual variables with `class()`. 
 
@@ -71,7 +71,7 @@ class(occ.cov.df$pcMix)
 
 Species distribution datasets are, to varying degrees, reliant on manually-compiled data from observations. Even in situations where we are fitting a model to entirely remotely-sensed data such as bioclimatic variables, our species occurrence records are usually pen-and-paper recordings from the field. This manual data entry can lead to mistakes.
 
-Inaccurate data can lead us to draw false conclusions, and for conservation work this could mean squandering our limited resources for a species in locations where the species is not likely to occur. `zoon`'s accessor functions in conjunction with base R `summary()` functions are a good way for us to check the raw data. For example, maybe the maximum value in your elevation variable is 1000 m, but you know that the highest peak in your study region is only 500 m. During the data entry process someone may have added an extra 0 to a 100 m measurement by mistake. Maybe your vegetation classification is showing as having ten levels despite it being an eight-category scale. Chances are a spelling mistake as benign as 'forest' instead of 'Forest' is the culprit. 
+Inaccurate data can lead us to draw false conclusions, and for conservation work this could mean squandering our limited resources for a species in locations where the species is not likely to occur. For example, maybe the maximum value in your elevation variable is 1000 m, but you know that the highest peak in your study region is only 500 m. During the data entry process someone may have added an extra 0 to a 100 m measurement by mistake. Maybe your vegetation classification is showing as having ten levels despite it being an eight-category scale. Chances are a spelling mistake as benign as 'forest' instead of 'Forest' is the culprit. 
 
 ```{r}
 summary(occ.cov.df$pcGr)
@@ -79,7 +79,7 @@ max(occ.cov.df$pcGr)
 min(occ.cov.df$pcGr)
 ```
 
-If can also help to visualise the spread of your variables, to more easily idetify unusual or unreasonable values. One way you can do this is with the `Outliers` module. 
+It can also help to visualise the spread of your variables, to more easily identify unusual or unreasonable values. One way you can do this is with the `Outliers` module. 
 
 ```{r Outlier module}
 
@@ -92,11 +92,12 @@ If you've identified errors in your occurrence data, one of the `zoon` modules, 
 process = Clean(which = c(1,2,3))
 ```
 
-# Missing values 
+## Missing values 
 
 +  NA values are to be expected in our raster data (unless they are oblong in shape) as they are commonly masked to cover only a particular region (e.g. the border of a country or a national park) but are stored as a matrix and thus padded with NA values in cells of no interest, but we would not expect NA values in our training data. Finding NA values in the training data could indicate that some data points have incorrect latitude/longitude values and are being mapped to locations outide the extent of our study, or that the data point sits on the border of the study region and "misses" the raster due to its resolution (i.e. a diagonal line is instead a series of alternating horizontal and vertical lines) and should be adjusted slightly.
 
 many of the models will require that you run the model on the same data. and will require you to remove NA values beforehand. You can only compare models that are built on the same set of data. This is because the out-of-sample variance will be higher in the model that is calculated with more data and therefore its AIC will be higher. 
+
 
 
 ## Collinearity
@@ -109,7 +110,7 @@ pairplot.
 
 +  Our training data does not adequately represent the full range of our covariate data in the study region. For example, we have an elevation covariate ranging from 0-100 m, but our samples are all from the 0-50 m range. This means that our predictions will have to extrapolate outside the sample range, and we then have to assume that the estimated relationship between species occurrence and the covariate holds under these conditions.
 
-# data distribution
+## data distribution
 histograms? 
 
 ## Data Report
@@ -128,6 +129,9 @@ A startin gstep in your analysis might be to explore how the
 
 ## Zero inflation
 
+<hr>
+
+# Data transformation
 
 ## Standardising Variables
 
@@ -144,7 +148,7 @@ process = StandardiseCov(Gelman = TRUE,
                          exclude = c("VarB", "VarC"))
 ```
 
-<hr>
+
 
 ## Data Transformation
 
