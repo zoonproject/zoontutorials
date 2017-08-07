@@ -168,23 +168,28 @@ A starting step in your analysis might be to explore how the univariate relation
 
 # Interactions
 
-Typical inference assumes that unique predictor variables have an independent effect on our response variable (species occurrence). This makes sense in many cases, where we are trying to 
+Typical inference assumes that unique predictor variables have an independent effect on our response variable (species occurrence). This makes sense in many cases, when we are reasonably confortable with the biological justification. For example, it is reasonable, and backed by experimental evidence, to suppose that mosquito populations are more common in humid regions. This would be an independent effect of environmental humidity on mosquito occurrence. However, we need to consider the conditionality of this assumption. Occurrence data are conditional upon how they enter our dataset (is data collection biased by region where we expect mosquitos to occur?) It is possible that the relationship between mosquito occurrence and humidity is *conditional* on another environmental variable. In this example, perhaps temperature moderates this relationship. 
 
-The `addInteraction` module in `zoon` lets us define the interactions between variables in the model. There are multiple ways to implement this module: adding all pairwise interactions, defining set interactions between a select group of variables, and specifying polynomial terms.
+One way to check for interaction effects is to produce a coplot. **Add coplot module**
 
+Once we have decided to add an interaction effect into our model, we can select from three possible ways to implement it in our model: add all pairwise interactions, define set interactions between a select group of variables, and specify polynomial terms.
+
+## Pairwise interactions
 A pairwise interaction is the interaction between two variables in a model such that:
 
 $Y = b_0 + b_1*X_1 + b_2*X_2 + b_3(X_1*X_2)$
 
 where b3 is the interaction term between the variables X1 and X2. 
 
-To implement all possible pairwise interactions in the model we write up the module like this:
+To implement all possible pairwise interactions in the model we write up the module with the `addInteraction` process module like this:
 
 ```{r Interaction_AllPairs, eval=FALSE}
 process = addInteraction(which.covs = 'pairs')
 ```
 
-Rather than a blanket application of interaction terms across our model, we might decide that it is more ecologically reasonable to define interactions only between a select group of variables. For example, we might not expect to see an interaction between average rainfall and distance to roads, but to see one between elevation and percentage forest cover. There are multiple ways to achieve this so lets go through them one at a time:
+
+## Define set interactions
+Rather than a blanket application of interaction terms across our model, we might decide that it is more ecologically reasonable to define interactions only between a select group of variables. There are multiple ways to achieve this so lets go through them one at a time:
 
 +  To define the pairwise interaction between any two variables as a character vector:
 
@@ -204,6 +209,7 @@ process = addInteraction(which.covs = list(c("A","B"), c("A","C")))   # adds int
 process = addInteraction(which.covs = c(A,B,C))   # adds all two-way (e.g. A & B) interactions and a three-way interaction between A, B & C
 ```
 
+## Interactions as polynomial terms
 the addInteraction method can also be used as an alternative to coding in polynomial terms. 
 
 ```{r eval=FALSE}
