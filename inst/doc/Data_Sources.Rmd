@@ -34,9 +34,9 @@ library(zoon)
 
 ## Introduction
 
-Normally, the first step in species distribution modelling is sourcing species observation records (presence-only, presence-absence, or abundance) and environmental data (such as bioclimatic variables or vegetation maps) in the form of rasters. In some instances we might be using data we recorded ourselves, other times we might want to use data from public repositories, or even a combination of the two. There are multiple sources of data available, and you can access many of them with `zoon` through R. 
+Typically, the first step in species distribution modelling is sourcing species observation records (presence-only, presence-absence, or abundance) and environmental data (such as bioclimatic variables or vegetation maps in the form of rasters) that we will use for our model. In some instances we might be using data we recorded ourselves, other times we might want to use data from public repositories, or even a combination of the two. This tutorial will guide you through the process of accessing some of these data sources within a `zoon` `workflow()`.
 
-Using the `GetModuleList()` command we can see all of the `Occurrence` modules under the `$occurrence` sub-heading. We can also view the `Covariate` modules under the `$covariate` sub-heading. This tutorial will guide you through accessing some of these data sources within a `zoon` `workflow()`. 
+Using the `GetModuleList()` command we can see all of the `Occurrence` modules under the `$occurrence` sub-heading. We can also view the `Covariate` modules under the `$covariate` sub-heading.
 
 ```{r Module_List, eval=TRUE}
 modules <- GetModuleList()
@@ -46,11 +46,11 @@ modules$covariate
 
 <hr>
 
-## Example data
+## `zoon` datasets
 
 `zoon` comes with several example dataset modules that we can use. These pre-loaded datasets are useful examples for experimenting with `zoon` modules, or as test datasets when building new modules of your own. For example, `SugarMaple` provides presence/absence data of sugar maple in North America, `CWBZimbabwe` provides presence/absence data for the coffee white stem border in Zimbabwe, and `NATrees` provides occurrence records for 21 eastern North American trees.
 
-For example, we could choose to fit a model to the Carolina wren data using the `CarolinaWrenPO` or `CarolinaWrenPA` occurrence modules (presence-only and presence-absence, respectively) with the `CarolinaWrenRasters` covariate module. 
+To gain familiarity with `zoon`, we could, for example, choose to fit a model to the Carolina wren data using the `CarolinaWrenPO` or `CarolinaWrenPA` occurrence modules (presence-only and presence-absence, respectively) with the `CarolinaWrenRasters` covariate module. 
 
 ```{r Workflow, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7}
 Carolina_Wren <- workflow(occurrence = CarolinaWrenPO,
@@ -69,9 +69,9 @@ Output(Carolina_Wren)
 
 ## Our own data
 
-SDMs are commonly fit to datasets we have collected ourselves, and `zoon` has modules to help us load them. The two modules of interest here are `LocalOccurrenceData` for our observation records and `LocalRaster` for our raster-based data.
+SDMs are commonly fit to datasets we have collected ourselves, and `zoon` has modules to help us load that data. The two modules of interest here are `LocalOccurrenceData` for our observation records and `LocalRaster` for our raster-based data. To ensure that all datasets loaded into a `zoon` `workflow()` are compatible with `model` modules, there are specific requirements for the structure and formate of each of these data types, which we will go through below. 
 
-To ensure that all datasets loaded in to a `zoon` `workflow` are compatible with the `model` modules, the `LocalOccurrenceData` module requires our data to be either .csv/.xlsx/.tab or .tsv files with a strict structure. The first and second columns are the `longitude` and `latitude` values (in that order), and the third column is the `value` of the observation (0 for absence, 1 for presence, and an integer for abundance data). If your coordinate system is not latitude/longitude then you can supply an optional fourth column called `CRS` that contains the PROJ.4 code for your coordinate system (e.g. `+init=epsg:27700` for easting/northing data for the UK). If no `CRS` column is supplied then latitude/longitude is assumed. 
+The `LocalOccurrenceData` module requires our data to be saved either as .csv, .xlsx, .tab, or .tsv files and be structured in a very specific format. The first and second columns are the `longitude` and `latitude` values (in that order), and the third column is the `value` of the observation (0 for absence, 1 for presence, or an integer for abundance data). If your coordinate system is not latitude/longitude then you can supply an optional fourth column called `CRS` that contains the PROJ.4 code for your coordinate system (e.g. `+init=epsg:27700` for easting/northing data for the UK). If no `CRS` column is supplied then latitude/longitude is assumed. 
 
 To use the `LocalOccurrenceData` module you call `occurrence` in your `workflow` like this:
 
@@ -79,7 +79,7 @@ To use the `LocalOccurrenceData` module you call `occurrence` in your `workflow`
 occurrence = LocalOccurrenceData(filename = "myData.csv",         # File path to your data file
                                  occurrenceType = "presence",     # The type of data you have
                                  columns = c(long = "longitude",  # The names of the columns in 
-                                             lat = "latitude",    #     your .csv that much the 
+                                             lat = "latitude",    #     your .csv that match the 
                                              value = "value"),    #     required columns
                                  externalValidation =  FALSE)     # Only required if validation
                                                                   #     data is set up externally
@@ -96,24 +96,25 @@ covariate = LocalRaster(rasters = c("myRaster1",     # Filepath to a raster
 covariate = LocalRaster(rasters = "myRasterStack")   # A RasterStack object already loaded
 ```
 
-To serve as an example of loading our own data, here we make use of the brown-throated sloth, *Bradypus variegatus*, data files provided in the `dismo` `R` package. The species occurrence records are not in the required format, so we need to do some pre-processing that would otherwise not be required.
+To serve as an example of loading our own data, here we make use of data on the brown-throated sloth, *Bradypus variegatus*, provided in the `dismo` `R` package. The code below will access this dataset and then do the necessary pre-processing to get it into the correct format. 
 
 ```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
-filename <- paste(system.file(package = "dismo"), '/ex/bradypus.csv', sep='') # filepath to .csv
-Bradypus <- read.csv(filename, header = TRUE) # read in .csv file
-Bradypus <- Bradypus[,2:3] # remove column of species name
-Bradypus <- cbind(Bradypus, rep(1, nrow(Bradypus))) # all records are presences, so add column of 1s
+filename <- paste(system.file(package = "dismo"),         
+                  '/ex/bradypus.csv', sep='')             # filepath to .csv
+Bradypus <- read.csv(filename, header = TRUE)             # read in .csv file
+Bradypus <- Bradypus[,2:3]                                # remove columns of species name
+Bradypus <- cbind(Bradypus, rep(1, nrow(Bradypus)))       # all records are presences, so add column of 1s
 colnames(Bradypus) <- c("longitude", "latitude", "value") # set necessary column names
-write.csv(Bradypus, "Bradypus.csv") # create a .csv file of the required format
+write.csv(Bradypus, "Bradypus.csv")                       # create a .csv file of the required format
 ```
 
-The raster data available through `dismo` is in the correct format, but needs to be loaded into our environment for use.
+The raster data available through `dismo` is in the correct format, but still needs to be loaded into our environment for use.
 
 ```{r eval=TRUE, echo=TRUE, warning=FALSE, message=FALSE}
-files <- list.files(path = paste(system.file(package="dismo"),'/ex', sep=''),
-                    pattern='grd', full.names=TRUE ) # list all .grd files in `dismo`
-predictors <- stack(files) # create a raster-stack from these layers
-predictors <- dropLayer(x=predictors,i=9) # drop unwanted raster layer
+files <- list.files(path = paste(system.file(package = "dismo"), '/ex', sep=''), 
+                    pattern = 'grd', full.names = TRUE )            # list all .grd files in `dismo`
+predictors <- stack(files)                                          # create a raster-stack
+predictors <- dropLayer(x = predictors, i = 9)                      # drop unwanted raster layer
 ```
 
 Now that we have our data in the required format (a .csv file and a raster-stack object) we can fit a model using the `LocalOccurrenceData` and `LocalRaster` modules.
@@ -130,6 +131,7 @@ Our_Data <- workflow(occurrence = LocalOccurrenceData(filename = "Bradypus.csv",
                      output = InteractiveOccurrenceMap)
 ```
 
+Our output, an interactive occurrence map for the brown-throated sloth, is shown here:
 ```{r HTML_Output_2, echo=FALSE, fig.align='center', fig.height=7, fig.width=7}
 # force the htmlwidget to render in the vignette
 Output(Our_Data)
@@ -139,9 +141,10 @@ Output(Our_Data)
 
 ## Online repositories
 
-Sometimes we may want to source our `occurrence` and/or `covariate` data from online sources. Some modules of interest for this aim are `SpOcc`, `Bioclim`, `Bioclim-future`, and `NCEP`.
+Sometimes we want to source our `occurrence` and/or `covariate` data from online sources. Some modules that are useful for sourcing online data include `SpOcc`, `Bioclim`, `Bioclim-future`, and `NCEP`.
 
-The `SpOcc` module is used to obtain species occurrence records from a selection of online databases, including: GBIF, BISON, iNat, eBird, Ecoengine, and AntWeb. These databases provide free access to species observation records taken my institutions all over the world. This means there is a wealth of data available to ecologists to tackle questions on species distributions without having to undertake costly field work themselves, or to supplement their own observations. The Global Biodiversity Information Facility, or GBIF, is the largest of these repositories (the others restricted by geographical region or taxon). We can call this module like this:
+### Species occurrence records with `SpOcc`
+The `SpOcc` module is used to obtain species occurrence records from a selection of online databases, including: GBIF, BISON, iNat, eBird, Ecoengine, and AntWeb. These databases provide free access to species observation records taken by institutions all over the world. This means there is a wealth of data available to ecologists to tackle questions on species distributions without having to undertake costly field work themselves, or to supplement their own observations. The Global Biodiversity Information Facility, or GBIF, is the largest of these repositories (the others restricted by geographical region or taxon). We can call this module like this:
 
 ```{r SpOcc, eval=FALSE}
 occurrence = SpOcc(species = "SpeciesName",   # Species scientific name
@@ -151,6 +154,7 @@ occurrence = SpOcc(species = "SpeciesName",   # Species scientific name
                    limit = 10000)             # A maximum limit of records to obtain
 ```
 
+### Online environmental covariate data
 The `Bioclim` module obtains bioclimatic variables from WorldClim. There are 19 bioclimatic variables available that are derived from monthly measurements of temperature and precipitation values to provide more biologically meaningful variables. These variables represent annual trends, seasonality, and limiting factors. This data is available at various resolutions (2.5, 5, or 10 minutes). We can call this module like this:
 
 ```{r Bioclim, eval=FALSE}
@@ -159,7 +163,7 @@ covariate = Bioclim(extent = c(-180, 180, -90, 90), # Coordinates for the extent
                     layers = 1:5)                   # Variables we want (between 1-19)
 ```
 
-We can also obtain these bioclimatic variables for predictions of future climate using the `Bioclim_future` module. Predicting species distributions under future climate conditions is useful for assessing the effects of climate change on a species for the purposes of conservation. There are multiple models used for predicting climate conditions in the future, and different magnitudes of change, so we must put some thought into the scenario into which we wish to predict. We can find more information about different scenarios used to predict future climates [here](https://en.wikipedia.org/wiki/Representative_Concentration_Pathways) and [here](https://en.wikipedia.org/wiki/General_circulation_model). We can call this `module` like this:
+We can also obtain these bioclimatic variables for predictions of future climate using the `Bioclim_future` module. Predicting species distributions under future climate conditions is useful for assessing the effects of climate change on a species for the purposes of conservation. There are multiple models used for predicting climate conditions in the future, and different magnitudes of change, so we must put some thought into the scenario we wish to predict. We can find more information about different scenarios used to predict future climates [here](https://en.wikipedia.org/wiki/Representative_Concentration_Pathways) and [here](https://en.wikipedia.org/wiki/General_circulation_model). Once we have done our research about how type of pathway and model we will use to predict, we can call the `Bioclim_future` `module` like this:
 
 ```{r Bioclim_future, eval=FALSE}
 covariate = Bioclim_future(extent = c(-10, 10, 45, 65),  # Coordinates of the extent of the region
@@ -200,9 +204,9 @@ Output(Online)
 
 <hr>
 
-## Example
+## Data source bias
 
-Now that we've seen how to use datasets from different sources, lets construct a workflow using a combination of sources. For the sake of comparison, lets use `CarolinaWrenPO` and `SpOcc` to obtain presence-only data for the Carolina wren and use `Bioclim` for our rasters.
+Now that we've seen how to use datasets from different sources, lets construct a workflow using a combination of sources with two sets of occurrence data for comparison. Let's use `CarolinaWrenPO` and `SpOcc` to obtain presence-only data for the Carolina wren and `Bioclim` for our environmental rasters.
 
 ```{r Combination_A, eval=TRUE, message=FALSE, warning=FALSE}
 CombinationA <- workflow(occurrence = list(CarolinaWrenPO,
@@ -214,13 +218,15 @@ CombinationA <- workflow(occurrence = list(CarolinaWrenPO,
                          output = PrintMap)
 ```
 
-Both of the above plots were generated identically except for their source of occurrence records. Despite this there are significant differences in the predicted distribution of the Carolina wren based on the dataset chosen. This highlights a very important point to be considered during an analysis: biases in data sources. Different data sources are going to have different amounts (and quality) of data-points, and their own inherent sampling biases. Do they contain scientific surveys only? Goverment agency surveys? All occurrence records?
+Both of the above plots were generated using the same process and model mdoules; they only differ in the source of their occurrence records. It is obvious that there are significant differences in the predicted distribution of the Carolina wren depending on the dataset chosen. This highlights a very important point to be considered during an analysis: bias in data source. Different data sources are going to have different amounts (and quality) of data-points, and their own inherent sampling biases. Do they contain scientific surveys only? Goverment agency surveys? All occurrence records?
 
 If we pretend that the dataset from `CarolinaWrenPO` was our own survey data from a study restricted to the contiguous USA, while the `SpOcc` dataset (via the GBIF repository) includes all occurrence records aross North America (thus including Canada and Mexico), then we have a spatial sampling bias to consider. The latter dataset potentially includes occurrence records outside of the environmental range of the former, which could impact the estimation of the species' response to the environmental variables.
 
-Potential sources of bias to consider include the sampled range of environmental variables, spatial sampling bias related to site accessibility (e.g. museum records commonly occur near roads), and reliability of the data source. Source A might have twice the number of occurrence records of Source B, possibly over a larger spatial and/or environmental range, but Source B may be more reliable as includes records only from trained surveyors to eliminate possibilities of species mis-identification. These are all things to consider when obtaining data for your SDM analysis.
+Other potential sources of bias to consider include the sampled range of environmental variables, spatial sampling bias related to site accessibility (e.g. museum records commonly occur near roads), and reliability of the data source. Source A might have twice the number of occurrence records as Source B, possibly over a larger spatial and/or environmental range, but Source B may be more reliable as it includes records only from trained surveyors to eliminate possibilities of species mis-identification. 
 
-As a final example, lets explore the ability to use the `SpOcc` module to obtain presence records for species other than our focus species and use them as background data in our model. This can be used to implement a 'targetted background group` approach for generating our background data for overcoming observation bias. Here we use presence records of the sedge wren, *Cistothorus platensis*, and the winter wren, *Troglodytes hiemalis*, as background data for our Carolina wren analysis. You can see that our background data points are now from geographically similar regions as our presence records rather than randomly distributed throughout the environment.
+## Targetted background group
+
+As a final example, lets explore the ability to use the `SpOcc` module to obtain presence records for species other than our focus species and use them as background data in our model. This can be used to implement a 'targetted background group' approach for generating our background data for overcoming observation bias. Here we use presence records of the sedge wren, *Cistothorus platensis*, and the winter wren, *Troglodytes hiemalis*, as background data for our Carolina wren analysis. You can see that our background data points are now from geographically similar regions as our presence records rather than randomly distributed throughout the environment.
 
 ```{r TargettedBackground, eval=TRUE, message=FALSE, warning=FALSE, out.width=350, fig.show = "hold"}
 TargettedBG <- workflow(occurrence = Chain(SpOcc("Thryothorus ludovicianus",

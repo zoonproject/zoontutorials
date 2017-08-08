@@ -78,6 +78,12 @@ For parametric models, check coefficients make sense (go the same way as data, g
 
 
 
+# Independence
+(to whomever is working on this, just pasted this here as a placeholder - happy to ocnsider moving it elsewhere)
+
+An underlying assumption of most presence-background regression models is that the occurrence data are conditionally independent given the covariates, meaning the covariates are expected to explain all the spatial variation in our data. Typically, however, this is not the case. Spatial dependence, for example through clustering or social aggregation of species, may take place, invalidating this assumption of independence. There are a handful of modelling approaches to identifying spatial dependence structures, including Gipps or Cox process models, that will be discussed elsewhere (?).
+
+
 
 ### Internal evalution
 
