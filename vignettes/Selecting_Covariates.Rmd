@@ -1,5 +1,5 @@
 ---
-title: "Data exploration and processing"
+title: "Selecting Covariates"
 output:
   html_document:
     css: zoon.css
@@ -10,7 +10,7 @@ output:
     theme: lumen
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Data exploration and processing}
+  %\VignetteIndexEntry{Selecting Covariates}
   %\VignetteEncoding{UTF-8}
 ---
 
