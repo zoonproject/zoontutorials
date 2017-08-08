@@ -10,7 +10,7 @@ output:
     theme: lumen
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteIndexEntry{Exploring Your Data}
+  %\VignetteIndexEntry{Data}
   %\VignetteEncoding{UTF-8}
 ---
 
@@ -29,9 +29,9 @@ knitr::opts_chunk$set(message = FALSE,
 
 When we undertake a Species Distribution Model (SDM) we use both species occurrence data collected from field surveys or collated observations as well as environmental predictor data. Before beginning to use covariate data to model occurrence over space, a crucial first step is to familiarise ourselves with the data and its limitations. It is important to do this before modelling the data, as data exploration can result in consequences for the choice of model applied as well as the accurracy of the inference taken from the model. Equally, choice of model a priori may bring a unique set of assumptions that we need to check for in our data. 
 
-There are some generally agreed upon guidelines for this data exploration and processing, but it is also highly subjective and open to interpretation. This guide outlines a few suggested steps implemented in both base R as well as using `zoon` `output` and `process` modules (Figure 1).
+After exploring our data, we may want to implement various data processing steps into our `zoon` `workflow`. There are some generally agreed upon guidelines for this data exploration and processing, but it is also highly subjective and open to interpretation. This guide outlines a few suggested steps implemented in both base R as well as using `zoon` `output` and `process` modules for both the data exploration and processing steps (Figure 1).
 
-```{r echo = F, out.width= '650px', fig.align = "center", fig.cap="*Figure 1. Conceptual flowchart for data exploration steps.*"}
+```{r echo = F, out.width= '400px', fig.align = "center", fig.cap="*Figure 1. Conceptual flowchart for data exploration steps.*"}
 knitr::include_graphics("../vignettes/Images/DataExp_ConceptualDiagram.png")
 ```
 
