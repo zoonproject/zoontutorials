@@ -6,7 +6,7 @@ knitr::opts_chunk$set(message = FALSE,
                dev = c('png'),
                cache = TRUE)
 
-## ----echo = F, out.width= '650px', fig.align = "center", fig.cap="*Figure 1. Conceptual flowchart for data exploration steps.*"----
+## ----echo = F, out.width= '400px', fig.align = "center", fig.cap="*Figure 1. Conceptual flowchart for data exploration steps.*"----
 knitr::include_graphics("../vignettes/Images/DataExp_ConceptualDiagram.png")
 
 ## ----packages, message = FALSE, warning = FALSE--------------------------
@@ -26,6 +26,13 @@ head(occ.cov.df)
 ## ------------------------------------------------------------------------
 str(occ.cov.df)
 class(occ.cov.df$pcMix)
+
+## ----relationships workflow, message = FALSE, warning = FALSE------------
+#Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
+#                                   covariate = CarolinaWrenRasters,
+#                                   process = Background(1000),
+#                                   model = NullModel,
+#                                   output = Relationships)
 
 ## ----Clean, eval=FALSE---------------------------------------------------
 #  process = Clean(which = c(1,2,3))

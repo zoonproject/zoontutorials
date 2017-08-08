@@ -226,16 +226,15 @@ div.tocify {
 
 
 <hr>
-<div id="why" class="section level2">
-<h2>Why</h2>
-<p>Species distribution models are used for all sorts of important decisions: choosing protected areas, prioritising conservation actions, informing development applications, even determining the conservation status of species. As such, we need to know how much faith we can put in our models. We need to know if they are up to the task we set for them? We do that by evaluating our models performance.</p>
-</div>
-<div id="what" class="section level2">
-<h2>What</h2>
-<p>Model evaluation is the process of determining if our model is close enough to reality for our purpose. Models are smaller, simpler, hopefully useful versions of reality. Whether our imperfect model is useful is dependent on what we’re going to use it for. For example, if we wish to predict the geographic expansion of a species under a changing climate, we need to know if our model dcan extrapolate in geographic space. But, if we wish only to accuratley map the current distribution of a species, we don’t mind much at all if our model can extrapolate accurately. It is thus important to consider not how good our model is in absolute terms, but rather if our model is <em>good enough</em> for its purpose. Model evaluation, then, is the process of checking our model outputs to determine if they are a close enough representation of reality for the purpose you’re using it for.</p>
-</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Species distribution models are used for all sorts of important decisions: choosing protected areas, prioritising conservation actions, informing development applications, even determining the conservation status of species. As such, we need to know how much faith we can put in our models. We need to know if they are up to the task we set for them. We do that by evaluating our model’s performance.</p>
+<p>Model evaluation is the process of determining if our model is close enough to reality for our purpose. Models are smaller, simpler, hopefully useful versions of reality, but all models are wrong. Whether our imperfect model is useful is dependent on what we’re going to use it for. For example, if we wish to predict the geographic expansion of a species under a changing climate, we need to know if our model can extrapolate across geographic space. But, if we wish only to accurately map the current distribution of a species, we don’t mind much at all if our model can extrapolate accurately. It is thus important to consider not how good our model is in absolute terms, but rather if our model is <em>good enough</em> for its purpose. Model evaluation, then, is the process of checking our model outputs to determine if they are a close enough representation of reality for the purpose you’re using it for.</p>
 <div id="fit-for-purpose" class="section level2">
 <h2>Fit-for-purpose</h2>
+<ul>
+<li>tradeoff of fit and predictive capacity</li>
+</ul>
 <p>The purpose of our model will decide for us both how we evaluate our model and whether the goodness of fit, or lack thereof, determined by our evaluation is tolerable. Determinig if our model is ‘good enough’ is not a simple task and generally has to be justified on a case by case basis. Are we building a model to identify gradients species respond to and contribute to ecological knowledge? Or maybe we are running models on behalf of a governmental agency and thus require accurate models? We’ll address some of these nuances throughout this guide. However, there is one facet of model fit worht discussing straight up - over-fitting.</p>
 <p>Models are considered over-fitted when they go beyond identifying a pattern in data and instead fit a relationship to the noise in the data - to the stochastic variation. In species distribution models, sometimes we want to avoid over-fitting and sometimes we don’t mind. Generally, if we only want to know about here and now as precisely as possible, over-fitting our models is of littel concern. For example, if there is a location where a species is found but that location is an outlier as far as the species is concerned, we still want to protect it. Thus, a model which estimates that location as a presence if useful. If we use a model that determines that site is an outlier, and therefore has a low probability of presence, we will miss it in our conservation prioritisations. Over-fitted models are difficult to identify and the jury is still out on precisley what makes a model over-fitted.</p>
 <p>Model evaluation then, even over-fitted models, is an exercise in justifying that our model is fit for the purpose for which we made it. It is not an exercise in validating that our models perfectly reflect reality. For example, a model that only explains 15% of the variance in the data but identifies an important environmental gradient is still a useful model for the purpose of generating ecological knowledge. It is probably not a model we should use to inform development applications but it is still a useful model.</p>
@@ -265,6 +264,7 @@ div.tocify {
 <p>For parametric models, check coefficients make sense (go the same way as data, giev back sensible results) (coefficient plot)</p>
 </div>
 </div>
+</div>
 <div id="independence" class="section level1">
 <h1>Independence</h1>
 <p>An underlying assumption of most presence-background regression models is that the occurrence data are conditionally independent given the covariates, meaning the covariates are expected to explain all the spatial variation in our data. Typically, however, this is not the case. Spatial dependence, for example through clustering or social aggregation of species, may take place, invalidating this assumption of independence. There are a handful of modelling approaches to identifying spatial dependence structures, including Gibbs or Cox process models, that will be discussed elsewhere.</p>
@@ -278,7 +278,7 @@ div.tocify {
 </div>
 <div id="information-criteria" class="section level4">
 <h4>Information criteria</h4>
-<p>Information criteria build on deviance measures by penalising models for additional covariates. That is, they select for accurate and <em>parimsoneous</em>models.</p>
+<p>Information criteria build on deviance measures by penalising models for additional covariates. That is, they select for accurate and <em>parimsoneous</em> models.</p>
 </div>
 </div>
 <div id="cross-validation" class="section level3">
