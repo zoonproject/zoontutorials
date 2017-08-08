@@ -32,7 +32,7 @@ knitr::opts_chunk$set(message = FALSE,
 Species distribution models are used for all sorts of important decisions: choosing protected areas, prioritising conservation actions, informing development applications, even determining the conservation status of species. As such, we need to know how much faith we can put in our models. We need to know if they are up to the task we set for them? We do that by evaluating our models performance.
 
 ## What
-Model evaluation is the process of determining if our model is close enough to reality for our purpose. Models are smaller, simpler, hopefully useful versions of reality. Whether our imperfect model is useful is dependent on what we're going to use it for. For example, if we wish to predict the geographic expansion of a species under a changing climate, we need to know if our model dcan extrapolate in geographic space. But, if we wish only to accuratley map the current distribution of a species, we don't mind much at all if our model can extrapolate accurately. It is thus important to consider not how good our model is in absolute terms, but  rather if our model is *good enough* for it's purpose. Model evaluation, then, is the process of checking our model outputs to determine if they are a close enough representation of reality for the purpose you're using it for.
+Model evaluation is the process of determining if our model is close enough to reality for our purpose. Models are smaller, simpler, hopefully useful versions of reality. Whether our imperfect model is useful is dependent on what we're going to use it for. For example, if we wish to predict the geographic expansion of a species under a changing climate, we need to know if our model dcan extrapolate in geographic space. But, if we wish only to accuratley map the current distribution of a species, we don't mind much at all if our model can extrapolate accurately. It is thus important to consider not how good our model is in absolute terms, but  rather if our model is *good enough* for its purpose. Model evaluation, then, is the process of checking our model outputs to determine if they are a close enough representation of reality for the purpose you're using it for.
 
 ## Fit-for-purpose
 The purpose of our model will decide for us both how we evaluate our model and whether the goodness of fit, or lack thereof, determined by our evaluation is tolerable. Determinig if our model is 'good enough' is not a simple task and generally has to be justified on a case by case basis. Are we building a model to identify gradients species respond to and contribute to ecological knowledge? Or maybe we are running models on behalf of a governmental agency and thus require accurate models? We'll address some of these nuances throughout this guide. However, there is one facet of model fit worht discussing straight up - over-fitting.
@@ -79,9 +79,8 @@ For parametric models, check coefficients make sense (go the same way as data, g
 
 
 # Independence
-(to whomever is working on this, just pasted this here as a placeholder - happy to ocnsider moving it elsewhere)
 
-An underlying assumption of most presence-background regression models is that the occurrence data are conditionally independent given the covariates, meaning the covariates are expected to explain all the spatial variation in our data. Typically, however, this is not the case. Spatial dependence, for example through clustering or social aggregation of species, may take place, invalidating this assumption of independence. There are a handful of modelling approaches to identifying spatial dependence structures, including Gipps or Cox process models, that will be discussed elsewhere (?).
+An underlying assumption of most presence-background regression models is that the occurrence data are conditionally independent given the covariates, meaning the covariates are expected to explain all the spatial variation in our data. Typically, however, this is not the case. Spatial dependence, for example through clustering or social aggregation of species, may take place, invalidating this assumption of independence. There are a handful of modelling approaches to identifying spatial dependence structures, including Gibbs or Cox process models, that will be discussed elsewhere.
 
 
 
@@ -111,7 +110,7 @@ Cross-validation works as follows - you iteratively split the data into a test a
 
 #### Bootstrap
 
-#### Exrapolation in space
+#### Extrapolation in space
 
 Want to do if need to predict range shift or to a new location. Olden (ref) refer to this as the transferability of the model in space. And you do it by 
 

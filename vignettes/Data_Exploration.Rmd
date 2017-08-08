@@ -49,6 +49,8 @@ Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
                                    output = PrintMap)
 ```
 
+<hr>
+
 # Data exploration
 
 It is helpful to have a basic workflow loaded before we begin so that we can take advantage of zoon's accessor functions. We can call accessor function `Process` to generate a data frame object with extracted raster covariate values for each respective occurrence point. We can examine the first six rows of this data frame by using the base R function `head()`. 
@@ -105,11 +107,11 @@ Categorical data distribution
 
 # Standardising variables
 
-A common transformation, so common in fact that it is standard practice for most analyses nowadays and not really thought of in the same vein as transformation anymore, is the standarisation of variables. While it can improve the efficiency of model fitting algorithms, the main benefit of this transformation allows us to directly compare the influence of different variables on species distributions by placing them on the same scale. For example, the regression coefficient for the distance of a site to roads might be +3.0 when measured in kilometres, but +0.003 if measured in meters, and the effect of average temperature in Celsius could be -10. How would we compare the effect of these variables?
+Standardising variables is done to place variables on the same scale. It is achieved by subtracting the mean for a covariate from each individual value so all covariates are centred on zero, or additionally by dividing by the standard deviation, which makes the standard deviation of each covariate equal as well. One major reason to standardise covarites is to aid interpretation of our model results. Regression parameters of covariates on the same scale allowing us to compare the influence of different variables on species distributions. Without standardisation, the regression coefficient for the distance of a site to roads might be +0.003 if measured in meters and the effect of average temperature in Celsius could be -10. How would we compare these coefficients? 
 
-We do this with the `StandardiseCov` module in `zoon` to standardise covariates in the model. By default, the module standardises all variables by subtracting their mean and dividing by their standard deviation, also known as a 'z-score'. This standardisation places variables on the same scale, allowing us to compare the relative effects of different covariates within a model. To use this module we need to choose which variables to exclude from standardisation (if any), and whether to use the Gelman variant (standardises by two standard deviations instead of one - **(link to this here)**). 
+In addition, standardisation of covariates can aid in model fitting. If regression coefficients will be too different between two covariates in a model, then the software will struggle to converge on parameter estimates for both terms. 
 
-Some examples of how to use the module are below. The first is the default fit of the module that performs normal standardisation on all variables. The second calculates the Gelamn variant of standardisation on all variables except "VarB" and "VarC".
+We can standardise covariates in `zoon` with the `StandardiseCov` process module. By default, the module standardises all variables by subtracting their mean and dividing by their standard deviation, also known as a 'z-score'. To use this module we need to choose which variables to exclude from standardisation (if any), and whether to use the Gelman variant (standardises by two standard deviations instead of one). Some examples of how to use the module are below:
 
 ```{r StandardiseCov, eval=FALSE}
 process = StandardiseCov() # default form
@@ -122,16 +124,21 @@ process = StandardiseCov(Gelman = TRUE,
 
 # Data transformation
 
-(check model assumptions -- for cetain model types, or where biolgoically relevant.)
+Transformation of covariate data is a way to re-express dependent variables in a non-linear way. Generally, these decisions are subjective, and depend on the assumptions of your chosen model as well as the natural biological underpinnings of your parameters. A few key reasons to transform data:
 
-Data transformation is achieved in `zoon` using the `Transform` module. To use this module we need to define the transformation, nominate the variable to be transformed, and whether to replace the original variable or create a new one. We define the transformation in a similar manner to defining a function in base R. This takes the format of setting the `trans` argument in this module to the format of `function(x) {our transformation}`. We select the variables we want to apply this transformation to by supplying a character vector to the `which_cov` argument, and choose to replace the original variable or not by setting the `replace` argument to `TRUE` or `FALSE`.
++ Biological justification: Many biological parameters are more naturally understood on a particular scale, for example, many plant biometric variables are typically log-transformed because the data are naturally skewed, with only a few very large values. Variables such as elevation, temperature, and rainfall are good candidates for polynomial transformation, as the probability of occurrence would decrease outside of a certain variable range. 
 
-Sometimes the relationship between our response variable and predictor variable is not adequately represented using a standard linear relationship. For example, the probability of species occurrence might increase with elevation, but beyond a certain point it starts to decrease again. Polynomial terms are used to capture these relationships.
++ Skewed/systematically varying residuals: Transformation does not just change the distribution of the raw data, it also implies a relationship of the residuals. If there is a pattern among the residuals ('heterscedasticity') then transformation can be used to remove that pattern (ensuring 'homoscedasticity'). 
 
-Now, it may not be intuitive to think of polynomial terms as interactions, but the structure of defining interactions in the manner of the `addInteraction` module also suits defining polynomial terms. Rather than using characters vectors of multiple variables like defining interactions, we define a character vector of repeated instances of the same variable name of a length equal to the order of polynomial term we want to define. For example:
++ To linearise a relationship/simplify a model: If the relationship between a covariate and the response variable is non-linear, then you will need to add extra terms to the model, making it much more complicated. Transformation to linearlise this relationship thus simplifies the model. 
 
-While polynomial terms let us represent non-linear relationships between the response and predictor variables, we have to be careful in our application of them. Polynomial terms add extra parameters in the model to be estimated, and we need to be careful that we don't overload the model with additional terms unless we have enough data to be confident in estimating that many terms **(rule of thumb being 1 parameter for every 10 observations, or every 10 presences? I've heard different from different sources)**. To this end we should only apply polynomial terms to predictor variables where it is ecologically defensible. Variables like elevation, temperature, and rainfall where we could expect there to be a "sweet spot" for species occurrence, such that probability of occurrence would decrease outside of a certain variable range, would be suitable candidates for polynomial terms. Variables where we might expect a linear response for species occurrence include distance-based ones such as distance to roads, disturbances, or food/water resources. Categorical variables are another one where we would not use polynomial terms.
+Great care must be taken when adding transformations to our data, and there are several good reasons not to do so, or to take caution in doing so: 
 
++ Can complicate a model: Polynomial terms in particular add complexity to a model, and should only be attempted when you have enough data to reliably estimate those additional parameters. 
+
++ Masking outliers: Without a biological justification for doing so, transforming data simply to hide the impact of outlying values hides valuable insight in our data.
+
+Data transformation is achieved in `zoon` using the `Transform` process module. To use this module we need to define the transformation, nominate the variable to be transformed, and decide whether to replace the original variable or create a new one. We define the transformation in a similar manner to defining a function in base R. This takes the format of setting the `trans` argument in this module to the format of `function(x) {our transformation}`. We select the variables to transform by supplying a character vector to the `which_cov` argument, and determine variables to replace by setting the `replace` argument to `TRUE` or `FALSE`.
 
 Let's run through a couple of examples. If we want to square a variable called VarA and save it as an additional variable in our dataset (i.e. do not replace original variable) we would use this:
 
@@ -162,7 +169,9 @@ process = Chain(Transform(trans = function(x) {x^2},
 <hr>
 
 # Relationships
-A starting step in your analysis might be to explore how the univariate relationships
+A starting step in your analysis might be to explore the univariate relationships between occurrence and single environmental parameters. This initial exploration is useful to identify any obvious patterns in the data, and can also be helpful to identify outliers in the covariates. 
+
+*is this relevant for binary data?*
 
 <hr>
 
@@ -187,8 +196,7 @@ To implement all possible pairwise interactions in the model we write up the mod
 process = addInteraction(which.covs = 'pairs')
 ```
 
-
-## Define set interactions
+## Set interactions
 Rather than a blanket application of interaction terms across our model, we might decide that it is more ecologically reasonable to define interactions only between a select group of variables. There are multiple ways to achieve this so lets go through them one at a time:
 
 +  To define the pairwise interaction between any two variables as a character vector:
