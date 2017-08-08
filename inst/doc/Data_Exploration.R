@@ -27,13 +27,27 @@ head(occ.cov.df)
 str(occ.cov.df)
 class(occ.cov.df$pcMix)
 
+## ----Clean, eval=FALSE---------------------------------------------------
+#  process = Clean(which = c(1,2,3))
+
 ## ------------------------------------------------------------------------
 summary(occ.cov.df$pcGr)
 max(occ.cov.df$pcGr)
 min(occ.cov.df$pcGr)
 
-## ----Clean, eval=FALSE---------------------------------------------------
-#  process = Clean(which = c(1,2,3))
+## ----outliers workflow, message = FALSE, warning = FALSE-----------------
+#Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
+#                                   covariate = CarolinaWrenRasters,
+#                                   process = Background(1000),
+#                                   model = NullModel,
+#                                   output = Outliers)
+
+## ----pairplot workflow, message = FALSE, warning = FALSE-----------------
+Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
+                                   covariate = CarolinaWrenRasters,
+                                   process = Background(1000),
+                                   model = NullModel,
+                                   output = PairPlot)
 
 ## ----StandardiseCov, eval=FALSE------------------------------------------
 #  process = StandardiseCov() # default form
