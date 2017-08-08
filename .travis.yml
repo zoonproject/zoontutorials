@@ -1,5 +1,6 @@
 language: r
 dist: trusty
+cache: packages
 sudo: required
 
 addons:
@@ -21,6 +22,10 @@ r_packages:
  - zoon
  - gridExtra
  - lattice
+
+script:
+ - travis_wait 100 R CMD build
+ - travis_wait 100 R CMD check "${PKG_FILE_NAME}" --as-cran
 
 ## After success update the code coverage and deploy the pkgdown to gh-pages
 after_success:
