@@ -25,7 +25,7 @@ knitr::opts_chunk$set(message = FALSE,
 
 <hr>
 
-# Introduction
+## Introduction
 
 When we undertake a Species Distribution Model (SDM) we use both species occurrence data collected from field surveys or collated observations as well as environmental predictor data. Before beginning to use covariate data to model occurrence over space, a crucial first step is to familiarise ourselves with the data and its limitations. It is important to do this before modelling the data, as data exploration can result in consequences for the choice of model applied as well as the accurracy of the inference taken from the model. Equally, choice of model a priori may bring a unique set of assumptions that we need to check for in our data. 
 
@@ -51,7 +51,7 @@ Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
 
 <hr>
 
-# Data exploration
+## Data exploration
 
 It is helpful to have a basic workflow loaded before we begin so that we can take advantage of zoon's accessor functions. We can call the accessor function `Process()` to generate a data frame object with extracted raster covariate values for each occurrence point. We can examine the first six rows of this data frame by using the base R function `head()`. 
 
@@ -69,7 +69,7 @@ class(occ.cov.df$pcMix)
 
 <hr>
 
-# Outliers/data cleaning
+## Outliers/data cleaning
 
 Species distribution datasets are, to varying degrees, reliant on manually-compiled data from observations. Even in situations where we are fitting a model to entirely remotely-sensed data such as bioclimatic variables, our species occurrence records are usually pen-and-paper recordings from the field. This manual data entry can lead to mistakes. Inaccurate data can lead us to draw false conclusions, and for conservation work this could mean squandering our limited resources for a species in locations where the species is not likely to occur. One way to check for nonsense entries is to the plot occurrence data to covariate one by one, allowing you to isolate unusual entries. For example, if you plotted against latitude, you might see a single occurrence value at a latitude outside the range of your study. 
 
@@ -115,7 +115,7 @@ Or we can visualise continuous covariate data using boxplots. This can be achiev
 
 <hr>
 
-# Collinearity
+## Collinearity
 
 Collinearity is the existence of correlations among covariates. When two covariates in a model are correlated, for example perhaps altitude and temperature, then the software will struggle to identify the impact of each variable independently and the significance of either may be masked. If covariate A and covariate B are correlated, for example, many ecologists and statisticians (this is awk, maybe I'll find a key ref) would advocate selecting one to include in the model, preferably based on sound biological justification. Should variable A be included, then in the discussion of the results it will be important to note that the observed effect could equally be driven by correlated covariate B. 
 
@@ -133,7 +133,7 @@ Similarly, correlation can be checked among cateogorical variables with conditio
 
 <hr>
 
-# Standardising variables
+## Standardising variables
 
 Variables are standardised to but them on the same scale. Standardisation is achieved by subtracting the mean for a covariate from each individual value so all covariates are centred on zero, or additionally by dividing by the standard deviation, which makes the standard deviation of each covariate equal to one (this is called the 'z-score'). One major reason to standardise covarites is to aid interpretation of our model results. Regression parameters of covariates on the same scale allowing us to compare the influence of different variables on species distributions. Without standardisation, the regression coefficient for the distance of a site to roads might be +0.003 if measured in meters and the effect of average temperature in Celsius could be -10. How would we compare these coefficients? 
 
@@ -150,7 +150,7 @@ process = StandardiseCov(Gelman = TRUE,
 
 <hr>
 
-# Data transformation
+## Data transformation
 
 Transformation of covariate data is a way to re-express dependent variables in a non-linear form. Generally, decisions about transformation are subjective, and depend upon the assumptions of our chosen model as well as the natural biological underpinnings of our parameters. A few key reasons to transform data:
 
@@ -196,7 +196,7 @@ process = Chain(Transform(trans = function(x) {x^2},
 
 <hr>
 
-# Interactions
+## Interactions
 
 Typical inference assumes that unique predictor variables have an independent effect on our response variable (species occurrence). This makes sense in many cases, when we are reasonably confortable with the biological justification. For example, it is reasonable and backed by experimental evidence, to suppose that mosquito populations are more common in humid regions. This would be an independent effect of humidity on mosquito occurrence. However, we need to consider the conditionality of this assumption. Occurrence data are conditional upon how they enter our dataset (is data collection biased by region where we expect mosquitos to occur?) It is possible that the relationship between mosquito occurrence and humidity is *conditional* on another environmental variable. In this example, perhaps temperature moderates this relationship. A pairwise interaction is the interaction between two variables in a model such that:
 
@@ -255,5 +255,5 @@ This module generates a data profiling report for our training data (the data se
 output = GenerateCovariateReport(type = "DR")
 ```
 
-
+<hr>
 
