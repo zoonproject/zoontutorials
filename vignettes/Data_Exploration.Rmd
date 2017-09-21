@@ -49,7 +49,7 @@ NA values are to be expected in our raster data (unless they are oblong in shape
 With the `zoon` output module `DataSummary`, examining covariate data for these potential pitfalls is very easy. 
 
 ```{r data summary workflow, message = FALSE, warning = FALSE}
-Carolina_Wren_Workflow <- workflow(occurrence = test,
+Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
                                    covariate = CarolinaWrenRasters,
                                    process = Background(1000),
                                    model = NullModel,
@@ -69,7 +69,7 @@ Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
                                    covariate = CarolinaWrenRasters,
                                    process = Background(1000),
                                    model = NullModel,
-                                   output = CovHistogram)
+                                   output = CovHistograms)
 ```
 
 <hr>
