@@ -1,0 +1,141 @@
+---
+title: "Reproducibility"
+author: "David Wilkinson"
+date: "11 July 2017"
+output:
+  html_document:
+    css: zoon.css
+    theme: lumen
+    toc: yes
+    toc_float:
+      collapsed: no
+      toc_depth: 4
+bibliography: bibliography.bib
+vignette: |
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Reproducibility}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r eval = TRUE, echo = FALSE, message = FALSE, warning = FALSE}
+library(zoon)
+```
+
+<hr>
+
+# Introduction
+
+One of the hot topics in science recently has been the issue of reproducibility [@Baker2016]. While we wont explore this issue here, the inability of researchers to reproduce, scrutinise, and build on others' research prevents rigorous peer review, synthesis of research findings across studies, and reduces capacity for the science to be a self-correcting process [@Boulton2012].
+
+In order to overcome these problems, the data and code underpinning SDM research need to be made more accessible, reproducible and modifiable by the whole research community. This can be achieved if technologies enable and encourage sharing of research as fully reproducible objects [@Peng2011], in ways that suit the diversity of users involved in SDM [@Ahmed2015].
+
+The zoon R package has been developed specifically to improve the reproducibility of SDMs by allowing users to encode entire SDM analyses as repeatable and extensible workflows consisting of independently executable, community-contributed modules. The module-workflow structure enables scientists to easily create and share components of their analysis; and then access, modify, reuse and combine the components of others (see below and Figure 1).
+
+In this guide we will cover the ways in which zoon aids reproducibility in SDM analysis.
+
+<hr>
+
+# The `zoon` workflow
+
+While the `workflow()` in `zoon` is capable of fitting basic SDMs with a minimal amount of code, one of its strengths is the ability to perform more elaborate analyses using the `Chain()` and `list()` functions to run multiple modules in series and/or parallel. Here is a moderately complex example:
+
+```{r example, eval = TRUE, echo = TRUE, message = FALSE, warning = FALSE, fig.show='hide'}
+example <- workflow(occurrence = SpOcc(species = "Ursus arctos",
+                                       extent = c(-175, -65, 20, 75),
+                                       databases = "gbif",
+                                       type = "presence"),
+                    covariate = Bioclim(extent = c(-175, -65, 20, 75),
+                                        resolution = 10,
+                                        layers = 1:19),
+                    process = Chain(Clean,
+                                    Background(1000),            ### This chunk is evaluated and not
+                                    StandardiseCov,              ### shown/printed to screen
+                                    Crossvalidate(k = 5)),       ### Next chunk is not evaluated
+                    model = list(LogisticRegression,             ### But chunk code shown
+                                 MaxNet,
+                                 RandomForest),
+                    output = Chain(PrintMap,
+                                   PerformanceMeasures),
+                    forceReproducible = TRUE)
+```
+
+```{r eval = TRUE, echo = FALSE, message = FALSE, warning = FALSE}
+plot(example)
+```
+
+Here we fit three modelling methods to data sourced from online repositories, perform multiple pre-processing steps in sequence, and generate multiple outputs for each model.
+
+An issue with reproducing the results of an SDM analysis like the one above *without* having access to the code (e.g. based only on the Methods section of a published paper) is ensuring that all of the steps are undertaken in the same order with the same parameters. Even the choice of computer program (as well as different versions of both the program and add-on packages) can affect the chances of replicating results. The `workflow()` function has been designed specifically to overcome these difficulties.
+
+First up is the `forceReproducible` argument within the `workflow()` function itself. When set to `TRUE` it forces the function to obtain all called modules from the online repository. This prevents any issues from arising due to users working with modified versions of modules stored locally on their own computer.
+
+## Object calls
+
+When our workflow is saved into our environment as a `zoonWorkflow` object, we can make calls to it directly to return the commands needed to re-run the analysis, find out information about the computer it was run on, what versions of R packages were used, and which version of each zoon module was used. 
+
+We can obtain the code used to run a workflow by accessing the `call` attribute of our `workflow`. This lets us see exactly what choices were made by another user when they fit their `workflow()` function.
+
+```{r eval = TRUE, echo = TRUE}
+example$call
+```
+
+On occassion there may still be differences in the output of a `workflow` despite being called with the exact same code. This is often related to different users running the code on different operating systems, different versions of R, with different package versions (`zoon` or otherwise), and/or different versions of `zoon` modules. These can be checked by accessing the `session.info` and `module.versions` attributes of a `zoonWorkflow` object.
+
+`session.info` stores the non-zoon information about the analysis including the version of R used, the user's operating system, and the version numbers of the packages loaded for the analysis. `module.info` stores the version numbers of the modules used in the analysis.
+
+```{r eval = TRUE, echo = TRUE}
+example$session.info
+```
+
+```{r eval = TRUE, echo = TRUE}
+example$module.versions
+```
+
+<hr>
+
+# Save/Load
+
+As `workflow()` functions are saved as objects of class `zoonWorkflow` they can be saved to file and shared between users. This object contains all of the code needed to re-run the analysis, all of the data used, and all of the results. We can save a `zoonWorkflow` object as a single .RData object with R's `save()` command:
+
+```{r save, eval = FALSE}
+save(example, file = 'workflow.RData')
+```
+
+And reload it with `load()`:
+
+```{r load, eval = FALSE}
+load('workflow.RData')
+```
+
+This allows the entire data analysis process (data, model, and output) to be shared between users.
+
+<hr>
+
+# RerunWorkflow
+
+The `RerunWorkflow()` function takes a `zoonWorkflow` object and reruns it. This lets us try to reproduce our own analysis or that of someone else provided we have access to the `zoonWorkflow` object. If you only want to rerun the workflow from a certain point onwards (such as keeping the same data from an online repository but with new background data) then you can use the `from` argument to specify a starting point.
+
+```{r eval = FALSE, echo = TRUE, message=FALSE, warning=FALSE}
+RerunWorkflow(example)
+```
+
+<hr>
+
+# `ZoonFigshare()`
+
+The `ZoonFigshare()` function lets us upload our `zoonWorkflow` object to figshare, and online digital repository. figshare provides a service where researchers can freely preserve and share their research online. This is a useful function for making your research accessible to researchers all around the globe and not just to those in direct contact with you and aware of your work. This function connects with figshare via your internet browser and will require you to have a registered account. You can supply additional arguments to the function to add information to the figshare object.
+
+```{r eval = FALSE}
+ZoonFigshare(zoonWorkflow = example,
+             title = "Example",
+             description = "Our example workflow",
+             authors = "Zoon Team",
+             categories = "ecology",
+             tags = c("ecology", "zoon", "species distribution model"))
+```
+
+<hr>

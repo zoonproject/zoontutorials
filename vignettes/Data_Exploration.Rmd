@@ -26,7 +26,7 @@ knitr::opts_chunk$set(message = FALSE,
 
 <hr>
 
-# Introduction
+## Introduction
 
 When we undertake a Species Distribution Model (SDM) we use both species occurrence data collected from field surveys or collated observations as well as environmental predictor data. Before beginning to use covariate data to model occurrence over space, a crucial first step is to familiarise ourselves with the data and its limitations. It is important to do this before modelling the data, as data exploration can result in consequences for the choice of model applied as well as the accurracy of the inference taken from the model. Equally, choice of model a priori may bring a unique set of assumptions that we need to check for in our data. This guide outlines a few suggested steps implemented in both base R as well as using `zoon` `output` and `process` modules for data exploration (Figure 1), but is by no means exhaustive.
 
@@ -40,7 +40,7 @@ library(zoon)
 
 <hr>
 
-# Data exploration
+## Data exploration
 
 To begin to familisarise ourselves with the data, it is very useful to be able examine summary information, including min, mean, and max values for each covariate that you have laoded. Environmental covariate data is subject to error. For example, maybe the maximum value in your elevation variable is 1000 m, but you know that the highest peak in your study region is only 500 m. During the data entry process someone may have added an extra 0 to a 100 m measurement by mistake. Maybe your vegetation classification is showing as having ten levels despite it being an eight-category scale. Chances are a spelling mistake as benign as 'forest' instead of 'Forest' is the culprit. 
 
@@ -58,7 +58,7 @@ Carolina_Wren_Workflow <- workflow(occurrence = test,
 
 <hr>
 
-# Outliers/data cleaning
+## Outliers/data cleaning
 
 Species distribution datasets are, to varying degrees, reliant on observation records gathered by humans and therefore subject to human error. Even in situations where we are fitting a model to entirely remotely-sensed data such as bioclimatic variables, our species occurrence records are usually pen-and-paper recordings from the field. This manual data entry can lead to mistakes. Inaccurate data can lead us to draw false conclusions, and for conservation work this could mean squandering our limited resources for a species in locations where the species is not likely to occur. One way to check for nonsense entries is to the plot occurrence data to covariate one by one, allowing you to isolate unusual entries. For example, if you plotted against latitude, you might see a single occurrence value at a latitude outside the range of your study. 
 
@@ -74,7 +74,7 @@ Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
 
 <hr>
 
-# Collinearity
+## Collinearity
 
 Collinearity is the existence of correlations among covariates. When two covariates in a model are correlated, for example perhaps altitude and temperature, then the modelling method will struggle to identify the impact of each variable independently and the significance of either may be masked. If covariate A and covariate B are correlated, for example, one approach would be to include one in the model, preferably based on sound biological justification. Should variable A be included, then in the discussion of the results it will be important to note that the observed effect could equally be driven by correlated covariate B. 
 
@@ -112,4 +112,6 @@ This can be helpful, for example, to check the format of the covariates included
 str(occ.cov.df)
 class(occ.cov.df$pcMix)
 ```
+
+<hr>
 
