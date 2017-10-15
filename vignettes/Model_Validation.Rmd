@@ -11,9 +11,9 @@ output:
   pdf_document:
     toc: yes
 vignette: |
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Model Validation}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
 ---
 
 ```{r knitr_options, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
@@ -117,7 +117,7 @@ Can your model predict extremes? Can it extrpolate.
 
 #### Selectivity
 
-## Call to action, snappy sub-title
+## Call to action
 
 
 
