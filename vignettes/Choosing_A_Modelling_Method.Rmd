@@ -38,9 +38,9 @@ library(gridExtra)
 
 In order to fit a species distribution model (SDM), we must select a modelling method to relate our response data (e.g., presence-background points) and our covariates (e.g., mean annual temperature). This best practice guide is concerned with how to select an appropriate modelling method.
 
-With the abundance of SDM methods to pick from, it can be difficult to know which to choose. Primarily, the modelling method we choose depends on the type of data we want to analyse and the question we want to ask. Methods for species distribution modelling fall into three broad categories: 'profile', 'regression', or 'machine learning'. In addition to these main types, there are ensemble models that combine analyses from multiple different modelling methods into a single result. We will confine our discussion in this tutorial to regression and machine learning-based methods. There's no fundamental distinction between these two categroies, however the literature refers to the models under these headings and so we keep to convention here. 
+With the abundance of SDM methods to pick from, it can be difficult to know which to choose. Primarily, the modelling method we choose depends on the type of data we want to analyse and the question we want to ask. Methods for species distribution modelling fall into three broad categories: 'profile', 'regression', or 'machine learning'. In addition to these main types, there are ensemble models that combine analyses from multiple different modelling methods into a single result. We will confine our discussion in this guide to regression and machine learning-based methods. There's no fundamental distinction between these two categroies, however the literature refers to the models under these headings and so we keep to convention here. 
 
-In this tutorial we go into detail about some common modelling methods currently available as modules in `zoon`. For each method we will cover which data types they are compatible with, explain the underlying statistical approach, and demonstrate how to fit them in `zoon`. To keep comparisons straightforward, we fit them all to the same Carolina wren dataset. 
+In this guide we go into detail about some common modelling methods currently available as modules in `zoon`. For each method we will cover which data types they are compatible with, explain the underlying statistical approach, and demonstrate how to fit them in `zoon`. To keep comparisons straightforward, we fit them all to the same Carolina wren dataset. 
 
 <hr>
 
@@ -48,13 +48,13 @@ In this tutorial we go into detail about some common modelling methods currently
 
 Regression analyses estimate the statistical relationship between a dependent variable (e.g. presence of a species) and one or more independent variables (e.g. environmental covariates). The two regression-based SDMs currently available as `zoon` modules, logistic regression and generalised additive models, are covered in detail here.
 
-Standard linear models (e.g. $y = c + mx$) assume a linear effect of covariates (*x* in equation XX). on response variable (*y* in equation XX). These models assume that the response variable varies linearly with the covariates, and relies on normally-distributed response variables. In contrast, generalised linear models (GLMs) allow the linear models to be related to the response variable via so-called 'link functions'. These link functions let us use non-normally distributed response variables by transforming them so they can be used within the standard linear model framework.
+Standard linear models (e.g. $y = c + mx$ $(1)$) assume a linear effect of covariates (*x* in equation XX). on response variable (*y* in equation XX). These models assume that the response variable varies linearly with the covariates, and relies on normally-distributed response variables. In contrast, generalised linear models (GLMs) allow the linear models to be related to the response variable via so-called 'link functions'. These link functions let us use non-normally distributed response variables by transforming them so they can be used within the standard linear model framework.
 
 ### Logistic regression
 
 Logistic regression is a type of generalised linear model (GLM). It uses the 'logit' link function to estimate the probability of a binary response variable (e.g. species presence/absence encoded as 1/0) based on its relationship with our predictor covariates. In the same way that we estimate the slope of a linear relationship (e.g. *m* in equation XX), logistic regression estimates one regression coefficient ($/beta$ in equation XXX below) for each covariate using maximum likelihood estimation. As in a standard linear model, we also estimate an intercept term (e.g. *c* in equation XX). 
 
-$$logit(Pr(Occurrence)) = Intercept + \beta_1Covariate_1 + \beta_2Covariate_2 + \beta_3Covariate_3\\$$
+$$logit(Pr(Occurrence)) = Intercept + \beta_1Covariate_1 + \beta_2Covariate_2 + \beta_3Covariate_3\\$$ $(2)$
 
 The left-hand side of the equation is the link function transformation of the response variable. The right-hand side of this equation is known as the linear predictor. 
 
@@ -129,7 +129,7 @@ Boosted regression trees (BRTs) are a machine learning technique that produces a
 
 BRTs differ from the standard regression approach of fitting a single best model (using some information criterion like AIC) by using the 'boosting' technique to combine relatively large numbers of simple trees adaptively, optimising predictive performance. 
 
-Decision trees partition the predictor space with binary splits to identify the regions with the most homogenous responses to the predictor variables (see Figure X below), and a constant value is then fit to each region (ether the most probable class for classification models, or the mean response for regression models). The growth of a decision tree involves recursive binary splits, such that binary splits are applied to its own outputs until some criterion is met (such as a maximum tree depth). For example, predictor space could be split at a node for mean annual temperature < or >= 10C, and then the < 10C branch split at mean annual rainfall < or >= 500mm. The "end" of a branch in a tree thus shows the estimated response variable for a given set of covariates e.g. mean annual temperature >= 10C *and* mean annual rainfall <500mm.
+Decision trees partition the predictor space with binary splits to identify the regions with the most homogenous responses to the predictor variables (see Figure X below), and a constant value is then fit to each region (ether the most probable class for classification models, or the mean response for regression models). The growth of a decision tree involves recursive binary splits, such that binary splits are applied to its own outputs until some criterion is met (such as a maximum tree depth). For example, predictor space could be split at a node for mean annual temperature < or >= 10C, and then the < 10C branch split at mean annual rainfall < or >= 500 mm. The "end" of a branch in a tree thus shows the estimated response variable for a given set of covariates e.g. mean annual temperature >= 10C *and* mean annual rainfall <500 mm.
 
 ```{r Decision_Tree_Image, echo = FALSE, fig.cap="*Figure 1. A single decision tree (upper panel), with a response Y, two predictor variables, X1 and X2 and split points t1 , t2 , etc. The bottom panel shows its prediction surface (after Hastie et al. 2001). Image sourced from @elith08", fig.align = "centre"}
 knitr::include_graphics("../vignettes/Images/Decision_Tree_Elith.jpg")
@@ -158,7 +158,7 @@ BRT <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
                 output = PrintMap(points = FALSE))
 ```
 
-The `XGBoost` software for fitting BRTs is increasingly used in machine learning applications to very large datasets. You can use the `MachineLearn` module to fit BRT models with XGBoost by replacing the model module above with: `MachineLearn(method = 'xgbTree')`.
+The `XGBoost` software is increasingly used in machine learning applications for fitting BRTs to very large datasets. You can use the `MachineLearn` module to fit BRT models with XGBoost by replacing the model module above with: `MachineLearn(method = 'xgbTree')`.
 
 ### RandomForest
 
@@ -177,27 +177,8 @@ RandomForest <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
 
 <hr>
 
-## Comparing the modelling methods
+## Choosing a modelling method
 
-The most common SDM modelling methods have been highlighted above, and `zoon` allows us to quickly compare lots of different models on the same data. First, lets plot their outputs next to each other.
+The most common SDM modelling methods have been highlighted above, but the question remains about whih method to choose. In short, there are no set rules to determine which method you should use. The way that the methods operate can rule some options out. For example, if you have presence-absence data you wouldn't use MaxEnt (which only accepts presence-only data), or if you cared about inference more than prediction you would possibly pick a GLM- or GAM-based method over a decision tree-based one. Even after making some of these decisions you would still have multiple methods to pick from, and while there *may* a 'best' method there is no expert consensus. One option is to try multiple options and determine which one best fits your data, or combine multiple methods as part of an ensemble model. Choice of modelling method or methods is an important aspect of species distribution modelling, and is at least partly dependent on the type of analysis you are trying to perform. This guide has outlined the options available, but ultimately the choice of modelling method is up to you.
 
-```{r Colour_Palette, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-cls <- colorRampPalette(c('#e0f3db', '#a8ddb5', '#4eb3d3', '#08589e'))(10)  # PrintMap colour palette
-```
-
-```{r Comparison, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=10, fig.width=7}
-grid.arrange(spplot(Output(Logistic), col.regions=cls,
-                    cuts = length(cls)-1, main = "Logistic Regression"),
-             spplot(Output(GAM), col.regions=cls,
-                    cuts = length(cls)-1, main = "Generalised Additive Model"),
-             spplot(Output(MaxNet), col.regions=cls,
-                    cuts = length(cls)-1, main = "MaxNet"),
-             spplot(Output(BRT), col.regions=cls,
-                    cuts = length(cls)-1, main = "Boosted Regression Tree"),
-             spplot(Output(RandomForest), col.regions=cls,
-                    cuts = length(cls)-1, main = "Random Forest"))
-```
-
-At first glance there are some big differences in the predicted occurrence maps of the Carolina wren between SDM methods. The regression methods have smoother transitions in the probability of occurrence than the machine learning ones. The logistic regression, MaxNet, and boosted regression tree models predict large amounts of area with high probability of occurrence outside of the range of the observed presences, yet the generalised additive model and random forest model are mostly restrained to the range of the observed data. Some models predict occurrence probabilities only as high as 0.7, yet others predict values as high as 1.0. So what drives these differences when the models are fit to the same data?
-
-To be continued...
+<hr>
