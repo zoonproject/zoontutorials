@@ -12,7 +12,6 @@ output:
       collapsed: no
       toc_depth: 4
 bibliography: bibliography.bib
-vignette: |
   %\VignetteIndexEntry{Choosing A Modelling Method}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
