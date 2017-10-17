@@ -34,45 +34,64 @@ library(gridExtra)
 
 ## Introduction
 
-In order to fit a species distribution model (SDM), we must select a modelling method to relate our response data (e.g., presence-background points) and our covariates (e.g., mean annual temperature). This best practice guide is concerned with how to select an appropriate modelling method.
+In order to fit a species distribution model (SDM), we must select a modelling method to relate our response data (e.g., presence-background points) to our covariates (e.g., mean annual temperature). There are multiple modelling method available, so how do we select the one appropriate for our analysis?
 
-With the abundance of SDM methods to pick from, it can be difficult to know which to choose. Primarily, the modelling method we choose depends on the type of data we want to analyse and the question we want to ask. Methods for species distribution modelling fall into three broad categories: 'profile', 'regression', or 'machine learning'. In addition to these main types, there are ensemble models that combine analyses from multiple different modelling methods into a single result. We will confine our discussion in this guide to regression and machine learning-based methods. There's no fundamental distinction between these two categroies, however the literature refers to the models under these headings and so we keep to convention here. 
+With an abundance of SDM methods available, it can be difficult to know which to choose. Primarily, the modelling method we choose depends on the type of data we want to analyse and the question we want to ask. Methods for species distribution modelling fall into three broad categories: 'profile', 'regression', or 'machine learning'. There are also ensemble models that combine analyses from multiple methods into a single result. Here we confine our discussion to regression and machine learning-based methods. The literature refers to the models under these headings, and we keep to convention, but note that there is no fundamental distinction between the two. 
 
-In this guide we go into detail about some common modelling methods currently available as modules in `zoon`. For each method we will cover which data types they are compatible with, explain the underlying statistical approach, and demonstrate how to fit them in `zoon`. To keep comparisons straightforward, we fit them all to the same Carolina wren dataset. 
+This guide goes into detail about some common modelling methods currently available as modules in `zoon`. For each method we will cover compatible data types, the underlying statistical approach, and demonstrate how to fit them in `zoon`. 
+
+Throughout these examples we will use presence-only data for the Carolina wren, *Thryothorus ludovicianus*, in North America, and generate 1000 background points. Below is a visualisation of our data.
+
+```{r Data, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7}
+ext <- extent(c(-138.71, -52.58, 18.15, 54.95)) # define extent of study area
+
+data <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
+                                    extent = ext),
+                 covariate = Bioclim(extent = ext),
+                 process = Background(1000),
+                 model = LogisticRegression,
+                 output = PrintOccurrenceMap)
+```
+
 
 <hr>
 
 ## Regression-based methods
 
-Regression analyses estimate the statistical relationship between a dependent variable (e.g. presence of a species) and one or more independent variables (e.g. environmental covariates). The two regression-based SDMs currently available as `zoon` modules, logistic regression and generalised additive models, are covered in detail here.
+Regression analyses estimate the statistical relationship between a dependent variable (e.g. presence of a species) and one or more independent variables (e.g. environmental covariates). There are currently two regression-based SDMs available as `zoon` modules: logistic regression and generalised additive models.
 
-Standard linear models (e.g. $y = c + mx$ $(1)$) assume a linear effect of covariates (*x* in equation XX). on response variable (*y* in equation XX). These models assume that the response variable varies linearly with the covariates, and relies on normally-distributed response variables. In contrast, generalised linear models (GLMs) allow the linear models to be related to the response variable via so-called 'link functions'. These link functions let us use non-normally distributed response variables by transforming them so they can be used within the standard linear model framework.
+Standard linear models assume a linear effect of covariates ,$x$, on the response variable ,$y$ (see $(1)$). These models assume the response variable varies linearly with the covariates, and rely on normally-distributed response variables. In contrast, generalised linear models (GLMs) make use of 'link functions' to allow us to relax the assumption of linearity. They let us use non-normally distributed response variables (such as binary data) by transforming them to be used within the standard linear model framework.
+
+$$y = c + mx$$  $(1)$
 
 ### Logistic regression
 
-Logistic regression is a type of generalised linear model (GLM). It uses the 'logit' link function to estimate the probability of a binary response variable (e.g. species presence/absence encoded as 1/0) based on its relationship with our predictor covariates. In the same way that we estimate the slope of a linear relationship (e.g. *m* in equation XX), logistic regression estimates one regression coefficient ($/beta$ in equation XXX below) for each covariate using maximum likelihood estimation. As in a standard linear model, we also estimate an intercept term (e.g. *c* in equation XX). 
+Logistic regression is onesuch generalised linear model (GLM). It uses the 'logit' link function to estimate the probability of a binary response variable (e.g. species presence/absence) based on its relationship with our predictor covariates. Logistic regression estimates one regression coefficient ($\beta$ in the $(2)$) for each covariate using maximum likelihood estimation. We also estimate an $Intercept$ term ($c$ in $(1)$) like in a standard linear model. 
 
 $$logit(Pr(Occurrence)) = Intercept + \beta_1Covariate_1 + \beta_2Covariate_2 + \beta_3Covariate_3\\$$ $(2)$
 
-The left-hand side of the equation is the link function transformation of the response variable. The right-hand side of this equation is known as the linear predictor. 
+The left-hand side of equation $(2)$ is the transformation of the response variable using the link function. The right-hand side of this equation is known as the *linear predictor*. 
 
-In `zoon`, we can fit a `LogisticRegression` model by choosing it as the model module in our `zoon` `workflow`. `LogisticRegression` uses the `glm` package.
+In `zoon`, we can estimate a species distribution using a logistic regression model by choosing the `LogisticRegression` model module in our `zoon` `workflow`. `LogisticRegression` uses the `glm` package.
+
+**ADD SENTENCE ON DATA TYPES**
 
 ```{r Logistic_Regression, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7}
-Logistic <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
-                                        extent = c(-138.71, -52.58, 18.15, 54.95)),
-                     covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
-                     process = Chain(StandardiseCov,
-                                     Background(1000)),
+logistic <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
+                                        extent = ext),
+                     covariate = Bioclim(extent = ext),
+                     process = Background(1000),
                      model = LogisticRegression,
                      output = PrintMap(points = FALSE))
 ```
 
+**ADD SENTENCE REFERRING TO GRAPH**
+
 ### Generalised additive model
 
-Generalised additive models (GAMs) are similar to GLMs but allow a bit more flexibility. GAMs with a logit link function can fit binary data such as presence-background or presence-absence datasets (different link functions allow the use of different types of data). The main difference between GAMs and GLMs is that GAMs do not estimate regression coefficients. Instead, the 'linear predictor' is the sum of a set of 'smoothing functions' (see equation XX below). Smoothing functions allow the inclusion of non-linear effects of covariates in our model. By using smoothing functions instead of regression coefficients, we can fit complex, non-linear relationships between our dependent and independent covariates. As GAMs are non-parametric models, the shape of the predictor function for a covariate is entirely dependent on the data and not set by a small number of model parameters (such as defining a quadratic term in a GLM).
+Generalised additive models (GAMs) are similar to GLMs but allow more flexibility. Fitting a GAM for binary data (presence-background or presence-absence) is done using a logit link function. The use of different link functions allows us to use different types of data. The main difference between GAMs and GLMs is that GAMs do not estimate regression coefficients. Instead, the *linear predictor* is the sum of a set of *smoothing functions* (see $(3)$ below). Smoothing functions allow the inclusion of non-linear effects of covariates in our model. By using smoothing functions instead of regression coefficients, we can fit complex, non-linear relationships between our dependent and independent covariates. As GAMs are non-parametric models, the shape of the predictor function for a covariate is entirely dependent on the data and not set by a small number of model parameters (such as defining a quadratic term in a GLM).
 
-$$logit(Pr(Occurrence)) = Intercept + f_1(Covariate_1) + f_2(Covariate_2) + f_3(Covariate_3)\\$$
+$$logit(Pr(Occurrence)) = Intercept + f_1(Covariate_1) + f_2(Covariate_2) + f_3(Covariate_3)\\$$ $3$
 
 If we use smoothing functions without any restrictions, however, it is possible to 'overfit' our model to our data, creating a linear predictor that is too complex. To avoid this, GAMs use 'penalised likelihood maximisation,' which penalises the model for each additional smoothing function (or 'wiggliness'). Overfit models are too tailored to the specific dataset they were fit too (picking up on the little quirks and random noise), which means they tend to make poor predictions. 
 
