@@ -2,6 +2,8 @@
 title: "Choosing A Modelling Method"
 csl: Methods.csl
 output:
+  pdf_document:
+    toc: yes
   html_document:
     css: zoon.css
     theme: lumen
@@ -10,10 +12,9 @@ output:
       collapsed: no
       toc_depth: 4
 bibliography: bibliography.bib
-vignette: >
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Choosing A Modelling Method}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
 ---
 
 ```{r knitr_options, eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
