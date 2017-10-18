@@ -9,10 +9,6 @@ output:
     toc_float:
       collapsed: no
       toc_depth: 4
-  pdf_document:
-    toc: yes
-  word_document:
-    toc: yes
 bibliography: bibliography.bib
 vignette: |
   %\VignetteEngine{knitr::rmarkdown}
