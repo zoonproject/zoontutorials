@@ -9,10 +9,6 @@ output:
     toc_float:
       collapsed: no
       toc_depth: 4
-  pdf_document:
-    toc: yes
-  word_document:
-    toc: yes
 bibliography: bibliography.bib
 vignette: |
   %\VignetteEngine{knitr::rmarkdown}
@@ -145,7 +141,7 @@ ext <- extent(Covariate(workflow))
 ext
 
 workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", extent = ext),
-                     covariate = Bioclim(extent = as.vector(ext)),
+                     covariate = Bioclim(extent = ext),
                      process = Background(100),
                      model = MaxNet,
                      output = PrintMap)
@@ -161,7 +157,7 @@ Next it's time to consider any required data processing. We process our data by 
 
 ```{r process, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
 workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", extent = ext),
-                          covariate = Bioclim(extent = as.vector(ext)),
+                          covariate = Bioclim(extent = ext),
                           process = Chain(Clean, Background(100)),
                           model = MaxNet,
                           output = PrintMap)
@@ -177,7 +173,7 @@ For now, let's work with the common modelling method logistic regression using t
 
 ```{r model, eval=TRUE, warning=FALSE, message=FALSE, fig.align='center', fig.height=4, fig.width=7, cache=TRUE}
 workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", extent = ext),
-                     covariate = Bioclim(extent = as.vector(ext)),
+                     covariate = Bioclim(extent = ext),
                      process = Chain(Clean, Background(100)),
                      model = LogisticRegression,
                      output = PrintMap)
@@ -195,7 +191,7 @@ Instead of displaying a static map, as we have been so far, let's use the `Inter
 ```{r ourput_interactive_map, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=7, fig.width=7, cache=TRUE}
 
 workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", extent = ext),
-                          covariate = Bioclim(extent = as.vector(ext)),
+                          covariate = Bioclim(extent = ext),
                           process = Chain(Clean, Background(100)),
                           model = LogisticRegression,
                           output = InteractiveMap())
@@ -213,7 +209,7 @@ Now we've seen how Carolina wren occurrence varies over geographic space, let's 
 
 ```{r output_response_plot_no_eval, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.height=5, fig.width=7, cache=TRUE}
 workflow <- workflow(occurrence = SpOcc("Thryothorus ludovicianus", extent = ext),
-                     covariate = Bioclim(extent = as.vector(ext)),
+                     covariate = Bioclim(extent = ext),
                      process = Chain(Clean, Background(100)),
                      model = LogisticRegression,
                      output = ResponsePlot)
