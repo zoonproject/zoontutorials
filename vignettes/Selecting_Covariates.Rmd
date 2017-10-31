@@ -132,7 +132,7 @@ Once we have decided to add an interaction effect into our model, we can select 
 To implement all possible pairwise interactions in the model we write up the module with the `addInteraction` process module like this:
 
 ```{r Interaction_AllPairs, eval=FALSE}
-process = addInteraction(which.covs = 'pairs')
+process = addInteraction(which_covs = 'pairs')
 ```
 
 ### Set interactions
@@ -142,40 +142,41 @@ Rather than a blanket application of interaction terms across our model, we migh
 +  To define the pairwise interaction between any two variables as a character vector:
 
 ```{r Interaction_Pair, eval=FALSE}
-process = addInteraction(which.covs = c("A", "B"))   # adds an interaction between A & B
+process = addInteraction(which_covs = c("A", "B"))   # adds an interaction between A & B
 ```
 
 +  To define multiple pairwise interactions, but not *all* pairwise interactions, we make use of `R`'s `list()` function. We provide a list of interaction terms as character vectors like so:
 
 ```{r Interaction_MultPairs, eval=FALSE}
-process = addInteraction(which.covs = list(c("A","B"), c("A","C")))   # adds interactions between A & B and A & C, but not B & C
+process = addInteraction(which_covs = list(c("A","B"), c("A","C")))   # adds interactions between A & B and A & C, but not B & C
 ```
 
 +  To define higher order interactions between more than two variables we just need to extend the length of our character vectors. This will define the highest order interaction term between all of the selected variables as well as all combinations of lower-order interaction terms.
 
 ```{r Interaction_Three-way, eval=FALSE}
-process = addInteraction(which.covs = c(A,B,C))   # adds all two-way (e.g. A & B) interactions and a three-way interaction between A, B & C
+process = addInteraction(which_covs = c('A', 'B', 'C'))   # adds all two-way (e.g. A & B) interactions and a three-way interaction between A, B & C
 ```
 
 ### Interactions as polynomial terms
 the addInteraction method can also be used as an alternative to coding in polynomial terms. 
 
 ```{r eval=FALSE}
-process = addInteraction(which.covs = c(A,A))   # leads to a quadratic polynomial
+process = addInteraction(which_covs = c('A', 'A'))   # leads to a quadratic polynomial
 
-process = addInteraction(which.covs = c(A,A,A))   # leads to a cubic, polynomial
+process = addInteraction(which_covs = c('A', 'A', 'A'))   # leads to a cubic, polynomial
 ```
 
 <hr>
 
 ### Example
-We will start by setting up a basic `zoon` `workflow()` with the Sugar Maple data and using a raster covariate dataset from Bioclim for illustration.  We will set `process = NoProcess`, `model = NullModel`, and `output = PrintOccurrenceMap` - this map simply shows us our raw occurrence points (in red) and our background points (in black), no model has been applied. 
+We will start by setting up a basic `zoon` `workflow()` with the Sugar Maple data and using a raster covariate dataset from Bioclim for illustration.  
 
 ```{r workflow, message = FALSE, warning = FALSE}
-SugarMaple_Workflow <- workflow(occurrence = SugarMaple,
-                                   covariate = Bioclim,
-                                   process = addInteraction(which.covs = c('Bio3', 'Bio3')),
-                                   model = LogisticRegression,
-                                   output = ResponsePlot)
+# ext <- c(-170, -20, 10, 80)
+# SugarMaple_Workflow <- workflow(occurrence = SugarMaple,
+#                                 covariate = Bioclim(extent = as.vector(ext)),
+#                                 process = addInteraction(which_covs = c('Bio3', 'Bio3')),
+#                                 model = NullModel,
+#                                 output = ResponsePlot)
 ```
 
