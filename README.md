@@ -1,21 +1,19 @@
 # Species Distribution Modelling tutorials using zoon
 
-Introductory tutorials and best practice guides for species distribution modelling using the zoon R package.
+Introductory tutorials and best practice guides for species distribution modelling using the zoon R package.  
 
 You can install the package from GitHub with:
 
-```r
+```{r}
 devtools::install_github('zoonproject/zoontutorials')
 ```
 
-and load the introductory tutorial as a vignette with:
+You can find all the vignettes on [our website](ihttps://zoonproject.github.io/zoontutorials/). Alternatively, you can load the vignettes in R Studio: 
 
-```r
+```{r}
 library(zoontutorials)
 vignette('Intro_Module')
 ```
 
-Alternatively, you can check some of the tutorials and guides out in your browser, e.g. [the basic introduction](https://cdn.rawgit.com/goldingn/zoontutorials/563c74c1/inst/doc/Introduction.html)
-
-The introductory tutorials are only in a very early draft stage at the moment. Please let us know what you think we should cover in the repo's issues tracker!
+Please let us know what you think we should cover in the repo's issues tracker!
 

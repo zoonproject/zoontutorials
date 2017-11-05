@@ -9,6 +9,10 @@ vignettes/*.html
 vignettes/*_files
 vignettes/.build.timestamp
 vignettes/Bradypus.csv
+
+docs/articles/*_cache
+docs/articles/*.R
+
 report.html
 R/knit_zoon.R
 Bradypus.csv
