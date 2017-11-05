@@ -8,7 +8,7 @@ You can install the package from GitHub with:
 devtools::install_github('zoonproject/zoontutorials')
 ```
 
-You can find all the vignettes on [our website](ihttps://zoonproject.github.io/zoontutorials/). Alternatively, you can load the vignettes in R Studio: 
+You can find all the vignettes on [our website](https://zoonproject.github.io/zoontutorials/). Alternatively, you can load the vignettes in R Studio: 
 
 ```{r}
 library(zoontutorials)
