@@ -7,6 +7,31 @@ knitr::opts_chunk$set(message = FALSE,
                cache = TRUE, 
                comment = '')
 
+<<<<<<< HEAD
+=======
+## ----echo = F, out.width= '400px', fig.align = "center", fig.cap="*Figure 1. Conceptual flowchart for process modules in covariates selection and reparation.*"----
+knitr::include_graphics("../vignettes/Images/SelectCov_ConceptualDiagram.png")
+
+## ----packages, message = FALSE, warning = FALSE--------------------------
+library(zoon)
+
+## ----workflow, message = FALSE, warning = FALSE--------------------------
+Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
+                                   covariate = CarolinaWrenRasters,
+                                   process = Background(1000),
+                                   model = NullModel,
+                                   output = PrintOccurrenceMap)
+
+## ----Clean, eval=FALSE---------------------------------------------------
+#  process = Clean(which = c(1,2,3))
+
+## ----StandardiseCov, eval=FALSE------------------------------------------
+#  process = StandardiseCov() # default form
+#  
+#  process = StandardiseCov(Gelman = TRUE,
+#                           exclude = c("VarB", "VarC"))
+
+>>>>>>> 41ef0af
 ## ----eval=FALSE----------------------------------------------------------
 #  process = Transform(trans = function(x) {x^2},
 #                      which_cov = "VarA",
@@ -24,6 +49,21 @@ knitr::opts_chunk$set(message = FALSE,
 #                  Transform(trans = function(x) {log(x)},
 #                            which_cov = c("VarC", "VarD")))
 
+<<<<<<< HEAD
+=======
+## ----Interaction_AllPairs, eval=FALSE------------------------------------
+#  process = addInteraction(which.covs = 'pairs')
+
+## ----Interaction_Pair, eval=FALSE----------------------------------------
+#  process = addInteraction(which.covs = c("A","B"))   # adds an interaction between A & B
+
+## ----Interaction_MultPairs, eval=FALSE-----------------------------------
+#  process = addInteraction(which.covs = list(c("A","B"), c("A","C")))   # adds interactions between A & B and A & C, but not B & C
+
+## ----Interaction_Three-way, eval=FALSE-----------------------------------
+#  process = addInteraction(which.covs = c(A,B,C))   # adds all two-way (e.g. A & B) interactions and a three-way interaction between A, B & C
+
+>>>>>>> 41ef0af
 ## ----eval=FALSE----------------------------------------------------------
 #  process = addInteractions(which.covs = c(A,A))   # leads to a quadratic polynomial
 #  

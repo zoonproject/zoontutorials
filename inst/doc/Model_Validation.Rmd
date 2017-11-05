@@ -94,9 +94,26 @@ The next step up in the model evaluation game is internal evaluation. Internal e
 
 R-squared (variance explained)
 
+
+
 Deviance
 
 #### Information criteria
+Adding more parameters almost always improves the fit of the model, so why not just put them all in? While adding more parameters improves the fit, it may reduce the ability of the model to predict new data outside your current sample. 
+
+There are two fundamental types of statistical error that we must deal with when evaluating and interpreting model results: overfitting and underfitting. Both of these errors lead to poor prediction by the model, or its ability to retrodict the original data. When we overfit our data, we learn too much from our data, while underfitting leads us to learn too little from our data. 
+
+
+
+
+The information theoretic approach to model selection uses information criteria, which are metrics to score models by prediction accuracy with a penalty for complexity. 
+
+This approach is in contrast to significance testing approaches that focus on selecting models where all terms have <0.05 significance. Some 'significant' terms may not help improve prediction, whereas some that are not might. 
+
+
+
+
+
 
 Information criteria build on deviance measures by penalising models for additional covariates. That is, they select for accurate and *parimsoneous* models.
 
