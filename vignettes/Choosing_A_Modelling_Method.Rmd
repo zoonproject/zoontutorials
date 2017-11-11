@@ -34,13 +34,13 @@ library(gridExtra)
 
 ## Introduction
 
-In order to fit a species distribution model (SDM), we must select a modelling method to relate our response data (e.g., presence-background points) to our covariates (e.g., mean annual temperature). There are multiple modelling method available, so how do we select the one appropriate for our analysis?
+In order to fit a species distribution model (SDM), we must select a modelling method to relate our response data (e.g., presence-background points) to our covariates (e.g., mean annual temperature). There are multiple modelling method available, so how do we choose the one appropriate for our analysis? Choosing the wrong one can have consequences for our over-arching modelling goal: species conservation.
 
-With an abundance of SDM methods available, it can be difficult to know which to choose. Primarily, the modelling method we choose depends on the type of data we want to analyse and the question we want to ask. Methods for species distribution modelling fall into three broad categories: 'profile', 'regression', or 'machine learning'. There are also ensemble models that combine analyses from multiple methods into a single result. Here we confine our discussion to regression and machine learning-based methods. The literature refers to the models under these headings, and we keep to convention, but note that there is no fundamental distinction between the two. 
+With an abundance of SDM methods available, it can be difficult to know which to choose. The modelling method we choose primarily depends on the type of data we have and the question we're asking. Methods for species distribution modelling fall into three broad categories: 'profile', 'regression', or 'machine learning'. There are also ensemble models that combine analyses from multiple methods into a single result. Here, we confine our discussion to the regression and machine learning-based methods currently available in `zoon`. The literature refers to the models under these headings, and we keep to convention, but note that there is no fundamental distinction between the two. 
 
-This guide goes into detail about some common modelling methods currently available as modules in `zoon`. For each method we will cover compatible data types, the underlying statistical approach, and demonstrate how to fit them in `zoon`. 
+In this guide we go into detail about some common modelling methods currently available as modules in `zoon`. For each method we cover compatible data types and the underlying statistical approaches, as well as demonstrate how to fit them in `zoon`. 
 
-Throughout these examples we will use presence-only data for the Carolina wren, *Thryothorus ludovicianus*, in North America, and generate 1000 background points. Figure 1 below is a visualisation of our data.
+Throughout this guide our intention is to understand the distribution of the Carolina wren, *Thryothorus ludovicianus*, in North America, and to highlight the differences between modelling methods as we do so. SDMs are frequently used to map predicted species' distributions, so we will use these to examine the differences between modelling methods. Some things to keep an eye out for are changes in the probability of occurrence, the 'sharpness' in transitions from high-to-low probability of occurrence areas, and distributions predicted outside the range of our observation data. Figure 1 below is a visualisation of our data where we have used the `NullModel` module to predict constant occupancy. You can see that our data includes presence-only observation data (red) that is mostly restricted to the eastern USA, and randomly-generated background data (black) across our entire areas of interest.
 
 ```{r Data, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, fig.cap="Figure 1: Distribution of presence (red) and background (black) data for the Carolina wren in North America"}
 ext <- extent(c(-138.71, -52.58, 18.15, 54.95)) # define extent of study area
@@ -50,17 +50,16 @@ data <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
                  covariate = Bioclim(extent = ext),
                  process = Background(1000),
                  model = NullModel,
-                 output = PrintOccurrenceMap,
-                 forceReproducible = TRUE)
+                 output = PrintOccurrenceMap)
 ```
 
 <hr>
 
 ## Regression-based methods
 
-Regression analyses estimate the statistical relationship between a dependent variable (e.g. presence of a species) and one or more independent variables (e.g. environmental covariates). There are currently two regression-based SDMs available as `zoon` modules: logistic regression and generalised additive models.
+There are currently two regression-based SDMs available as `zoon` modules: logistic regression and generalised additive models. Regression analyses estimate the statistical relationship between a dependent variable (e.g. presence of a species) and one or more independent variables (e.g. environmental covariates).
 
-Standard linear models assume a linear effect of covariates ,$x$, on the response variable ,$y$ (see $(1)$). These models assume the response variable varies linearly with the covariates, and rely on normally-distributed response variables. In contrast, generalised linear models (GLMs) make use of 'link functions' to allow us to relax the assumption of linearity. They let us use non-normally distributed response variables (such as binary data) by transforming them to be used within the standard linear model framework.
+Standard linear models assume a linear effect of covariates, $x$, on the response variable, $y$ (see $(1)$). These models assume a linear relationship between the response variable and the covariates, and that the response variables are normally-distributed. In contrast, generalised linear models (GLMs) use 'link functions' which relax the assumption of linearity. GLMs let us use non-normally-distributed response variables (such as binary data) by transforming them to be used within the standard linear model framework.
 
 $$y = c + mx   (1)$$
 
@@ -72,7 +71,7 @@ $$logit(Pr(Occurrence)) = Intercept + \beta_1Covariate_1 + \beta_2Covariate_2 + 
 
 The left-hand side of equation $(2)$ is the transformation of the response variable using the link function. The right-hand side of this equation is known as the *linear predictor*. 
 
-In `zoon`, we can estimate a species distribution using a logistic regression model by choosing the `LogisticRegression` model module in our `zoon` `workflow`. `LogisticRegression` uses the `glm` package.
+In `zoon`, we can estimate a species distribution using logistic regression by choosing the `LogisticRegression` model module in our `zoon` `workflow`. `LogisticRegression` uses the `glm` package.
 
 ```{r Logistic_Regression, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, fig.cap="Figure 2: Predicted Carolina wren distribution map from the logistic regression SDM."}
 logistic <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
@@ -83,7 +82,7 @@ logistic <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
                      output = PrintMap)
 ```
 
-In Figure 2 above you can see that the logistic regression model predicts a high probability of occurrence in the eastern USA which broadly matches the distribution of our presence points. There are also patches of high probability of occurrence in western USA, and these likely represent areas of suitable habitat for the Carolina wren that it does not have the dispersal ability to reach.
+In Figure 2 we can see our logistic regression model predicts a high probability of occurrence in eastern USA which broadly matches the distribution of our presence points. There are also patches of high probability of occurrence in western USA that likely represent areas of suitable habitat for the Carolina wren that it does not have the dispersal ability to reach. These patches are selected because their environmental conditions are similar to the location of our presence locations.
 
 ### Generalised additive model
 
