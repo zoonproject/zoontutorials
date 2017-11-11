@@ -86,28 +86,27 @@ In Figure 2 we can see our logistic regression model predicts a high probability
 
 ### Generalised additive model
 
-Generalised additive models (GAMs) are similar to GLMs but allow more flexibility. Fitting a GAM for binary data (presence-background or presence-absence) is done using a logit link function. The use of different link functions allows us to use different types of data. The main difference between GAMs and GLMs is that GAMs do not estimate regression coefficients. Instead, the *linear predictor* is the sum of a set of *smoothing functions* (see $(3)$ below). Smoothing functions let us fit complex, non-linear relationships between our dependent and independent covariates. Since there are no paramters to estimate in the model GAMs are non-parametric models. Thus the estimated shape of the smoothing function for a covariate is dependent on the data and not set by model parameters (such as defining a quadratic term in a GLM).
+Generalised additive models (GAMs) are similar to GLMs but allow more flexibility. Fitting a GAM for binary data (presence-background or presence-absence) is done using a logit link function. Different link functions allows us to use different types of data, e.g. a log link function for abundance data. The main difference between GAMs and GLMs is that GAMs do not estimate regression coefficients. That is, GAMs are non-parametric - without estimated coefficients. Instead, the *linear predictor* is the sum of a set of *smoothing functions* (see $(3)$ below). Using smoothing functions we can fit complex, non-linear relationships between our dependent and independent covariates. 
 
 $$logit(Pr(Occurrence)) = Intercept + f_1(Covariate_1) + f_2(Covariate_2) + f_3(Covariate_3)    (3)$$
 
-When we use smoothing functions without any restrictions, however, it is possible to *overfit* the model to our data. Models that are overfit pick up on the random error (or noise) in the dataset instead of the underlying relationships with covariates. This means they have poor predictive ability since they overreact to minor variations in the training data. To avoid this GAMs use *penalised likelihood maximisation* which penalises the model for each additional smoothing function (or 'wiggliness').  
+When we use smoothing functions without restrictions, however, it is possible to *overfit* the model to our data. Models that are overfit model the noise in the dataset instead of the underlying relationships with covariates. This leads to poor predictive ability since they respond to irrelevant variations in the data. To avoid this GAMs use *penalised likelihood maximisation* which penalises the model for each additional covariate/smoothing function pair. This balances a trade-off between including enough smoothing functions to explain environmental relationships (or increasing 'wiggliness') and too many smoothing functions increasing 'badness-of-fit'.  
 
-In `zoon`, the `mgcv` model module fits a GAM using the `mgcv` package. To fit a GAM we need to define a couple of parameters that determine how wiggly and complex the linear predictor can be. Specifically, we need to define the maximum degrees of freedom, $k$, and the *penalised smoothing basis*, $bs$. Together these two parameters balance the model's representation of the data with the risk of overfitting the model to the dataset. You can find more details on selecting these parameters using `?mgcv::choose.k` and `?mgcv::smooth.terms`. 
+In `zoon`, the `mgcv` model module fits a GAM using the `mgcv` package. To fit a GAM we need to define a couple of parameters that determine how complex the linear predictor can be. Specifically, we define the maximum degrees of freedom, $k$, and the *penalised smoothing basis*, $bs$. Together these parameters balance the model's explanation of the data with the risk of overfitting the model to the dataset. You can find more details on how to define these parameters using `?mgcv::choose.k` and `?mgcv::smooth.terms`. 
 
-Let's just start by fitting a GAM (using the default settings of $k$ and $bs$) in our `workflow`.
+Let's start by fitting a GAM (using the default settings of $k$ and $bs$) in our `workflow`.
 
 ```{r GAM, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, fig.cap="Figure 3: Predicted Carolina wren distribution map for the GAM SDM"}
 GAM <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
-                                   extent = c(-138.71, -52.58, 18.15, 54.95)),
-                covariate = Bioclim(extent = c(-138.71, -52.58, 18.15, 54.95)),
-                process = Chain(StandardiseCov,
-                                Background(1000)),
+                                   extent = ext),
+                covariate = Bioclim(extent = ext),
+                process = Background(1000),
                 model = mgcv(k = -1,
                              bs = "tp"),
                 output = PrintMap)
 ```
 
-Figure 3 above shows the predicted distribution of the Carolina wren from the GAM SDM. Like the logistic regression SDM there is a large patch of high probability of occurrence in the eastern USA that broadly matches the locations of our presence records. In contrast to the logistic regression SDM, however, there is markedly lower predicted probabilities of occurrence in the western USA.
+Figure 3 shows the predicted distribution of the Carolina wren from our GAM. Like our logistic regression SDM there is a large patch of high probability of occurrence in the eastern USA that overlaps the locations of our presence records. In contrast to the logistic regression SDM, however, areas with high predicted probabilities of occurrence are much more constrained to the eastern USA. Locales such as California, The Bahamas, Nova Scotia, and British Columbia have markedly lower probabilities of occurrence.
 
 <hr>
 
