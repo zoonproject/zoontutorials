@@ -112,21 +112,21 @@ Figure 3 shows the predicted distribution of the Carolina wren from our GAM. Lik
 
 ## Machine learning methods
 
-Machine learning is a field of computer science where modelling algorithms iteratively learn from data without being explicitly programmed where to look for insight. This is in contast to regression models like GLMs and GAMs that belong to a field of mathematics which finds relationshipis between variables.
+Machine learning is a field of computer science where modelling algorithms iteratively learn from data without being explicitly programmed where in the data to look. This is in contast to regression models like GLMs and GAMs which find relationships between specified variables.
 
 ### MaxEnt/MaxNet
 
-MaxEnt is one of the most widely used SDM modelling methods [@elith11]. MaxEnt is used only for presence-background data. MaxEnt maximum entropy estimation to fit a model to data. 
+MaxEnt is one of the most widely used SDM modelling methods [@elith11]. Unlike GLMs and GAMs, which can be used for either presence-absence or presence-background data, MaxEnt can only be used for presence-background data. 
 
-Maximum entropy estimation compares two probaility densities of our data. First, the probability density of our environmental covariates across the landscape where the species is present, $f_1(z)$. Second, the probability density of the covariates for our background points, $f(z)$. The estimated ratio of $f_1(z)/f(z)$ provides insight on which covariates are important, and establishes the relative suitability of sites. 
+MaxEnt uses maximum entropy estimation to fit a model to our data. Maximum entropy estimation compares two probability densities of our data. First, the probability density of our environmental covariates across the landscape where the species is present, $f_1(z)$. Second, the probability density of the covariates for our background points, $f(z)$. The estimated ratio of $f_1(z)/f(z)$ provides insight on which covariates are important, and establishes the relative suitability of sites. 
 
 MaxEnt must estimate $f_1(z)$ such that it is consistent with our occurrence data, but as there are many possible distributions that can accomplish this it chooses the one closest to $f(z)$. Minimising the difference between the two probability densities is sensible as, without species absence data, we have no information to guide our expectation of species' preferences for one particular environment over another. 
 
 The distance from $f(z)$ represents the relative entropy of $f_1(z)$ with respect to $f(z)$. Minimising the relative entropy is equivalent to maximising the entropy (hence, MaxEnt) of the ratio $f_1(z)/f(z)$. This model can be described as maximising entropy in geographic space, or minimising entropy in environmental space.
 
-MaxEnt needs to estimate coefficients in a manner that balances the above constraints with the risk of overfitting the model. This is achieved using regularisation, which can be thought of as shrinking the coefficients towards zero by penalising them to balance model fit and complexity. Thus, MaxEnt can be seen as fitting a penalised maximum likelihood model. 
+Like GLMs and GAMs, MaxEnt is also prone to overfitting so must estimate coefficients in a manner that balances this risk with the above constraints. This is achieved using regularisation, which can be thought of as shrinking the coefficients towards zero by penalising them to balance model fit and complexity. Thus, MaxEnt can be seen as fitting a penalised maximum likelihood model. 
 
-The `MaxEnt` module uses the `maxent()` function in the `dismo` package, and requires a MaxEnt installation on our computer. The `zoon` helper function `GetMaxEnt()` is available to help with this installation. Due to common difficulties in downloading MaxEnt, in this example we will use `MaxNet` as a subsitute. The `MaxNet` module uses the `maxnet` R package to fit MaxEnt models without requiring the user to install the MaxEnt java executable file. You select this model in your `workflow` as follows:
+The `MaxEnt` module uses the `maxent()` function in the `dismo` package, and requires MaxEnt be installed on our computer. The `zoon` helper function `GetMaxEnt()` is available to help with this installation. In this example we will use `MaxNet` as a subsitute for `MaxEnt` due to common difficulties in downloading MaxEnt. The `MaxNet` module uses the `maxnet` R package to fit maximum entropy models without requiring the user to install the MaxEnt java executable file. You select this model in your `workflow` as follows:
 
 ```{r MaxNet, eval=TRUE, message=FALSE, warning=FALSE, fig.align='center', fig.height=4, fig.width=7, fig.cap="Figure 4: Predicted Carolina wren distribution map for the MaxNet SDM"}
 MaxNet <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
@@ -137,7 +137,7 @@ MaxNet <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
                    output = PrintMap)
 ```
 
-In Figure 4 above we can see the predicted distribution of the Carolina wren from the MaxNet model. The probability of occurrence within the range of our presence points is markedly smaller than for the GLM- and GAM- based SDMs. There is also a reduced amount of non-zero predictions outside of the range of our presence points (that are also at a lower probability).
+The SDM for the Carolina wren using `MaxNet` (Figure 4)is markedly different from both regression-based methods. The probability of occurrence within the range of our presence points is considerably smaller than for the regression-based SDMs. There is also a reduced amount of non-zero predictions outside of the range of our presence points, and those that remain have lower probability.
 
 ### RandomForest
 
