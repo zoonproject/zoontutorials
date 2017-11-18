@@ -141,15 +141,15 @@ The SDM for the Carolina wren using `MaxNet` (Figure 4)is markedly different fro
 
 ### RandomForest
 
-Random forest models (RF) are a machine learning technique that produces a single prediction model in the form of an ensemble of weak prediction models (e.g. decision trees). This is in contast to the standard regression approach of fitting a single best model using some information cirterion like AIC.
+In contrast to the previous SDMs, which fit a single model, a random forest model (RF) is an ensemble model. That is, it produces a single prediction model in the form of an ensemble of weak prediction models. Put more simply, the core of this idea is that it is easier to build and average multiple rules of thumb than to find one accurate prediction rule.
 
-Decision trees partition the predictor space with binary splits to identify the regions with the most homogenous responses to the predictor variables (see Figure 1 below). A constant value is then fit to each region: either the most probable class for classification models, or the mean response for regression models. The growth of a decision tree involves recursive binary splits, such that binary splits are applied to its own outputs until some criterion is met (such as a maximum tree depth). For example, predictor space could be split at a node for mean annual temperature < or >= 10C, and then the < 10C branch split at mean annual rainfall < or >= 500 mm. The "end" of a branch in a tree thus shows the estimated response variable for a given set of covariates e.g. mean annual temperature >= 10C *and* mean annual rainfall <500 mm.
+Each of these weak prediction models is a decision tree. These models partition use binary splits of our predictor space to identify the regions with the most homogenous responses to our predictor variables (see Figure 5 below). A constant value is then fit to each region: either the most probable class for classification models, or the mean response for regression models. The growth of a decision tree involves recursive binary splits, such that binary splits are applied to its own outputs until some criterion is met (such as a maximum tree depth). For example, predictor space could be split at a node for mean annual temperature < or >= 10C, and then the < 10C branch split at mean annual rainfall < or >= 500 mm. The "end" of a branch in a tree thus shows the estimated response variable for a given set of covariates e.g. mean annual temperature >= 10C *and* mean annual rainfall <500 mm.
 
 ```{r Decision_Tree_Image, echo = FALSE, fig.cap="*Figure 5: A single decision tree (upper panel), with a response Y, two predictor variables, X1 and X2 and split points t1 , t2 , etc. The bottom panel shows its prediction surface (after Hastie et al. 2001). Image sourced from @elith08", fig.align = "centre"}
 knitr::include_graphics("../vignettes/Images/Decision_Tree_Elith.jpg")
 ```
 
-An RF model independently fits multiple decision trees to boot-strapped samples of the data. The final predicted output is the mean prediction of all of the trees. This is to correct for the tendency of decision trees to over-fit their data. Put simply, the core of this idea is that it is easier to build and average multiple rules of thumb than to find a single, highly accurate prediction rule.
+RF SDMs independently fit multiple decision trees (normally hundreds or thousands) to bootstrapped samples of our data. Bootstrapping involves re-sampling our data with replacement for each decision tree. The final output of an RF SDM is the mean prediction of all of the individual trees. This corrects the tendency of decision trees to over-fit our data as the bootstrapping process decreases the variance of the model without increasing the bias. 
 
 The `RandomForest` module can be fit to presence-background or presence-absence data using the following call in your `workflow`:
 
@@ -162,15 +162,19 @@ RandomForest <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
                          output = PrintMap)
 ```
 
-In Figure 5 above we can see the predicted distribution of the Carolina wren from the RF model. Once again we see an area of high probability of occurrence in the eastern USA matching the range of our presence-records, but the map appears "patchier". There are also some small predicted patches of occupancy in the western USA (more than GAMs/MaxNet, less than GLM).
+In Figure 5 above we can see the predicted distribution of the Carolina wren from the RF model. Once again we see an area of high probability of occurrence in the eastern USA matching the range of our presence-records, but the map appears patchier.
 
 ### Boosted regression trees
 
-Like RF models, Boosted regression trees (BRTs) produce a prediction model in the form of an ensemble of weak prediction models (e.g. decision trees). BRTs are known by various names (including gradient boosting machine, or GBM), but BRT is the name most commonly used in the SDM context.
+Like RF models, Boosted regression trees (BRTs) produce a prediction model in the form of an ensemble of weak prediction models. BRTs are also known as gradient boosting machines or generalised boosting models (GBM), but BRT is the name most commonly used in the SDM context.
 
-In contrast to RF models, where each tree is independent, BRTs utilise the *boosting* technique to combine relatively large numbers of trees in an adaptive manner to optimise predictive performance. This is an iterative procedure that fits each subsequent tree to target the largest amount of unexplained variance from the preceeding trees. This gradually increase the emphasis on observations modelled poorly by existing trees.  
+In contrast to RF models, where each tree is independent, BRTs use the *boosting* technique to combine large numbers of trees in an adaptive manner to improve predictive performance. Boosting is an iterative procedure that fits each subsequent tree to target the largest amount of unexplained variance from the preceeding trees. This gradually increase the emphasis on observations modelled poorly by existing trees.  
 
-The `GBM` module fits a generalised boosted regression model using the `gbm` package, and it can be fit to both presence-background and presence-absence datasets. This requires us to set several tuning parameters to control tree and model complexity. The maximum number of trees, `max.trees`, is equivalent to the number of maximum number of iterations in the model. The maximum depth of each tree, `interaction.depth`, controls the number of nodes (or splits) allowed in the decision trees. Finally, the learning rate/shrinkage factor of the model, `shrinkage`, determines the contribution of each tree to the final model average.
+The `GBM` module fits a BRT SDM using the `gbm` package. It can be fit to both presence-background and presence-absence datasets. This requires us to set several tuning parameters to control model complexity:
+
++  `max.trees`: The maximum number of trees. This is equivalent to the maximum number of iterations in the model.
++  `interaction.depth`: The maximum depth of each tree. This controls the number of nodes (or splits) allowed in the decision trees.
++  `shrinkage`: The learning rate/shrinkage factor of the model. This determines the contribution of each tree to the final model average.
 
 This model can be fit using the following call in your `workflow` (using the default values for the `BRT` module):
 
@@ -185,9 +189,9 @@ BRT <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
                 output = PrintMap)
 ```
 
-In Figure 6 above we can see the predicted distribution of the Carolina wren from the BRT model. Once again we see a large patch of high probability corresponding to the range of our presence points, but also a larger amount of patches in western USA. The overall tendency for predictions to be near 0 or 1 suggests that the model run with the default parameters is overfit to the data.
+In Figure 6 above we can see the predicted distribution of the Carolina wren from the BRT model. Once again we see a large patch of high probability corresponding to the range of our presence points, but also a larger amount of patches in western USA. The overall tendency for predictions to be near 0 or 1 suggests that the model run with the default parameters is overfit to the data **[NEED REFERENCE]**.
 
-The `XGBoost` software is increasingly used in machine learning applications for fitting BRTs to very large datasets. You can use the `MachineLearn` module to fit BRT models with XGBoost by replacing the model module above with: `MachineLearn(method = 'xgbTree')`.
+The `XGBoost` software is increasingly used in machine learning applications for fitting BRTs to very large datasets. This is a re-implementation of the BRT principles designed around maximising computational efficiency. You can use the `MachineLearn` module to fit BRT models with XGBoost by replacing the model module above with: `MachineLearn(method = 'xgbTree')`.
 
 <hr>
 
