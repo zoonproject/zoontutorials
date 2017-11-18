@@ -26,157 +26,97 @@ knitr::opts_chunk$set(message = FALSE,
 
 <hr>
 
-## Introduction
+# Introduction
 
-<<<<<<< HEAD
-When we perform a Species Distribution Model analysis (SDM) we use species occurrence data collected from both structured field surveys and/or collated observation records as well as environmental predictor data. Before beginning to use covariate data to model occurrence over space, a crucial first step is to familiarise ourselves with the data and its limitations. It is important to do this before modelling the data, as data exploration can result in consequences for the choice of modelling method applied as well as the accurracy of the inference taken from the model. Equally, the choice of model *a priori* may bring a unique set of assumptions that we need to check for in our data. This guide outlines a few suggested steps implemented in both base R as well as using `zoon`'s `output` and `process` modules for data exploration (Figure 1).
+When we undertake a Species Distribution Model (SDM) we use both species occurrence data collected from field surveys or collated observations, as well as environmental predictor data. Before beginning to use covariate data to model occurrence over space, a crucial first step is to familiarise ourselves with the data and its limitations. It is important to do this before modelling the data, as data exploration can result in consequences for the choice of model applied as well as the accurracy of the inference taken from the model. Equally, choice of model a priori may bring a unique set of assumptions that we need to check for in our data. This guide outlines a few suggested steps implemented in both base R as well as using `zoon` `output` and `process` modules for data exploration (Figure 1), but is by no means exhaustive.
 
-** NEED TO CHANGE IMAGE AFTER SPLITTING GUIDE IN TWO **
-
-=======
-When we undertake a Species Distribution Model (SDM) we use both species occurrence data collected from field surveys or collated observations as well as environmental predictor data. Before beginning to use covariate data to model occurrence over space, a crucial first step is to familiarise ourselves with the data and its limitations. It is important to do this before modelling the data, as data exploration can result in consequences for the choice of model applied as well as the accurracy of the inference taken from the model. Equally, choice of model a priori may bring a unique set of assumptions that we need to check for in our data. This guide outlines a few suggested steps implemented in both base R as well as using `zoon` `output` and `process` modules for data exploration (Figure 1).
-
->>>>>>> 41ef0af
-```{r echo = F, out.width= '400px', fig.align = "center", fig.cap="*Figure 1. Conceptual flowchart for data exploration*"}
+```{r echo = F, out.width= '400px', fig.align = "center", fig.cap="*Figure 1. Data exploration considerations for occurence and covariate data*"}
 knitr::include_graphics("../vignettes/Images/DataExp_ConceptualDiagram.png")
 ```
 
-<<<<<<< HEAD
-We will start by setting up a basic `zoon` `workflow()` with Carolina wren presence-only data and raster covariate datasets for illustration.  We generate 1000 background points, fit a null model, and use the `PrintOccurrenceMap` output module to plot a map visualising our raw occurrence points (in red) and our background points (in black). 
-=======
-We will start by setting up a basic `zoon` `workflow()` with the Carolina wren presence-only data and raster covariate datasets for illustration.  We will set `process = Background(1000)`, `model = NullModel`, and `output = PrintOccurrenceMap` - this map simply shows us our raw occurrence points (in red) and our background points (in black), no model has been applied. 
->>>>>>> 41ef0af
+<hr>
+
+# Data summary
+
+To begin to familiarise ourselves with the data, it is very useful to examine summary information, including min, mean, and max values for each covariate that you have loaded. Environmental covariate data is subject to error. For example, maybe the maximum value in your elevation variable is 1000 m, but you know that the highest peak in your study region is only 500 m. Maybe your vegetation classification shows ten levels despite it being an eight-category scale. 
+
+It can also help us to check the format of the covariates - to ensure continuous variables are stored as numeric data and categorical variables as factors. Categorical variables may be erroneously listed in a numerical index (e.g. vegetation categories identified as 1-10), causing them to be mis-classed. Similarly, if there are any typos in numerical data entries that introduce characters (e.g. '2 cm' instead of '2'), then a continuous variable could be classed as a factor. 
+
+NA values are to be expected in our raster data as they are commonly masked to cover only a particular region, however finding NA values for covariates in the training data could indicate that some data points have incorrect latitude/longitude values. This can result from being mapped to locations outide the extent of our study, or suggest that the data point sits on the border of the study region and misses the raster due to its resolution and should be adjusted slightly.
+
+With the `zoon` output module `DataSummary`, examining covariate data for these potential pitfalls is very easy. 
 
 ```{r packages, message = FALSE, warning = FALSE}
 library(zoon)
 ```
 
-```{r workflow, message = FALSE, warning = FALSE}
-Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
-                                   covariate = CarolinaWrenRasters,
-                                   process = Background(1000),
-                                   model = NullModel,
-                                   output = PrintOccurrenceMap)
-```
-
-<hr>
-
-## Data exploration
-
-<<<<<<< HEAD
-A simple step for exploring your data is extracting a summary of it. Looking at things like the minimum/maximum values and the spread of your data are useful for identifying potential sampling biases in your data. The data is also potentially subject to error. For example, maybe the maximum value in your elevation variable is 1000 m, but you know that the highest peak in your study region is only 500 m. During the data entry process someone may have added an extra 0 to a 100m measurement by mistake. Maybe your vegetation classification is showing as having ten levels despite it being an eight-category scale. Chances are a spelling mistake as benign as 'forest' instead of 'Forest' is the culprit. 
-
-NA values are to be expected in our raster data (unless they are oblong in shape) as they are commonly masked to cover only a particular region (e.g. the border of a country or a national park) but are stored as a matrix and thus padded with NA values in cells of no interest, but we would not expect NA values in our training data. Finding NA values for covariates in the training data could also indicate that some data points have incorrect latitude/longitude values and are being mapped to locations outide the extent of our study, or that the data point sits on the border of the study region and "misses" the raster due to its resolution (i.e. a diagonal line is instead a series of alternating horizontal and vertical lines) and should be adjusted slightly.
-
-The `DataSummary` output module extracts these summaries separately for both the (non-background) model fitting data and the prediction data. Once again using the Carolina wren data, we fit a `workflow()` using the `DataSummary` module to explore our data.
-
-```{r workflow2, message = FALSE, warning = FALSE}
+```{r data summary workflow, message = FALSE, warning = FALSE}
 Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
                                    covariate = CarolinaWrenRasters,
                                    process = Background(1000),
                                    model = NullModel,
                                    output = DataSummary)
 ```
-=======
-Explain the summary print stuff module. 
->>>>>>> 41ef0af
 
 **EXPAND ON WHAT WE SEE ONCE THE UPDATED MODULE PULL REQUEST GOES THROUGH**
 
 <hr>
 
-## Outliers/data cleaning
+# Outliers/data cleaning
 
-Species distribution datasets are, to varying degrees, reliant on observation records gathered by humans and therefore subject to human error. Even in situations where we are fitting a model to entirely remotely-sensed data such as bioclimatic variables, our species occurrence records are usually pen-and-paper recordings from the field. This manual data entry can lead to mistakes. Inaccurate data can lead us to draw false conclusions, and for conservation work this could mean squandering our limited resources for a species in locations where the species is not likely to occur. One way to check for nonsense entries is to the plot occurrence data to covariate one by one, allowing you to isolate unusual entries. For example, if you plotted against latitude, you might see a single occurrence value at a latitude outside the range of your study. 
+Species distribution datasets are, to varying degrees, reliant on observation records gathered by humans and therefore subject to human error. Even in situations where we are fitting a model to entirely remotely-sensed data such as bioclimatic variables, our species occurrence records are usually pen-and-paper recordings from the field. This manual data entry can lead to mistakes. One way to check for nonsense entries is to the plot occurrence data to covariates one by one, allowing us to isolate unusual entries. For example, if we plotted against latitude, we might see a single occurrence value at a latitude outside the range of our study. 
 
-You can visualise these plots using the `Relationships` output module. 
-
-**insert here make it like hist freq of colours. ....**
+You can visualise these plots using the `CovHistogram` output module. 
 
 ```{r relationships workflow, message = FALSE, warning = FALSE}
-#Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
-#                                   covariate = CarolinaWrenRasters,
-#                                   process = Background(1000),
-#                                   model = NullModel,
-#                                   output = Relationships)
-```
-
-<<<<<<< HEAD
-<hr>
-=======
-Environmental covariate data is also subject to error. For example, maybe the maximum value in your elevation variable is 1000 m, but you know that the highest peak in your study region is only 500 m. During the data entry process someone may have added an extra 0 to a 100 m measurement by mistake. Maybe your vegetation classification is showing as having ten levels despite it being an eight-category scale. Chances are a spelling mistake as benign as 'forest' instead of 'Forest' is the culprit. 
->>>>>>> 41ef0af
-
-# Collinearity
-
-Collinearity is the existence of correlations among covariates. When two covariates in a model are correlated, for example altitude and temperature, then the modelling method will struggle to identify the impact of each variable independently and the significance of either may be masked. If covariate A and covariate B are correlated, for example, one approach would be to include one in the model, preferably based on sound biological justification. Should variable A be included, then in the discussion of the results it will be important to note that the observed effect could equally be driven by correlated covariate B. 
-
-<<<<<<< HEAD
-You can check for collinearity in many ways, but the simplest is to look at a pair plot of your covariate data. You can do this in the `PairPlot` output module. Variable names are listed down the diagonal, the bottom half of the panel shows the pairs plots, and the top half shows $r^2$ values for the relationships.
-=======
-```{r}
-# summary(occ.cov.df$pcGr)
-# max(occ.cov.df$pcGr)
-# min(occ.cov.df$pcGr)
+Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
+                                   covariate = CarolinaWrenRasters,
+                                   process = Background(1000),
+                                   model = NullModel,
+                                   output = CovHistograms)
 ```
 
 <hr>
 
 # Collinearity
 
-Collinearity is the existence of correlations among covariates. When two covariates in a model are correlated, for example perhaps altitude and temperature, then the modelling method will struggle to identify the impact of each variable independently and the significance of either may be masked. If covariate A and covariate B are correlated, for example, one approach would be to include one in the model, preferably based on sound biological justification. Should variable A be included, then in the discussion of the results it will be important to note that the observed effect could equally be driven by correlated covariate B. 
+Collinearity is the existence of correlations among covariates, for example between altitude and temperature. For some modelling methods, though notably not all of them, when two covariates in a model are correlated, the modelling method may struggle to identify the impact of each variable independently and the significance of either may be masked. If covariate A and covariate B are correlated, one approach would be to include a single one in the model, preferably based on sound biological justification. Should variable A be included, then in the discussion of the results it will be important to note that the observed effect could equally be driven by correlated covariate B. 
 
-You can check for collinearity in many ways, but the simplest is to look at a pair plot of your covariate data. You can do this in the `zoon` output module `PairPlot`. Variable names are listed down the diagonal, the bottom half of the panel shows the pairs plots, and the top half shows $r^2$ values for the relationships.
->>>>>>> 41ef0af
-
-**Saras to make it so pairplot does not have overlapping points - hexbin?**
+You can check for collinearity in many ways, but the simplest is to look at a pair plot of your covariate data. You can do this using the `zoon` output module `PairPlot`. The upper panel shows a density scatterplots of relationships between covariates, the diagonal panel shows a density of the points as well as variable names, and the lower panel shows the $r^2$ correlation values where darker colours indicate stronger correlation (blue in the positive direction, red in the negative).
 
 ```{r pairplot workflow, message = FALSE, warning = FALSE}
-<<<<<<< HEAD
-#Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
-#                                   covariate = CarolinaWrenRasters,
-#                                   process = Background(1000),
-#                                   model = NullModel,
-#                                   output = PairPlot)
-=======
 Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
                                    covariate = CarolinaWrenRasters,
                                    process = Background(1000),
                                    model = NullModel,
                                    output = PairPlot)
->>>>>>> 41ef0af
 ```
 
 <hr>
 
-<<<<<<< HEAD
-A tidy summary of many of the previous data exploration methods is provided by the `GenerateCovariateReport` output module. This is based on the `GenerateReport()` function in the `DataExplorer` `R` package, but tailored specifically for SDM analyses.
-
-This module generates a data profiling report for our training data (the data set that our model is fit to) and/or our raster data (that our model uses to predict the distribution of our study species). These reports will show our data's structure, the percentage of missing data, the distribution of our covariates (histograms for continuous data, bar charts for discrete), and show the results of a correlation analysis. We need to tell the module which report/s to generate by setting the `type` argument to one of `"D"` (Data Report only), `"R"` (Raster report only), or `"DR"` (Data and Raster Report).
-
-<hr>
-=======
-A tidy summary of many of the following data exploration methods is provided with the `GenerateCovariateReport` `Output` module. This is based on the `GenerateReport()` function in the `DataExplorer` `R` package, but tailored specifically for SDM analyses.
-
-This module generates a data profiling report for our training data (the data set that our model is fit to) and/or our raster data (that our model uses to predict the distribution of our study species). These reports will show our data's structure, the percentage of missing data, the distribution of our covariates (histograms for continuous data, bar charts for discrete), and show the results of a correlation analysis. We need to tell the module which report(s) to generate by setting the `type` argument to one of "D" (Data Report only), "R" (Raster report only), or "DR" (Data and Raster Report).
+# Covariate Report
+A tidy summary of many of these data exploration methods is provided with the `GenerateCovariateReport` `Output` module. This is based on the `GenerateReport()` function in the `DataExplorer` `R` package, but tailored specifically for SDM analyses. These reports show our data structure, the percentage of missing data, the distribution of our covariates (histograms for continuous data, bar charts for discrete), and show the results of a basic correlation analysis. We need to tell the module which report(s) to generate by setting the `type` argument to one of "D" (Data Report only), "R" (Raster report only), or "DR" (Data and Raster Report).
 
 ```{r DataReport, eval=FALSE}
 output = GenerateCovariateReport(type = "DR")
 ```
 
-# Accessor function method
-It is helpful to have a basic workflow loaded before we begin so that we can take advantage of zoon's accessor functions. We can call the accessor function `Process()` to generate a data frame object with extracted raster covariate values for each occurrence point. We can examine the first six rows of this data frame by using the base R function `head()`. 
+<hr>
+
+# Accessor functions
+Where there is no module already designed, we can manipulate our data directly by using the accessor function `Process()` to generate a dataframe object with extracted raster covariate values for each occurrence point. We can examine the first six rows of this data frame by using the base R function `head()`. 
 
 ``` {r}
-# occ.cov.df <- Process(Carolina_Wren_Workflow)$df
-# head(occ.cov.df)
+occ.cov.df <- Process(Carolina_Wren_Workflow)$df
+head(occ.cov.df)
 ```
 
-It is also useful to check the format of the covariates included to ensure continuous variables are stored as numeric data and categorical variables as factors so that they perform as expected in the model. Categorical variables may, for example, be erroneously listed in a numerical index (e.g. vegetation categories identified as 1-10 instead of 'VegClass1', 'VegClass2', etc) and therefore interpreted as numerical data. Similarly, if there are any typos in numerical data entries that introduce characters (e.g. '2 cm' instead of '2'), then a continuous variable will be classed as a factor. We can check the format of the data with the `str()` function, or check individual variables with `class()`. 
+We can check the format of the data with the `str()` function, or check individual variables with `class()`. 
 
 ``` {r}
-# str(occ.cov.df)
-# class(occ.cov.df$pcMix)
+str(occ.cov.df)
+class(occ.cov.df$pcMix)
 ```
 
->>>>>>> 41ef0af
+<hr>
+
