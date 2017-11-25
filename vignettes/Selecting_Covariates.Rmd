@@ -26,11 +26,11 @@ knitr::opts_chunk$set(message = FALSE,
 
 <hr>
 
-# Introduction
+## Introduction
 
 When we undertake a Species Distribution Model (SDM), a good first step is to explore our data to familiarise ourselves with its structure and limitations. We explore this topic in the [Data Exploration vignette](https://rawgit.com/zoonproject/zoontutorials/master/inst/doc/Selecting_Covariates.html). 
 
-After exploring our data, and in conjunction with variable selection, if appropriate, we may want to implement various data processing steps into our `zoon` `workflow`. There are some generally agreed upon guidelines for this data processing, but it is also highly subjective and open to interpretation. This guide outlines a few suggested steps implemented in both base R as well as using `zoon` `output` and `process` modules for data processing. These include data cleaning, variable standardisation and transformation, and adding interaction terms (Figure 1).
+After exploring our data, and in conjunction with variable selection, if appropriate, we may want to implement various data processing steps into our `zoon` `workflow`. There are some generally agreed upon guidelines for this data processing, but it is also highly subjective and open to interpretation. This guide outlines a few suggested steps implemented in both base R as well as using `zoon`'s `output` and `process` modules for data processing. These include data cleaning, variable standardisation and transformation, and adding interaction terms (Figure 1).
 
 ```{r echo = F, out.width= '400px', fig.align = "center", fig.cap="*Figure 1. Conceptual flowchart for process modules in covariates selection and reparation.*"}
 knitr::include_graphics("../vignettes/Images/SelectCov_ConceptualDiagram.png")
@@ -42,42 +42,75 @@ library(zoon)
 
 <hr>
 
-# Data cleaning
+## Data cleaning
+
+**Not against this being here, but I made a copy in Data Exploration where I think it suits better. Should we keep it here or remove it**
 
 Plotting occurrence data in this can make it possible to identify errors. One of the `zoon` modules, `Clean`, removes impossible, incomplete, or unlikely species occurrence points. Impossible occurrence points include those where the location doesn't exist, incomplete records may be missing either a longitude or latitude value (or both), and unlikely data points are those that fall well outside the geographic range of your study area (for example, in the middle of the sea). Within `Clean` these options are referred to by number as impossible (1), incomplete (2), and unlikely (3), and this module is used as follows:
 
-```{r Clean, eval=FALSE}
-process = Clean(which = c(1,2,3))
+```{r clean workflow, eval = FALSE}
+Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
+                                   covariate = CarolinaWrenRasters,
+                                   process = Chain(Background(1000),
+                                                   Clean(which = c(1,2,3))),
+                                   model = NullModel,
+                                   output = NoOutput)
 ```
+
+```
+The Clean module has removed 0 data points. This includes 0 presences, 0 absences, and 0 background points.
+```
+
+Here you can see that our test dataset had no observations that warranted cleaning!
 
 <hr>
 
-# Standardising variables
+## Standardising variables
 
-For some modelling methods, it is helpful to standardise variables, thereby putting them on the same scale. Always check the assumptions of your selected model, however, as this is not always necessary, for example with Boosted Regression Trees or Random Forest models. Standardisation is achieved by subtracting the mean for a covariate from each individual value so all covariates are centred on zero, or additionally by dividing by the standard deviation, which makes the standard deviation of each covariate equal to one (this is called the 'z-score'). One major reason to standardise covarites is to aid interpretation of our model results. Regression parameters of covariates on the same scale allow us to compare the influence of different variables on species distributions. Without standardisation, the regression coefficient for the distance of a site to roads might be +0.003 and the effect of average temperature could be -10. How would we compare these coefficients? 
+For some modelling methods, it is helpful to standardise variables, thereby putting them on the same scale. Always check the assumptions of your selected model, however, as this is not always necessary. For example, boosted regression trees with the `GBM` module or random forest models with `RandomForest`. Standardisation is achieved by subtracting the mean for a covariate from each individual value so all covariates are centred on zero, or additionally by dividing by the standard deviation, which makes the standard deviation of each covariate equal to one (this is called the 'z-score'). One major reason to standardise covarites is to aid interpretation of our model results. Regression parameters of covariates on the same scale allow us to compare the influence of different variables on species distributions. Without standardisation, the regression coefficient for the distance of a site to roads might be +0.003 and the effect of average temperature could be -10. How would we compare these coefficients? 
 
 In addition, standardisation of covariates can aid in model fitting. If regression coefficients are too different between two covariates in a model, then the software may struggle to converge on parameter estimates for both terms. 
 
-We can standardise covariates in `zoon` with the `StandardiseCov` process module. By default, the module standardises all variables by subtracting their mean and dividing by their standard deviation (calculating their 'z-score'). To use this module we need to choose which variables to exclude from standardisation (if any), and whether to use the Gelman variant (standardises by two standard deviations instead of one). Some examples of how to use the module are below:
+We can standardise covariates in `zoon` with the `StandardiseCov` process module. By default, the module standardises all variables by subtracting their mean and dividing by their standard deviation (calculating their 'z-score'). To use this module we need to choose which variables to exclude from standardisation (if any), and whether to use the Gelman variant (standardises by two standard deviations instead of one). Below is an example of how to use the default verison of the `StandardiseCov` module:
 
-```{r StandardiseCov, eval=FALSE}
-process = StandardiseCov() # default form
+```{r StandardiseCov, warning=FALSE, message=FALSE}
+workflow_standardised <- workflow(CarolinaWrenPO,
+                                  CarolinaWrenRasters,
+                                  Chain(Background(1000),
+                                        StandardiseCov),
+                                  NullModel,
+                                  NoOutput)
+```
 
-process = StandardiseCov(Gelman = TRUE,
-                         exclude = c("VarB", "VarC"))
+Lets look at our data pre-standardisation using the `Covariate` accessor function:
+
+```{r}
+summary(Covariate(workflow_standardised))
+```
+
+And now post-standardisation uing the `Process` accessor function:
+
+```{r}
+summary(Process(workflow_standardised)$ras)
+```
+
+Now to confirm it worked properly, lets standardise our pre-standardised data externally:
+
+```{r}
+summary(scale(Covariate(workflow_standardised)))
 ```
 
 <hr>
 
-# Data transformation
+## Data transformation
 
 Transformation of covariate data is a way to express dependent variables in a non-linear form. Generally, decisions about transformation are subjective, and depend upon the assumptions of our chosen model as well as the natural biological underpinnings of our parameters. A few key reasons to transform data:
 
 + Biological justification: Many biological parameters are naturally better understood on a particular scale, for example, many plant biometric variables are typically log-transformed because the data are naturally skewed, with only a few very large values. 
 
-+ Skewed/systematically varying residuals: Transformation doesn't just change the distribution of the raw data, it also implies a relationship of the residuals. If there is a pattern among the residuals ('heterscedasticity') then transformation can be used to remove that pattern (ensuring 'homoscedasticity'), an assumption of some models. 
++ Skewed/systematically varying residuals: Transformation doesn't just change the distribution of the raw data, it also implies a relationship of the residuals. If there is a pattern among the residuals ('heteroscedasticity') then transformation can be used to remove that pattern (ensuring 'homoscedasticity'), an assumption of some models. 
 
-+ To linearise a relationship/simplify a model: If the relationship between a covariate and the response variable is non-linear, then you may need to add extra terms to the model, making it more complicated. Transformation to linearlise this relationship thus simplifies the model. 
++ To linearise a relationship/simplify a model: If the relationship between a covariate and the response variable is non-linear, then you may need to add extra terms to the model, making it more complicated. Transformation to linearise this relationship thus simplifies the model. 
 
 + To add flexibility: Polynomial transformation is useful for variables whose impact on occurrence is not linear. Some environmental variables, such as elevation, temperature, and rainfall, actually have a peak value for occurrence and would therefore be good candidates for polynomial transformation.
 
@@ -87,7 +120,11 @@ Great care must be taken when adding transformations to our data, and there are 
 
 + Masking outliers: Without a biological justification for doing so, transforming data simply to hide the impact of outlying values hides valuable insight in our data.
 
-There is a process module for data transformation in `zoon` called `Transform`. To use this module we need to define the transformation, nominate the variable to be transformed, and decide whether to replace the original variable or to create a new one. We define the transformation in a similar manner to defining a function in base R. This takes the format of setting the `trans` argument in this module to the format of `function(x) {our transformation}`. We select the variables to transform by supplying a character vector to the `which_cov` argument, and determine variables to replace by setting the `replace` argument to `TRUE` or `FALSE`.
++ Some transformations have no effect when using certain modelling methods. Some machine learning methods like MaxEnt, boosted regression trees, and random forests effectively ignore monotonic transformations. These are transformations of covariates such that the rank order of values never changes (it may reverse, but not mix them up). Non-monotonic transformations will have an effect.
+
+### Defining transformations
+
+There is a process module for data transformation in `zoon` called `Transform`. To use this module we need to define the transformation, nominate the variable to be transformed, and decide whether to replace the original variable or to create a new one. We define the transformation in a similar manner to defining a function in base `R`. This takes the format of setting the `trans` argument in this module to the format of `function(x) {our transformation}`. We select the variables to transform by supplying a character vector to the `which_cov` argument, and determine variables to replace by setting the `replace` argument to `TRUE` or `FALSE`.
 
 Let's run through a couple of examples. If we want to square a variable called VarA and save it as an additional variable in our dataset (i.e. do not replace original variable) we would use this:
 
@@ -117,13 +154,13 @@ process = Chain(Transform(trans = function(x) {x^2},
 
 <hr>
 
-# Interactions
+## Interactions
 
-Typical inference assumes that unique predictor variables have an independent effect on our response variable (species occurrence). This makes sense in many cases, when we are reasonably confortable with the biological justification. For example, it is reasonable and backed by experimental evidence, to suppose that mosquito populations are more common in humid regions. This would be an independent effect of humidity on mosquito occurrence. However, we need to consider the conditionality of this assumption. Occurrence data are conditional upon how they enter our dataset (is data collection biased by region where we expect mosquitos to occur?) It is possible that the relationship between mosquito occurrence and humidity is *conditional* on another environmental variable. In this example, perhaps temperature moderates this relationship. A pairwise interaction is the interaction between two variables in a model such that:
+Typical inference assumes that unique predictor variables have an independent effect on our response variable (species occurrence). This makes sense in many cases, when we are reasonably confortable with the biological justification. For example, it is reasonable, and backed by experimental evidence, to suppose that mosquito populations are more common in humid regions. This would be an independent effect of humidity on mosquito occurrence. However, we need to consider the conditionality of this assumption. Occurrence data are conditional upon how they enter our dataset (is data collection biased by region where we expect mosquitos to occur?) It is possible that the relationship between mosquito occurrence and humidity is *conditional* on another environmental variable. In this example, perhaps temperature moderates this relationship. A pairwise interaction is the interaction between two variables in a model such that:
 
-$Y = b_0 + b_1*X_1 + b_2*X_2 + b_3(X_1*X_2)$
+$$Y = b_0 + b_1*X_1 + b_2*X_2 + b_3(X_1*X_2)$$
 
-and where $b_3$ is the interaction term between the variables $X_1$ and $X_2$. 
+where $b_3$ is the interaction term between the variables $X_1$ and $X_2$. 
 
 Once we have decided to add an interaction effect into our model, we can select from three possible ways to implement it in our model: add all pairwise interactions, define set interactions between a select group of variables, or specify polynomial terms.
 
@@ -158,7 +195,8 @@ process = addInteraction(which_covs = c('A', 'B', 'C'))   # adds all two-way (e.
 ```
 
 ### Interactions as polynomial terms
-the addInteraction method can also be used as an alternative to coding in polynomial terms. 
+
+The `addInteraction` method can also be used as an alternative to coding in polynomial terms. 
 
 ```{r eval=FALSE}
 process = addInteraction(which_covs = c('A', 'A'))   # leads to a quadratic polynomial
@@ -167,16 +205,3 @@ process = addInteraction(which_covs = c('A', 'A', 'A'))   # leads to a cubic, po
 ```
 
 <hr>
-
-### Example
-We will start by setting up a basic `zoon` `workflow()` with the Sugar Maple data and using a raster covariate dataset from Bioclim for illustration.  
-
-```{r workflow, message = FALSE, warning = FALSE}
-# ext <- c(-170, -20, 10, 80)
-# SugarMaple_Workflow <- workflow(occurrence = SugarMaple,
-#                                 covariate = Bioclim(extent = as.vector(ext)),
-#                                 process = addInteraction(which_covs = c('Bio3', 'Bio3')),
-#                                 model = NullModel,
-#                                 output = ResponsePlot)
-```
-
