@@ -23,9 +23,11 @@ Regardless of interpretation, when using an SDM for presence-background data we 
 
 ## How many background points?
 
-+ Hard limits (e.g. 10,000)
-+ As many as computational limits allow
-+ Enough to cover predictor variability
+The number of background points sampled has generally been selected *ad hoc*. Quantities between 1,000 - 10,000 are frequently seen in the literature. A study by Barbet-Massin (**REF**) found that different modelling methods performed best with different quantities of background points (e.g. 10,000 for regression-based SDMs).
+
+Where background points are interpreted as samples of the environmental space, however, then *ad hoc* quantities may seem less appropriate. Here we need to generate enough background points to adequately sample the environmental covariate space. Thus the roughness of covariate space largely defines the number of background points required; more variability = more points required (**right?**). In theory an infinitely large number of background points would best approximate this covariate space, but computationally this is generally not a feasible approach.
+
+**Need closing sentence**
 
 ## How to generate background points?
 
