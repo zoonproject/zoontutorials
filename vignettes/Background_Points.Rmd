@@ -1,0 +1,33 @@
+---
+title: "Background Points"
+csl: Methods.csl
+output:
+  html_document:
+    css: zoon.css
+    theme: lumen
+    toc: yes
+    toc_float:
+      collapsed: no
+      toc_depth: 4
+bibliography: bibliography.bib
+output: html_document
+---
+
+## Introduction
+
++ what are background points
++ background vs pseudo-absence
+
+## How many background points?
+
++ Hard limits (e.g. 10,000)
++ As many as computational limits allow
++ Enough to cover predictor variability
+
+## How to generate background points?
+
++ Random
++ Bias layer
++ Targetted background
+
+## Conclusion
