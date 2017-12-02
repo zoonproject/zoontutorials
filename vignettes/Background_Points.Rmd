@@ -15,8 +15,11 @@ output: html_document
 
 ## Introduction
 
-+ what are background points
-+ background vs pseudo-absence
+Many species distribution model (SDM) analyses make use of presence-only datasets. These datasets often stem from historical or museum records, citizen science, and other, often opportunistic, unstructured surveys. Most modelling methods, however, are not compatible with presence-only datasets. In lieu of proper absence observation records we need to make use of background, or pseudo-absence, points. Depending on the viewpoint of the modeller and the modelling method being used, these can be interpreted as pseudo-absences, samples of the environmental background, or integration points (**REF**, see forum post). For example, MaxEnt, one of the most widely used SDM methods, uses background points to sample the environmental predictor space. Yet MaxEnt can be considered equivalent to a poisson-point process model where they are considered integration points.
+
+**Logistic regression: treated as pseudo-absences?**
+
+Regardless of interpretation, when using an SDM for presence-background data we need to make a decision about *how* to generate our background points, and *how many* do we need? These choices can have important impacts on our SDM.
 
 ## How many background points?
 
