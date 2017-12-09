@@ -15,15 +15,15 @@ output: html_document
 
 ## Introduction
 
-Many species distribution model (SDM) analyses make use of presence-only datasets. These datasets often stem from historical or museum records, citizen science, and other, often opportunistic, unstructured surveys. Most modelling methods, however, are not compatible with presence-only datasets. In lieu of proper absence observation records we need to make use of background, or pseudo-absence, points. Depending on the viewpoint of the modeller and the modelling method being used, these can be interpreted as pseudo-absences, samples of the environmental background, or integration points (**REF**, see forum post). For example, MaxEnt, one of the most widely used SDM methods, uses background points to sample the environmental predictor space. Yet MaxEnt can be considered equivalent to a poisson-point process model where they are considered integration points.
+Many species distribution model (SDM) analyses make use of presence-only datasets. These datasets often stem from historical or museum records, citizen science, and other, often opportunistic, unstructured surveys. Most modelling methods, however, are not compatible with presence-only datasets. In lieu of proper absence observation records we need to make use of background, or pseudo-absence, points. Depending on the viewpoint of the modeller and the modelling method being used, these can be interpreted as pseudo-absences, samples of the environmental background [@Phillips2009], or integration points [@Warton2010]. For example, MaxEnt, one of the most widely used SDM methods [@elith11], uses background points to sample the environmental predictor space. Yet MaxEnt can be considered equivalent to a poisson-point process model where they are considered integration points.
 
 **Logistic regression: treated as pseudo-absences?**
 
-Regardless of interpretation, when using an SDM for presence-background data we need to make a decision about *how* to generate our background points, and *how many* do we need? These choices can have important impacts on our SDM.
+Regardless of interpretation, when using an SDM for presence-background data we need to make a decision about *how to generate* our background points, and *how many* of them we need. These choices can have important impacts on our SDM.
 
 ## How many background points?
 
-The number of background points sampled has generally been selected *ad hoc*. Quantities between 1,000 - 10,000 are frequently seen in the literature. A study by Barbet-Massin (**REF**) found that different modelling methods performed best with different quantities of background points (e.g. 10,000 for regression-based SDMs).
+The number of background points sampled has generally been selected *ad hoc*. Quantities between 1,000 - 10,000 are frequently seen in the literature. A study by Barbet-Massin [@Barbet-Massin2012] found that different modelling methods performed best with different quantities of background points (e.g. 10,000 for regression-based SDMs).
 
 Where background points are interpreted as samples of the environmental space, however, then *ad hoc* quantities may seem less appropriate. Here we need to generate enough background points to adequately sample the environmental covariate space. Thus the roughness of covariate space largely defines the number of background points required; more variability = more points required (**right?**). In theory an infinitely large number of background points would best approximate this covariate space, but computationally this is generally not a feasible approach.
 
@@ -31,17 +31,13 @@ Where background points are interpreted as samples of the environmental space, h
 
 ## How to generate background points?
 
-In addition to the number of background points to generate, we need to decide on *how* we are going to generate them. A common method seen in the literature is to uniformly choose them at random from the study area. Note that this is random within *geographic* space and not necessarily random within *environmental* space.
-
-**insert code chunk**
-
-The problem with random generation of background points is that it does not account for any potential sampling bias in our presence records. In contrast to structured presence-absence surveys, presence-only data are commonly subject to sampling biases. Museum and herbaria records are frequently opportunistic and tend to occur near roads, while citizen science data is biased towards places that people frequently go (like cities). Since we don't have true absences to help us determine where a species isn't, we use background points to compare the environment where a species *is* to the environment where it *could be* (**REWORD**). Most SDMs are fit in *environmental* space with no regard for *geographic* space, so sampling bias can cause environmental bias in the data. If these potential biases are not accounted for then the fitted model could represent survey effort more than it does the species true distribution.
-
-Here we cover three methods of accounting for sampling bias when generating our background points: bias layers, geographic exclusion, and targetted background.
+In addition to the number of background points to generate, we need to decide on *how* we are going to generate them. 
 
 ### Random
 
-The simplest (**and most common??**) method of generating background points is to generate them randomly across the entire study area. We can do this with the `Background` module and only need to specify a number of points to generate. Optionally, we can set a seed for the process using the `seed` argument to make our point generation reproducible. Here we randomly generate 1000 background points to go with presence-only data for the Carolina wren (grey circles).
+The simplest (**and most common??**) method of generating background points is to generate them randomly across the entire study area. Note that this is random within *geographic* space and not necessarily random within *environmental* space. 
+
+We can do this with the `Background` module, and only need to specify a number of points to generate. Optionally, we can set a seed for the process, using the `seed` argument, to make our point generation reproducible. Here we randomly generate 1000 background points (grey circles) to go with presence-only data for the Carolina wren (red circles).
 
 ```{r}
 ext <- extent(c(-138.71, -52.58, 18.15, 54.95))
@@ -57,7 +53,9 @@ Background <- workflow(occurrence = SpOcc("Thryothorus ludovicianus",
 
 ### Biased
 
-Presence-only data is often subject to sampling bias. This data is commonly sourced from opportunistic observations like museum/herbarium records and citizen science databases, which are often biased towards areas frequenty used by humans like roads and towns. If we don't account for this bias when generating our background points we run the risk of modelling sampling effort rather than the species' distribution. If our presence-only data and background data are both sampled with the same bias the model should differentiate between the distributions of occurrences and background data (**Phillips ref**). There are several methods of accounting for bias in background point generation in `zoon` at present: bias layers and targetted group background.
+The problem with random generation of background points is that it does not account for any potential sampling bias in our presence records. In contrast to structured presence-absence surveys, presence-only data are commonly subject to sampling biases. Museum and herbaria records are frequently opportunistic and tend to occur near roads, while citizen science data is biased towards places that people frequently go (like cities). Since we don't have true absences to help us determine where a species isn't, we use background points to compare the environment where a species *is* to the environment where it *could be* (**REWORD**). Most SDMs are fit in *environmental* space with no regard for *geographic* space, so sampling bias can cause environmental bias in the data. If these potential biases are not accounted for then the fitted model could represent survey effort more than it does the true species distribution. If our presence-only data and background data are both sampled with the same bias the model should differentiate between the distributions of occurrences and background data [@Phillips2009].
+
+Here we cover three methods of accounting for sampling bias when generating our background points: bias layers, geographic exclusion, and targetted background.
 
 #### Bias layer
 
@@ -75,22 +73,22 @@ TargettedBG <- workflow(occurrence = SpOcc(species = "Thryothorus ludovicianus",
                                            limit = 500),
                         covariate = CarolinaWrenRasters,
                         process = TargetGroupBackground(OccurrenceCall = Chain(
-                          SpOcc(species = "Turdus migratorius",
+                          SpOcc(species = "Empidonax virescens",
                                 databases = "gbif",
                                 extent = ext,
                                 type = "background",
                                 limit = 300),
-                          SpOcc(species = "Zenaida macroura",
+                          SpOcc(species = "Peucaea aestivalis",
                                 databases = "gbif",
                                 extent = ext,
                                 type = "background",
                                 limit = 300),
-                          SpOcc(species = "Corvus brachyrhynchos",
+                          SpOcc(species = "Strix varia",
                                 databases = "gbif",
                                 extent = ext,
                                 type = "background",
                                 limit = 300),
-                          SpOcc(species = "Haemorhous mexicanus",
+                          SpOcc(species = "Cyanocitta cristata",
                                 databases = "gbif",
                                 extent = ext,
                                 type = "background",
@@ -100,5 +98,6 @@ TargettedBG <- workflow(occurrence = SpOcc(species = "Thryothorus ludovicianus",
 
 ```
 
-
 ## Conclusion
+
+No two SDM analyses are identical. We put considerable thought into our selection of modelling method and the choices involved in fitting them, and should extend the same effort for background point generation. The number of points to generate depends on the variability of our environmental data, but also has a ceiling due to computational constraints (although this is less of an issue with modern computing resources). If and how to account for any sampling bias inherent in our presence-only data will depend on the data in question and its sampling regime. Background point generation is an important step for the analysis of presence-only data and it should be undertaken with care.
