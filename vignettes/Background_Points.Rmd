@@ -10,7 +10,10 @@ output:
       collapsed: no
       toc_depth: 4
 bibliography: bibliography.bib
-output: html_document
+vignette: |
+  %\VignetteIndexEntry{Background Points}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
 ---
 
 ## Introduction
