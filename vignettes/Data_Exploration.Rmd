@@ -28,7 +28,7 @@ knitr::opts_chunk$set(message = FALSE,
 
 ## Introduction
 
-When we undertake a species distribution model (SDM) we use both species occurrence data collected from field surveys or collated observations, as well as environmental predictor data. Before using covariate data to model species occurrence over geographic or environmental space, a crucial first step is to familiarise ourselves with the data and its limitations. It is important to do this before modelling the data, as data exploration can result in consequences for our choice of modelling method as well as the accurracy of the inferences we can make. Equally, choice of model *a priori* may bring a unique set of assumptions that we need to check for in our data. This guide outlines a few suggested steps implemented in both base R as well as using `zoon`'s `output` and `process` modules for data exploration (Figure 1), but is by no means exhaustive.
+When we undertake a species distribution model (SDM) we use both species occurrence data collected from field surveys or collated observations, as well as environmental predictor data. Before using covariate data to model species occurrence over geographic or environmental space, a crucial first step is to familiarise ourselves with the data and its limitations. It is important to do this before modelling the data, as data exploration can result in consequences for our choice of modelling method as well as the accurracy of the inferences we can make. Equally, choice of model *a priori* may bring a unique set of assumptions that we need to check for in our data. This guide outlines a few suggested steps implemented in both `base` `R` as well as using `zoon`'s `output` and `process` modules for data exploration (Figure 1), but is by no means exhaustive.
 
 ```{r echo = F, out.width= '400px', fig.align = "center", fig.cap="*Figure 1. Data exploration considerations for occurence and covariate data*"}
 knitr::include_graphics("../vignettes/Images/DataExp_ConceptualDiagram.png")
@@ -38,7 +38,7 @@ knitr::include_graphics("../vignettes/Images/DataExp_ConceptualDiagram.png")
 
 ## Data summary
 
-To begin familiarising ourselves with our data, it is very useful to examine summary information including minimum, maximum, and mean values for each of our covariates. Covariate data is potentially subject to error, and this is a simple method to check for them. For example, maybe the maximum value in your elevation variable is 1000 m, but you know that the highest peak in your study region is only 500 m. Or maybe your vegetation classification shows ten levels despite it being an eight-category scale.
+To begin familiarising ourselves with our data, it is very useful to examine summary information including minimum, maximum, and mean values for each of our covariates. Covariate data is potentially subject to errors, and this is a simple method to check for them. For example, maybe the maximum value in your elevation variable is 1000 m, but you know that the highest peak in your study region is only 500 m. Or maybe your vegetation classification shows ten levels despite it being an eight-category scale.
 
 It can also help us check the format of the covariates - to ensure continuous variables are stored as numeric data and categorical variables as factors. Categorical variables may be erroneously listed in a numerical index (e.g. vegetation categories identified as 1-10), causing them to be mis-classed. Similarly, if there are any typos in numerical data entries that introduce characters (e.g. '2 cm' instead of '2'), then a continuous variable could be classed as a factor. Without addressing these issue our SDM either cannot run or will return erroneous results.
 
@@ -71,10 +71,6 @@ Here we can notice several points of interest in our dataset:
 Species distribution datasets are, to varying degrees, reliant on observation records gathered by humans and therefore subject to human error. Even in situations where we are fitting a model to entirely remotely-sensed data such as bioclimatic variables, our species occurrence records are usually pen-and-paper recordings from the field. This manual data entry can lead to mistakes. One way to check for nonsense entries is to the plot occurrence data to covariates one by one, allowing us to isolate unusual entries. For example, if we plotted against latitude, we might see a single occurrence value at a latitude outside the range of our study. 
 
 You can visualise these plots using the `CovHistogram` output module. 
-
-**CovHistograms module works on the raster data not the point data. Need to re-work the Data Exploration guide. Alternatively get it to plot on both point and raster data.**
-
-**Explain NAs in figure**
 
 ```{r relationships workflow, message = FALSE, warning = FALSE}
 Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
@@ -126,7 +122,11 @@ Here you can see that there is no apparrent colinearity between any of our covar
 A tidy summary of many of these data exploration methods is provided with the `GenerateCovariateReport` `Output` module. This is based on the `GenerateReport()` function in the `DataExplorer` `R` package, but tailored specifically for SDM analyses. These reports show our data structure, the percentage of missing data, the distribution of our covariates (histograms for continuous data, bar charts for discrete), and show the results of a basic correlation analysis. We need to tell the module which report(s) to generate by setting the `type` argument to one of "D" (Data Report only), "R" (Raster report only), or "DR" (Data and Raster Report).
 
 ```{r DataReport, eval=FALSE}
-output = GenerateCovariateReport(type = "DR")
+Carolina_Wren_Workflow <- workflow(occurrence = CarolinaWrenPO,
+                                   covariate = CarolinaWrenRasters,
+                                   process = Background(1000),
+                                   model = NullModel,
+                                   output = GenerateCovariateReport(type = "DR"))
 ```
 
 <hr>
@@ -154,4 +154,8 @@ Using base `R` instead of modules echoes the results of the modules we showed of
 
 <hr>
 
-**Does this need a conclusion?**
+## Conclusion
+
+Data exploration is a crucial first step when performing a species distribution model analysis, but we are not yet ready to jump straight into fitting a model. Next we need to use the information we've gained from our exploration to select our covariates and prepare them for analysis. We explore this topic in the [Selecting and Preparing Covariates](https://rawgit.com/zoonproject/zoontutorials/master/docs/articles/Selecting_Covariates.html) guide.
+
+<hr>
