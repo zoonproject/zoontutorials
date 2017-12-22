@@ -36,15 +36,13 @@ After exploring our data, and in conjunction with variable selection, if appropr
 knitr::include_graphics("../vignettes/Images/SelectCov_ConceptualDiagram.png")
 ```
 
-```{r packages, message = FALSE, warning = FALSE}
+```{r packages, message = FALSE, warning = FALSE, echo = FALSE}
 library(zoon)
 ```
 
 <hr>
 
 ## Data cleaning
-
-**Not against this being here, but I made a copy in Data Exploration where I think it suits better. Should we keep it here or remove it**
 
 Plotting occurrence data in this can make it possible to identify errors. One of the `zoon` modules, `Clean`, removes impossible, incomplete, or unlikely species occurrence points. Impossible occurrence points include those where the location doesn't exist, incomplete records may be missing either a longitude or latitude value (or both), and unlikely data points are those that fall well outside the geographic range of your study area (for example, in the middle of the sea). Within `Clean` these options are referred to by number as impossible (1), incomplete (2), and unlikely (3), and this module is used as follows:
 
@@ -67,7 +65,7 @@ Here you can see that our test dataset had no observations that warranted cleani
 
 ## Standardising variables
 
-For some modelling methods, it is helpful to standardise variables, thereby putting them on the same scale. Always check the assumptions of your selected model, however, as this is not always necessary. Many machine learning methods like random forests, boosted regression trees, and MaxEnt (**check MaxEnt. It rescales everything 0-1, so I assume insensitive?**) are insensitive to standardisation.
+For some modelling methods, it is helpful to standardise variables, thereby putting them on the same scale. Always check the assumptions of your selected model, however, as this is not always necessary. Decision tree models, like random forests and boosted regression trees, are insensitive to standardisation.
 
 Standardisation is achieved by subtracting the mean for a covariate from each individual value so all covariates are centred on zero, or additionally by dividing by the standard deviation, which makes the standard deviation of each covariate equal to one (this is called the 'z-score'). One major reason to standardise covarites is to aid interpretation of our model results. Regression parameters of covariates on the same scale allow us to compare the influence of different variables on species distributions. Without standardisation, the regression coefficient for the distance of a site to roads might be +0.003 and the effect of average temperature could be -10. How would we compare these coefficients? 
 
@@ -101,6 +99,8 @@ Now to confirm it worked properly, lets standardise our pre-standardised data ex
 ```{r}
 summary(scale(Covariate(workflow_standardised)))
 ```
+
+Everything is a match so we're good to go.
 
 <hr>
 
@@ -166,13 +166,17 @@ $$Y = b_0 + b_1*X_1 + b_2*X_2 + b_3(X_1*X_2)$$
 
 where $b_3$ is the interaction term between the variables $X_1$ and $X_2$. 
 
-Once we have decided to add an interaction effect into our model, we can select from three possible ways to implement it in our model: add all pairwise interactions, define set interactions between a select group of variables, or specify polynomial terms.
+It is important to note that decision tree based models like boosted regression trees and random forests consider interactions between variables implicitly so they don't require them to be defined *a priori* with a process module.
+
+Once we have decided to add an interaction effect into our model, we can select from three possible ways to implement it in our model: add all pairwise interactions, define set interactions between a select group of variables, or specify polynomial terms. 
 
 ### Pairwise interactions
 
 To implement all possible pairwise interactions in the model we write up the module with the `addInteraction` process module like this:
 
 ```{r Interaction_AllPairs, eval=FALSE}
+# All pairwise interactions
+
 process = addInteraction(which_covs = 'pairs')
 ```
 
@@ -183,19 +187,26 @@ Rather than a blanket application of interaction terms across our model, we migh
 +  To define the pairwise interaction between any two variables as a character vector:
 
 ```{r Interaction_Pair, eval=FALSE}
-process = addInteraction(which_covs = c("A", "B"))   # adds an interaction between A & B
+# Adds an interaction between A & B
+
+process = addInteraction(which_covs = c("A", "B"))   
 ```
 
 +  To define multiple pairwise interactions, but not *all* pairwise interactions, we make use of `R`'s `list()` function. We provide a list of interaction terms as character vectors like so:
 
 ```{r Interaction_MultPairs, eval=FALSE}
-process = addInteraction(which_covs = list(c("A","B"), c("A","C")))   # adds interactions between A & B and A & C, but not B & C
+# Adds interactions between A & B and A & C, but not B & C
+
+process = addInteraction(which_covs = list(c("A","B"), c("A","C")))   
 ```
 
 +  To define higher order interactions between more than two variables we just need to extend the length of our character vectors. This will define the highest order interaction term between all of the selected variables as well as all combinations of lower-order interaction terms.
 
 ```{r Interaction_Three-way, eval=FALSE}
-process = addInteraction(which_covs = c('A', 'B', 'C'))   # adds all two-way (e.g. A & B) interactions and a three-way interaction between A, B & C
+# Adds all two-way (e.g. A & B) interactions and a three-way
+# interaction between A, B & C
+
+process = addInteraction(which_covs = c('A', 'B', 'C')) 
 ```
 
 ### Interactions as polynomial terms
@@ -203,9 +214,19 @@ process = addInteraction(which_covs = c('A', 'B', 'C'))   # adds all two-way (e.
 The `addInteraction` method can also be used as an alternative to coding in polynomial terms. 
 
 ```{r eval=FALSE}
-process = addInteraction(which_covs = c('A', 'A'))   # leads to a quadratic polynomial
+# Adds a quadratic polynomial
 
-process = addInteraction(which_covs = c('A', 'A', 'A'))   # leads to a cubic, polynomial
+process = addInteraction(which_covs = c('A', 'A'))   
+
+# Adds a cubic polynomial
+
+process = addInteraction(which_covs = c('A', 'A', 'A'))
 ```
+
+<hr>
+
+## Conclusion
+
+Now that we have processed our data and it is ready for analysis we have two potential next steps. If we are using presence-only data we will need to generate background points for most modelling methods. There are several aspects of this to consider and we explore them in our [Background Points]() **LINK TO BE ADDED WHEN POSSIBLE** guide. If we have presence-absence data then we can proceed to selecting an appropriate modelling method, and we explore this decision in our [Choosing A Modelling Method](https://cdn.rawgit.com/zoonproject/zoontutorials/58522d20/docs/articles/Choosing_A_Modelling_Method.html) guide.
 
 <hr>
