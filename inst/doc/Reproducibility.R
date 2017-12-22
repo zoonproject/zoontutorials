@@ -13,10 +13,10 @@ example <- workflow(occurrence = SpOcc(species = "Ursus arctos",
                                         resolution = 10,
                                         layers = 1:19),
                     process = Chain(Clean,
-                                    Background(1000),            ### This chunk is evaluated and not
-                                    StandardiseCov,              ### shown/printed to screen
-                                    Crossvalidate(k = 5)),       ### Next chunk is not evaluated
-                    model = list(LogisticRegression,             ### But chunk code shown
+                                    Background(1000),            
+                                    StandardiseCov,              
+                                    Crossvalidate(k = 5)),       
+                    model = list(LogisticRegression,             
                                  MaxNet,
                                  RandomForest),
                     output = Chain(PrintMap,
