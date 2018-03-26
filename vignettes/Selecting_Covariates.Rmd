@@ -28,7 +28,7 @@ knitr::opts_chunk$set(message = FALSE,
 
 ## Introduction
 
-When we undertake a Species Distribution Model (SDM), a good first step is to explore our data to familiarise ourselves with its structure and limitations. We explore this topic in the [Data Exploration vignette](https://rawgit.com/zoonproject/zoontutorials/master/inst/doc/Selecting_Covariates.html). 
+When we undertake a Species Distribution Model (SDM), a good first step is to explore our data to familiarise ourselves with its structure and limitations. We explore this topic in the [Data Exploration vignette](Data_Exploration.html). 
 
 After exploring our data, and in conjunction with variable selection, if appropriate, we may want to implement various data processing steps into our `zoon` `workflow`. There are some generally agreed upon guidelines for this data processing, but it is also highly subjective and open to interpretation. This guide outlines a few suggested steps implemented in both base R as well as using `zoon`'s `output` and `process` modules for data processing. These include data cleaning, variable standardisation and transformation, and adding interaction terms (Figure 1).
 
@@ -227,6 +227,6 @@ process = addInteraction(which_covs = c('A', 'A', 'A'))
 
 ## Conclusion
 
-Now that we have processed our data and it is ready for analysis we have two potential next steps. If we are using presence-only data we will need to generate background points for most modelling methods. There are several aspects of this to consider and we explore them in our [Background Points]() **LINK TO BE ADDED WHEN POSSIBLE** guide. If we have presence-absence data then we can proceed to selecting an appropriate modelling method, and we explore this decision in our [Choosing A Modelling Method](https://cdn.rawgit.com/zoonproject/zoontutorials/58522d20/docs/articles/Choosing_A_Modelling_Method.html) guide.
+Now that we have processed our data and it is ready for analysis we have two potential next steps. If we are using presence-only data we will need to generate background points for most modelling methods. There are several aspects of this to consider and we explore them in our [Background Points](Background_Points.html) guide. If we have presence-absence data then we can proceed to selecting an appropriate modelling method, and we explore this decision in our [Choosing A Modelling Method](Choosing_A_Modelling_Method.html) guide.
 
 <hr>
