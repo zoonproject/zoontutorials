@@ -115,7 +115,7 @@ This approach is in contrast to significance testing approaches that focus on se
 
 
 
-Information criteria build on deviance measures by penalising models for additional covariates. That is, they select for accurate and *parimsoneous* models.
+Information criteria build on deviance measures by penalising models for additional covariates. That is, they select for accurate and *parsimoneous* models.
 
 ### Cross-validation
 
