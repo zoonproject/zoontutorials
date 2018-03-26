@@ -167,7 +167,7 @@ We don't always need to process our data, in those instances, we can use the `No
 
 ### Step 4. Model
 
-The fourth argument of `workflow()` is `model`; this is where we choose our modelling method. There are many modelling methods to choose from and each have their merits [@elith06]. To help you choose which model module is right for your data, we've written a ['Choosing A Model' guide](Choosing_A_Model.html).
+The fourth argument of `workflow()` is `model`; this is where we choose our modelling method. There are many modelling methods to choose from and each have their merits [@elith06]. To help you choose which model module is right for your data, we've written a ['Choosing A Modellling Method' guide](Choosing_A_Modelling_Method.html).
 
 For now, let's work with the common modelling method logistic regression using the module `LogisticRegression`. We'll keep our data and process modules the same:
 

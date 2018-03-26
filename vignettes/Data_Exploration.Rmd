@@ -156,6 +156,6 @@ Using base `R` instead of modules echoes the results of the modules we showed of
 
 ## Conclusion
 
-Data exploration is a crucial first step when performing a species distribution model analysis, but we are not yet ready to jump straight into fitting a model. Next we need to use the information we've gained from our exploration to select our covariates and prepare them for analysis. We explore this topic in the [Selecting and Preparing Covariates](https://rawgit.com/zoonproject/zoontutorials/master/docs/articles/Selecting_Covariates.html) guide.
+Data exploration is a crucial first step when performing a species distribution model analysis, but we are not yet ready to jump straight into fitting a model. Next we need to use the information we've gained from our exploration to select our covariates and prepare them for analysis. We explore this topic in the [Selecting and Preparing Covariates](Selecting_Covariates.html) guide.
 
 <hr>
